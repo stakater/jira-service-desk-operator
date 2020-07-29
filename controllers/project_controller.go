@@ -19,19 +19,21 @@ package controllers
 import (
 	"context"
 
-	"github.com/go-logr/logr"
+	log "github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
+	"github.com/stakater/jira-service-desk-operator/jiraservicedeskclient"
 )
 
 // ProjectReconciler reconciles a Project object
 type ProjectReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Scheme                *runtime.Scheme
+	JiraServiceDeskClient jiraservicedeskclient.Client
 }
 
 // +kubebuilder:rbac:groups=jiraservicedesk.stakater.com,resources=projects,verbs=get;list;watch;create;update;patch;delete
@@ -39,15 +41,53 @@ type ProjectReconciler struct {
 
 func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
-	_ = r.Log.WithValues("project", req.NamespacedName)
 
-	// your logic here
+	log.Info("Reconciling Project")
 
-	return ctrl.Result{}, nil
+	// Fetch the Project instance
+	instance := &jiraservicedeskv1alpha1.Project{}
+
+	err := r.Get(context.TODO(), req.NamespacedName, instance)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Request object not found, could have been deleted after reconcile request.
+			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
+			// Return and don't requeue
+			return r.handleDelete(req, instance)
+		}
+		// Error reading the object - requeue the request.
+		return ctrl.Result{}, err
+	}
+
+	// Check if the Project already exists
+	// 	if projectExists(instance.Spec.Name) {
+	// 		if actualObj != desiredObject {
+	// 			return r.handleUpdate(req, instance)
+	// 		} else {
+	// 			log.Info("Skipping update. No changes found")
+	// 		}
+	// 	} else {
+	// 		return r.handleCreate(req, instance)
+	// 	}
+
+	return r.handleCreate(req, instance)
+	// 	return ctrl.Result{}, nil
 }
 
 func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&jiraservicedeskv1alpha1.Project{}).
 		Complete(r)
+}
+
+func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	return ctrl.Result{Requeue: true}, nil
+}
+
+func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	return ctrl.Result{Requeue: true}, nil
+}
+
+func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	return ctrl.Result{Requeue: true}, nil
 }
