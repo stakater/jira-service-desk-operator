@@ -25,11 +25,61 @@ import (
 
 // ProjectSpec defines the desired state of Project
 type ProjectSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Project. Edit Project_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Name of the project
+	// +required
+	Name string `json:"name,omitempty"`
+
+	// The project key is used as the prefix of your project's issue keys
+	// +required
+	Key string `json:"key,omitempty"`
+
+	// The project type, which dictates the application-specific feature set
+	// +kubebuilder:validation:Enum=business;service_desk;software
+	// +required
+	ProjectTypeKey string `json:"projectTypeKey,omitempty"`
+
+	// A prebuilt configuration for a project
+	// +required
+	ProjectTemplateKey string `json:"projectTemplateKey,omitempty"`
+
+	// Description for project
+	// +required
+	Description string `json:"description,omitempty"`
+
+	// Task assignee type
+	// +kubebuilder:validation:Enum=PROJECT_LEAD;UNASSIGNED
+	// +required
+	AssigneeType string `json:"assigneeType,omitempty"`
+
+	// ID of project lead
+	// +kubebuilder:validation:MaxLength=128
+	// +required
+	LeadAccountId string `json:"leadAccountId,omitempty"`
+
+	// A link to information about this project, such as project documentation
+	// +optional
+	URL string `json:"url,omitempty"`
+
+	// An integer value for the project's avatar.
+	// +optional
+	AvatarId int `json:"avatarId,omitempty"`
+
+	// The ID of the issue security scheme for the project, which enables you to control who can and cannot view issues
+	// +optional
+	IssueSecurityScheme int `json:"issueSecurityScheme,omitempty"`
+
+	// The ID of the permission scheme for the project
+	// +optional
+	PermissionScheme int `json:"permissionScheme,omitempty"`
+
+	// The ID of the notification scheme for the project
+	// +optional
+	NotificationScheme int `json:"notificationScheme,omitempty"`
+
+	// The ID of the project's category
+	// +optional
+	CategoryId int `json:"categoryId,omitempty"`
 }
 
 // ProjectStatus defines the observed state of Project
