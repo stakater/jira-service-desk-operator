@@ -17,7 +17,7 @@ const (
 type Client interface {
 	// Methods for Project
 	GetProjectByName(name string) (Project, error)
-	GetProjectFromSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project
+	GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project
 	CreateProject(project Project) (Project, error)
 	UpdateProject(updatedProject Project) (Project, error)
 	ProjectEqual(oldProject Project, newProject Project) bool

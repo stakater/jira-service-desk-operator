@@ -67,21 +67,21 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// Check if the Project already exists
-	project, err := r.JiraServiceDeskClient.GetProjectByName(instance.Spec.Name)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-	// Project already exists
-	// TODO: This should be project != nil
-	if err != nil {
-		updatedProject := r.JiraServiceDeskClient.GetProjectFromSpec(instance.Spec)
-		if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
-			return r.handleUpdate(req, instance)
-		} else {
-			log.Info("Skipping update. No changes found")
-			return ctrl.Result{}, nil
-		}
-	}
+// 	project, err := r.JiraServiceDeskClient.GetProjectByName(instance.Spec.Name)
+// 	if err != nil {
+// 		return ctrl.Result{}, err
+// 	}
+// 	// Project already exists
+// 	// TODO: This should be project != nil
+// 	if err != nil {
+// 		updatedProject := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
+// 		if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
+// 			return r.handleUpdate(req, instance)
+// 		} else {
+// 			log.Info("Skipping update. No changes found")
+// 			return ctrl.Result{}, nil
+// 		}
+// 	}
 	// TODO: Think of use cases and add a default return ctrl.Result{}, nil
 	return r.handleCreate(req, instance)
 }
@@ -93,7 +93,7 @@ func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
-	project := r.JiraServiceDeskClient.GetProjectFromSpec(instance.Spec)
+	project := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
 	project, err := r.JiraServiceDeskClient.CreateProject(project)
 	if err != nil {
 		return ctrl.Result{}, err

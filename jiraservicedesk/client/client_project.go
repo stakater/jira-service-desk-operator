@@ -30,6 +30,6 @@ func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Proj
 	return false
 }
 
-func (c *jiraServiceDeskClient) GetProjectFromSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project {
+func (c *jiraServiceDeskClient) GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project {
 	return NewProject("test")
 }
