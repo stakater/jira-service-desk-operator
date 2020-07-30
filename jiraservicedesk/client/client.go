@@ -66,7 +66,7 @@ func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "golang httpClient")
-	req.SetBasicAuth(c.apiToken, "")
+	req.SetBasicAuth(c.email, c.apiToken)
 	return req, nil
 }
 
