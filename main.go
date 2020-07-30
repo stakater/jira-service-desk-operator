@@ -91,7 +91,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// TODO: initialize jiraservicedesk client here
+	// TODO: Will we initialize JSD Client for all controllers ?
 	if err = (&controllers.ProjectReconciler{
 		Client:                mgr.GetClient(),
 		Scheme:                mgr.GetScheme(),

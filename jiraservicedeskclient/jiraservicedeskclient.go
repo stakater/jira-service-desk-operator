@@ -1,6 +1,7 @@
 package jiraservicedeskclient
 
 import (
+	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	"net/http"
 )
 
@@ -15,6 +16,12 @@ var (
 )
 
 type Client interface {
+	// Methods for Project
+	GetProjectByName(name string) (Project, error)
+	GetProjectFromCR(spec jiraservicedeskv1alpha1.ProjectSpec) Project
+	CreateProject(name string) (Project, error)
+	UpdateProject(name string) (Project, error)
+	ProjectEqual(oldProject Project, newProject Project) bool
 }
 
 // Client wraps http client

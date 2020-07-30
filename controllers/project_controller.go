@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -27,6 +28,10 @@ import (
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	"github.com/stakater/jira-service-desk-operator/jiraservicedeskclient"
+)
+
+const (
+	defaultRequeueTime = 60 * time.Second
 )
 
 // ProjectReconciler reconciles a Project object
@@ -60,18 +65,24 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// Check if the Project already exists
-	// 	if projectExists(instance.Spec.Name) {
-	// 		if actualObj != desiredObject {
-	// 			return r.handleUpdate(req, instance)
-	// 		} else {
-	// 			log.Info("Skipping update. No changes found")
-	// 		}
-	// 	} else {
-	// 		return r.handleCreate(req, instance)
-	// 	}
+	project, err := r.JiraServiceDeskClient.GetProjectByName(instance.Spec.Name)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	// Project already exists
+	if project != nil {
+		updatedProject := r.JiraServiceDeskClient.GetProjectFromCR(instance.Spec)
+		if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
+			return r.handleUpdate(req, instance)
+		} else {
+			log.Info("Skipping update. No changes found")
+			return ctrl.Result{}, nil
+		}
+	} else {
+		return r.handleCreate(req, instance)
+	}
 
-	return r.handleCreate(req, instance)
-	// 	return ctrl.Result{}, nil
+	return ctrl.Result{}, nil
 }
 
 func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -81,13 +92,13 @@ func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
 }
 
 func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{}, nil
 }
 
 func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
-	return ctrl.Result{Requeue: true}, nil
+	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
 }
