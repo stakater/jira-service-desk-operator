@@ -16,6 +16,11 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
+# GOLANGCI_LINT env
+GOLANGCI_LINT = _output/tools/golangci-lint
+GOLANGCI_LINT_CACHE = $(PWD)/_output/golangci-lint-cache
+GOLANGCI_LINT_VERSION = v1.24
+
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -34,7 +39,7 @@ manager: generate fmt vet
 	go build -o bin/manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
-run: generate fmt vet manifests
+run: generate fmt vet manifests install
 	go run ./main.go
 
 # Install CRDs into a cluster
@@ -115,3 +120,14 @@ bundle: manifests
 # Build the bundle image.
 bundle-build:
 	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
+
+verify-fmt:
+	./hack/verify-gofmt.sh
+
+$(GOLANGCI_LINT):
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(dir $@) v1.24.0
+
+verify-golangci-lint: $(GOLANGCI_LINT)
+	GOLANGCI_LINT_CACHE=$(GOLANGCI_LINT_CACHE) $(GOLANGCI_LINT) run --timeout=300s ./api/... ./controllers/... ./test/...
+
+verify: verify-fmt verify-golangci-lint

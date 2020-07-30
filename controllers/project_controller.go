@@ -18,20 +18,27 @@ package controllers
 
 import (
 	"context"
+	"time"
 
-	"github.com/go-logr/logr"
+	log "github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
+	"github.com/stakater/jira-service-desk-operator/jiraservicedeskclient"
+)
+
+const (
+	defaultRequeueTime = 60 * time.Second
 )
 
 // ProjectReconciler reconciles a Project object
 type ProjectReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Scheme                *runtime.Scheme
+	JiraServiceDeskClient jiraservicedeskclient.Client
 }
 
 // +kubebuilder:rbac:groups=jiraservicedesk.stakater.com,resources=projects,verbs=get;list;watch;create;update;patch;delete
@@ -39,15 +46,58 @@ type ProjectReconciler struct {
 
 func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
-	_ = r.Log.WithValues("project", req.NamespacedName)
 
-	// your logic here
+	log.Info("Reconciling Project")
 
-	return ctrl.Result{}, nil
+	// Fetch the Project instance
+	instance := &jiraservicedeskv1alpha1.Project{}
+
+	err := r.Get(context.TODO(), req.NamespacedName, instance)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			// Request object not found, could have been deleted after reconcile request.
+			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
+			// Return and don't requeue
+			return r.handleDelete(req, instance)
+		}
+		// Error reading the object - requeue the request.
+		return ctrl.Result{}, err
+	}
+
+	// Check if the Project already exists
+	project, err := r.JiraServiceDeskClient.GetProjectByName(instance.Spec.Name)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	// Project already exists
+	// TODO: This should be project != nil
+	if err != nil {
+		updatedProject := r.JiraServiceDeskClient.GetProjectFromCR(instance.Spec)
+		if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
+			return r.handleUpdate(req, instance)
+		} else {
+			log.Info("Skipping update. No changes found")
+			return ctrl.Result{}, nil
+		}
+	}
+	// TODO: Think of use cases and add a default return ctrl.Result{}, nil
+	return r.handleCreate(req, instance)
 }
 
 func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&jiraservicedeskv1alpha1.Project{}).
 		Complete(r)
+}
+
+func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
+}
+
+func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	return ctrl.Result{}, nil
+}
+
+func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
 }
