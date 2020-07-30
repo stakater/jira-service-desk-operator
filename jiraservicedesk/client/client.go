@@ -16,7 +16,7 @@ const (
 
 type Client interface {
 	// Methods for Project
-	GetProjectByName(name string) (Project, error)
+	GetProjectByKey(key string) (Project, error)
 	GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project
 	CreateProject(project Project) (Project, error)
 	UpdateProject(updatedProject Project) (Project, error)
@@ -27,14 +27,16 @@ type Client interface {
 type jiraServiceDeskClient struct {
 	apiToken   string
 	baseURL    string
+	email      string
 	httpClient *http.Client
 }
 
 // NewClient creates an API client
-func NewClient(apiToken string, baseURL string) Client {
+func NewClient(apiToken string, baseURL string, email string) Client {
 	return &jiraServiceDeskClient{
 		apiToken:   apiToken,
 		baseURL:    baseURL,
+		email:      email,
 		httpClient: http.DefaultClient,
 	}
 }

@@ -93,7 +93,7 @@ func main() {
 	}
 
 	// Load config for controller from secret
-	apiKey, apiBaseUrl, err := jiraservicedeskconfig.LoadControllerConfig(mgr.GetAPIReader())
+	controllerConfig, err := jiraservicedeskconfig.LoadControllerConfig(mgr.GetAPIReader())
 	if err != nil {
 		setupLog.Error(err, "unable to load controller config")
 		os.Exit(1)
@@ -103,7 +103,7 @@ func main() {
 		Client:                mgr.GetClient(),
 		Scheme:                mgr.GetScheme(),
 		Log:                   ctrl.Log.WithName("controllers").WithName("Project"),
-		JiraServiceDeskClient: jiraservicedeskclient.NewClient(apiKey, apiBaseUrl),
+		JiraServiceDeskClient: jiraservicedeskclient.NewClient(controllerConfig.ApiToken, controllerConfig.ApiBaseUrl, controllerConfig.Email),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Project")
 		os.Exit(1)

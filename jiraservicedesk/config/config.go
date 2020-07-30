@@ -14,11 +14,18 @@ const (
 	JiraServiceDeskDefaultSecretName   string = "jira-service-desk-config"
 	JiraServiceDeskAPITokenSecretKey   string = "JIRA_SERVICE_DESK_API_TOKEN"
 	JiraServiceDeskAPIBaseURLSecretKey string = "JIRA_SERVICE_DESK_API_BASE_URL"
+	JiraServiceDeskEmailSecretKey      string = "JIRA_SERVICE_DESK_EMAIL"
 )
 
 var (
 	JiraServiceDeskSecretName = getConfigSecretName()
 )
+
+type ControllerConfig struct {
+	ApiToken   string
+	ApiBaseUrl string
+	Email      string
+}
 
 func getConfigSecretName() string {
 	configSecretName, _ := os.LookupEnv("CONFIG_SECRET_NAME")
@@ -29,7 +36,7 @@ func getConfigSecretName() string {
 	return configSecretName
 }
 
-func LoadControllerConfig(apiReader client.Reader) (string, string, error) {
+func LoadControllerConfig(apiReader client.Reader) (ControllerConfig, error) {
 	log.Info("Loading Configuration from secret")
 
 	// Retrieve operator namespace
@@ -55,5 +62,12 @@ func LoadControllerConfig(apiReader client.Reader) (string, string, error) {
 		log.Error(err, "Unable to fetch apiBaseUrl from secret")
 	}
 
-	return apiToken, apiBaseUrl, err
+	email, err := util.LoadSecretData(apiReader, JiraServiceDeskSecretName, operatorNamespace, JiraServiceDeskEmailSecretKey)
+	if err != nil {
+		log.Error(err, "Unable to fetch email from secret")
+	}
+
+	controllerConfig := ControllerConfig{ApiToken: apiToken, ApiBaseUrl: apiBaseUrl, Email: email}
+
+	return controllerConfig, err
 }

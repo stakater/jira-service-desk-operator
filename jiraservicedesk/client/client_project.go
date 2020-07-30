@@ -14,7 +14,7 @@ func NewProject(name string) Project {
 	}
 }
 
-func (c *jiraServiceDeskClient) GetProjectByName(name string) (Project, error) {
+func (c *jiraServiceDeskClient) GetProjectByKey(name string) (Project, error) {
 	return NewProject("test"), nil
 }
 
