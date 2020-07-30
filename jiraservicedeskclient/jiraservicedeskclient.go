@@ -19,8 +19,8 @@ type Client interface {
 	// Methods for Project
 	GetProjectByName(name string) (Project, error)
 	GetProjectFromCR(spec jiraservicedeskv1alpha1.ProjectSpec) Project
-	CreateProject(name string) (Project, error)
-	UpdateProject(name string) (Project, error)
+	CreateProject(spec jiraservicedeskv1alpha1.ProjectSpec) (Project, error)
+	UpdateProject(updatedProject Project) (Project, error)
 	ProjectEqual(oldProject Project, newProject Project) bool
 }
 
