@@ -92,13 +92,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Load config for controller from secret
 	apiKey, apiBaseUrl, err := jiraservicedeskconfig.LoadControllerConfig(mgr.GetAPIReader())
 	if err != nil {
 		setupLog.Error(err, "unable to load controller config")
 		os.Exit(1)
 	}
 
-	// TODO: Will we initialize JSD Client for all controllers ?
 	if err = (&controllers.ProjectReconciler{
 		Client:                mgr.GetClient(),
 		Scheme:                mgr.GetScheme(),
