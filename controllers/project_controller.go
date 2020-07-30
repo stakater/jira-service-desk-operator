@@ -20,7 +20,7 @@ import (
 	"context"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,6 +38,7 @@ const (
 type ProjectReconciler struct {
 	client.Client
 	Scheme                *runtime.Scheme
+	Log                   logr.Logger
 	JiraServiceDeskClient jiraservicedeskclient.Client
 }
 
@@ -46,6 +47,7 @@ type ProjectReconciler struct {
 
 func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
+	log := r.Log.WithValues("project", req.NamespacedName)
 
 	log.Info("Reconciling Project")
 
