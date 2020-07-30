@@ -74,7 +74,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// Project already exists
 	// TODO: This should be project != nil
 	if err != nil {
-		updatedProject := r.JiraServiceDeskClient.GetProjectFromCR(instance.Spec)
+		updatedProject := r.JiraServiceDeskClient.GetProjectFromSpec(instance.Spec)
 		if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
 			return r.handleUpdate(req, instance)
 		} else {
@@ -93,6 +93,11 @@ func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	project := r.JiraServiceDeskClient.GetProjectFromSpec(instance.Spec)
+	project, err := r.JiraServiceDeskClient.CreateProject(project)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
 }
 

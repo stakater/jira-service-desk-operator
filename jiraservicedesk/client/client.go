@@ -1,8 +1,13 @@
 package client
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
+	"io"
 	"net/http"
+	"net/url"
 )
 
 const (
@@ -12,8 +17,8 @@ const (
 type Client interface {
 	// Methods for Project
 	GetProjectByName(name string) (Project, error)
-	GetProjectFromCR(spec jiraservicedeskv1alpha1.ProjectSpec) Project
-	CreateProject(spec jiraservicedeskv1alpha1.ProjectSpec) (Project, error)
+	GetProjectFromSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project
+	CreateProject(project Project) (Project, error)
 	UpdateProject(updatedProject Project) (Project, error)
 	ProjectEqual(oldProject Project, newProject Project) bool
 }
@@ -32,4 +37,42 @@ func NewClient(apiToken string, baseURL string) Client {
 		baseURL:    baseURL,
 		httpClient: http.DefaultClient,
 	}
+}
+
+func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}) (*http.Request, error) {
+	endpoint := c.baseURL + path
+	url, err := url.Parse(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	var buf io.ReadWriter
+
+	if body != nil {
+		buf = new(bytes.Buffer)
+		err := json.NewEncoder(buf).Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+	req, err := http.NewRequest(method, url.String(), buf)
+	if err != nil {
+		return nil, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", "golang httpClient")
+	req.SetBasicAuth(c.apiToken, "")
+	return req, nil
+}
+
+func (c *jiraServiceDeskClient) do(req *http.Request) (*http.Response, error) {
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return resp, fmt.Errorf("Error calling the API endpoint: %v", err)
+	}
+
+	return resp, nil
 }

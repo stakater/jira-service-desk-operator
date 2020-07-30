@@ -18,7 +18,7 @@ func (c *jiraServiceDeskClient) GetProjectByName(name string) (Project, error) {
 	return NewProject("test"), nil
 }
 
-func (c *jiraServiceDeskClient) CreateProject(spec jiraservicedeskv1alpha1.ProjectSpec) (Project, error) {
+func (c *jiraServiceDeskClient) CreateProject(project Project) (Project, error) {
 	return NewProject("test"), nil
 }
 
@@ -30,6 +30,6 @@ func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Proj
 	return false
 }
 
-func (c *jiraServiceDeskClient) GetProjectFromCR(spec jiraservicedeskv1alpha1.ProjectSpec) Project {
+func (c *jiraServiceDeskClient) GetProjectFromSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project {
 	return NewProject("test")
 }
