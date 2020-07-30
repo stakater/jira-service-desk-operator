@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
-	"github.com/stakater/jira-service-desk-operator/jiraservicedeskclient"
+	jiraservicedeskclient "github.com/stakater/jira-service-desk-operator/jiraservicedesk/client"
 )
 
 const (

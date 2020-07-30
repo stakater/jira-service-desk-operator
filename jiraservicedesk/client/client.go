@@ -1,4 +1,4 @@
-package jiraservicedeskclient
+package client
 
 import (
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
@@ -7,12 +7,6 @@ import (
 
 const (
 	EndpointApiVersion3Project = "/rest/api/3/project"
-)
-
-// TODO: Remove this code and populate these values from secrets
-var (
-	apiBaseUrl string
-	apiToken   string
 )
 
 type Client interface {
