@@ -41,4 +41,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          - name: CONFIG_SECRET_NAME
+            value: jira-service-desk-config
       terminationGracePeriodSeconds: 10
