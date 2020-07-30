@@ -20,14 +20,14 @@ import (
 	"context"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
-	"github.com/stakater/jira-service-desk-operator/jiraservicedeskclient"
+	jiraservicedeskclient "github.com/stakater/jira-service-desk-operator/jiraservicedesk/client"
 )
 
 const (
@@ -38,6 +38,7 @@ const (
 type ProjectReconciler struct {
 	client.Client
 	Scheme                *runtime.Scheme
+	Log                   logr.Logger
 	JiraServiceDeskClient jiraservicedeskclient.Client
 }
 
@@ -46,6 +47,7 @@ type ProjectReconciler struct {
 
 func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
+	log := r.Log.WithValues("project", req.NamespacedName)
 
 	log.Info("Reconciling Project")
 
@@ -65,23 +67,23 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// Check if the Project already exists
-	project, err := r.JiraServiceDeskClient.GetProjectByName(instance.Spec.Name)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-	// Project already exists
-	// TODO: This should be project != nil
-	if err != nil {
-		updatedProject := r.JiraServiceDeskClient.GetProjectFromCR(instance.Spec)
-		if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
-			return r.handleUpdate(req, instance)
-		} else {
-			log.Info("Skipping update. No changes found")
-			return ctrl.Result{}, nil
-		}
-	}
+	// 	project, err := r.JiraServiceDeskClient.GetProjectByKey(instance.Spec.Key)
+	// 	if err != nil {
+	// 		return ctrl.Result{}, err
+	// 	}
+	// 	// Project already exists
+	// 	// TODO: This should be project != nil
+	// 	if err != nil {
+	// 		updatedProject := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
+	// 		if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
+	// 			return r.handleUpdate(req, instance)
+	// 		} else {
+	// 			log.Info("Skipping update. No changes found")
+	// 			return ctrl.Result{}, nil
+	// 		}
+	// 	}
 	// TODO: Think of use cases and add a default return ctrl.Result{}, nil
-	return r.handleCreate(req, instance)
+	return r.handleCreate(req, instance, log)
 }
 
 func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -90,7 +92,18 @@ func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project, log logr.Logger) (ctrl.Result, error) {
+
+	log.Info("Creating Jira Service Desk Project: " + instance.Spec.Name)
+
+	project := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
+	err := r.JiraServiceDeskClient.CreateProject(project)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
+
 	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
 }
 

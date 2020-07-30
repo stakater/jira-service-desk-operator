@@ -32,7 +32,8 @@ import (
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	"github.com/stakater/jira-service-desk-operator/controllers"
-	"github.com/stakater/jira-service-desk-operator/jiraservicedeskclient"
+	jiraservicedeskclient "github.com/stakater/jira-service-desk-operator/jiraservicedesk/client"
+	jiraservicedeskconfig "github.com/stakater/jira-service-desk-operator/jiraservicedesk/config"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -91,11 +92,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	// TODO: Will we initialize JSD Client for all controllers ?
+	// Load config for controller from secret
+	controllerConfig, err := jiraservicedeskconfig.LoadControllerConfig(mgr.GetAPIReader())
+	if err != nil {
+		setupLog.Error(err, "unable to load controller config")
+		os.Exit(1)
+	}
+
 	if err = (&controllers.ProjectReconciler{
 		Client:                mgr.GetClient(),
 		Scheme:                mgr.GetScheme(),
-		JiraServiceDeskClient: jiraservicedeskclient.NewClient("apiToken", "baseURL"),
+		Log:                   ctrl.Log.WithName("controllers").WithName("Project"),
+		JiraServiceDeskClient: jiraservicedeskclient.NewClient(controllerConfig.ApiToken, controllerConfig.ApiBaseUrl, controllerConfig.Email),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Project")
 		os.Exit(1)
