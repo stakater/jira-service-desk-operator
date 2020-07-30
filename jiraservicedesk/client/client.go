@@ -8,7 +8,11 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
+
+var Log = logf.Log.WithName("jiraServiceDeskClient")
 
 const (
 	EndpointApiVersion3Project = "/rest/api/3/project"
@@ -18,7 +22,7 @@ type Client interface {
 	// Methods for Project
 	GetProjectByKey(key string) (Project, error)
 	GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project
-	CreateProject(project Project) (Project, error)
+	CreateProject(project Project) error
 	UpdateProject(updatedProject Project) (Project, error)
 	ProjectEqual(oldProject Project, newProject Project) bool
 }

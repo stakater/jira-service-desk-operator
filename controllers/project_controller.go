@@ -83,7 +83,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// 		}
 	// 	}
 	// TODO: Think of use cases and add a default return ctrl.Result{}, nil
-	return r.handleCreate(req, instance)
+	return r.handleCreate(req, instance, log)
 }
 
 func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -92,12 +92,18 @@ func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project, log logr.Logger) (ctrl.Result, error) {
+
+	log.Info("Creating Jira Service Desk Project: " + instance.Spec.Name)
+
 	project := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
-	project, err := r.JiraServiceDeskClient.CreateProject(project)
+	err := r.JiraServiceDeskClient.CreateProject(project)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
+	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
+
 	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
 }
 
