@@ -67,23 +67,25 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// Check if the Project already exists
-	// 	project, err := r.JiraServiceDeskClient.GetProjectByKey(instance.Spec.Key)
-	// 	if err != nil {
-	// 		return ctrl.Result{}, err
-	// 	}
-	// 	// Project already exists
-	// 	// TODO: This should be project != nil
-	// 	if err != nil {
-	// 		updatedProject := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
-	// 		if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
-	// 			return r.handleUpdate(req, instance)
-	// 		} else {
-	// 			log.Info("Skipping update. No changes found")
-	// 			return ctrl.Result{}, nil
-	// 		}
-	// 	}
-	// TODO: Think of use cases and add a default return ctrl.Result{}, nil
-	return r.handleCreate(req, instance, log)
+	if len(instance.Status.ID) > 0 {
+		project, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		// Project already exists
+		if len(project.Id) > 0 {
+			updatedProject := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
+			// Compare retrieved project with current spec
+			if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
+				// Update if there are changes in the declared spec
+				return r.handleUpdate(req, instance)
+			} else {
+				log.Info("Skipping update. No changes found")
+				return ctrl.Result{}, nil
+			}
+		}
+	}
+	return r.handleCreate(req, instance)
 }
 
 func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -92,13 +94,22 @@ func (r *ProjectReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project, log logr.Logger) (ctrl.Result, error) {
+func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	log := r.Log.WithValues("project", req.NamespacedName)
 
 	log.Info("Creating Jira Service Desk Project: " + instance.Spec.Name)
 
 	project := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
-	err := r.JiraServiceDeskClient.CreateProject(project)
+	projectId, err := r.JiraServiceDeskClient.CreateProject(project)
 	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	instance.Status.ID = projectId
+
+	err = r.Status().Update(context.Background(), instance)
+	if err != nil {
+		log.Error(err, "Failed to update status of Project")
 		return ctrl.Result{}, err
 	}
 
@@ -108,9 +119,22 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 }
 
 func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	log := r.Log.WithValues("project", req.NamespacedName)
+
+	log.Info("Deleting Jira Service Desk Project: " + instance.Spec.Name)
+
+	if instance == nil {
+		// Instance not found, nothing to do
+		return ctrl.Result{}, nil
+	}
+
 	return ctrl.Result{}, nil
 }
 
 func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+	log := r.Log.WithValues("project", req.NamespacedName)
+
+	log.Info("Updating Jira Service Desk Project: " + instance.Spec.Name)
+
 	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
 }

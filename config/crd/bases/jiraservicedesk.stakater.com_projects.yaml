@@ -90,6 +90,12 @@ spec:
           type: object
         status:
           description: ProjectStatus defines the observed state of Project
+          properties:
+            id:
+              description: Jira service desk project ID
+              type: string
+          required:
+          - id
           type: object
       type: object
   version: v1alpha1

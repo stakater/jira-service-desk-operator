@@ -84,8 +84,8 @@ type ProjectSpec struct {
 
 // ProjectStatus defines the observed state of Project
 type ProjectStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Jira service desk project ID
+	ID string `json:"id"`
 }
 
 // +kubebuilder:object:root=true
