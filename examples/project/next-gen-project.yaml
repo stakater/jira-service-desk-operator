@@ -1,0 +1,14 @@
+apiVersion: jiraservicedesk.stakater.com/v1alpha1
+kind: Project
+metadata:
+  name: stakater
+spec:
+  name: stakater
+  key: STK
+  projectTypeKey: service_desk
+  projectTemplateKey: com.atlassian.servicedesk:next-gen-it-service-desk
+  description: "Sample project for jira-service-desk-operator"
+  assigneeType: PROJECT_LEAD
+  leadAccountId: 5ebfbc3ead226b0ba46c3590
+  url: https://stakater.com
+

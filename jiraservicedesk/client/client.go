@@ -14,15 +14,11 @@ import (
 
 var Log = logf.Log.WithName("jiraServiceDeskClient")
 
-const (
-	EndpointApiVersion3Project = "/rest/api/3/project"
-)
-
 type Client interface {
 	// Methods for Project
-	GetProjectByKey(key string) (Project, error)
+	GetProjectById(id string) (Project, error)
 	GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project
-	CreateProject(project Project) error
+	CreateProject(project Project) (string, error)
 	UpdateProject(updatedProject Project) (Project, error)
 	ProjectEqual(oldProject Project, newProject Project) bool
 }
