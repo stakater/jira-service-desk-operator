@@ -1,0 +1,5 @@
+channels:
+- currentCSV: jira-service-desk-operator.v0.0.1
+  name: alpha
+defaultChannel: alpha
+packageName: jira-service-desk-operator

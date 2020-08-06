@@ -1,0 +1,103 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: projects.jiraservicedesk.stakater.com
+spec:
+  group: jiraservicedesk.stakater.com
+  names:
+    kind: Project
+    listKind: ProjectList
+    plural: projects
+    singular: project
+  scope: Cluster
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: Project is the Schema for the projects API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: ProjectSpec defines the desired state of Project
+          properties:
+            assigneeType:
+              description: Task assignee type
+              enum:
+              - PROJECT_LEAD
+              - UNASSIGNED
+              type: string
+            avatarId:
+              description: An integer value for the project's avatar.
+              type: integer
+            categoryId:
+              description: The ID of the project's category
+              type: integer
+            description:
+              description: Description for project
+              type: string
+            issueSecurityScheme:
+              description: The ID of the issue security scheme for the project, which
+                enables you to control who can and cannot view issues
+              type: integer
+            key:
+              description: The project key is used as the prefix of your project's
+                issue keys
+              type: string
+            leadAccountId:
+              description: ID of project lead
+              maxLength: 128
+              type: string
+            name:
+              description: Name of the project
+              type: string
+            notificationScheme:
+              description: The ID of the notification scheme for the project
+              type: integer
+            permissionScheme:
+              description: The ID of the permission scheme for the project
+              type: integer
+            projectTemplateKey:
+              description: A prebuilt configuration for a project
+              type: string
+            projectTypeKey:
+              description: The project type, which dictates the application-specific
+                feature set
+              enum:
+              - business
+              - service_desk
+              - software
+              type: string
+            url:
+              description: A link to information about this project, such as project
+                documentation
+              type: string
+          type: object
+        status:
+          description: ProjectStatus defines the observed state of Project
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
