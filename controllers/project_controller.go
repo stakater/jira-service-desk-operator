@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -32,8 +31,9 @@ import (
 )
 
 const (
-	defaultRequeueTime        = 60 * time.Second
-	ProjectFinalizer   string = "jiraservicedesk.stakater.com/project"
+	// TODO: Check if this is required in our case
+	// 	defaultRequeueTime        = 60 * time.Second
+	ProjectFinalizer string = "jiraservicedesk.stakater.com/project"
 )
 
 // ProjectReconciler reconciles a Project object
@@ -142,12 +142,12 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
 	log := r.Log.WithValues("project", req.NamespacedName)
 
-	log.Info("Deleting Jira Service Desk Project: " + instance.Spec.Name)
-
 	if instance == nil {
 		// Instance not found, nothing to do
 		return util.DoNotRequeue()
 	}
+
+	log.Info("Deleting Jira Service Desk Project: " + instance.Spec.Name)
 
 	// Delete project from JSD
 	err := r.JiraServiceDeskClient.DeleteProject(instance.Status.ID)
