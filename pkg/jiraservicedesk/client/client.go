@@ -19,6 +19,7 @@ type Client interface {
 	GetProjectById(id string) (Project, error)
 	GetProjectFromProjectCR(project *jiraservicedeskv1alpha1.Project) Project
 	CreateProject(project Project) (string, error)
+	DeleteProject(id string) error
 	UpdateProject(updatedProject Project) error
 	ProjectEqual(oldProject Project, newProject Project) bool
 }

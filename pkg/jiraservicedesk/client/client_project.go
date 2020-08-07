@@ -118,6 +118,24 @@ func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project) error {
 	return nil
 }
 
+func (c *jiraServiceDeskClient) DeleteProject(id string) error {
+	request, err := c.newRequest("DELETE", EndpointApiVersion3Project+"/"+id, nil)
+	if err != nil {
+		return err
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != 204 {
+		return errors.New("Rest request to delete Project failed with status: " + strconv.Itoa(response.StatusCode))
+	}
+
+	return err
+}
+
 func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Project) bool {
 	// The fields AvatarId, IssueSecurityScheme, NotificationScheme, PermissionScheme, CategoryId are not retrieved
 	// through get project REST API call so they cannot be used in project comparison
