@@ -54,16 +54,16 @@ var _ webhook.Validator = &Project{}
 func (r *Project) ValidateCreate() error {
 	projectlog.Info("validate create", "name", r.Name)
 
-	// TODO(user): fill in your validation logic upon object creation.
-	return nil
+	_, err := r.IsValid()
+	return err
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *Project) ValidateUpdate(old runtime.Object) error {
 	projectlog.Info("validate update", "name", r.Name)
 
-	// TODO(user): fill in your validation logic upon object update.
-	return nil
+	_, err := r.IsValidUpdate()
+	return err
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type

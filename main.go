@@ -108,9 +108,12 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Project")
 		os.Exit(1)
 	}
-	if err = (&jiraservicedeskv1alpha1.Project{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "Project")
-		os.Exit(1)
+
+	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+		if err = (&jiraservicedeskv1alpha1.Project{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Project")
+			os.Exit(1)
+		}
 	}
 	// +kubebuilder:scaffold:builder
 

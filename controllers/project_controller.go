@@ -134,6 +134,10 @@ func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservice
 
 	log.Info("Updating Jira Service Desk Project: " + instance.Spec.Name)
 
+	if ok, err := instance.IsValidUpdate(); !ok {
+		return util.ManageError(r.Client, instance, err)
+	}
+
 	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
 
 	err := r.JiraServiceDeskClient.UpdateProject(project)
