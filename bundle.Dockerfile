@@ -12,3 +12,4 @@ LABEL operators.operatorframework.io.metrics.mediatype.v1=metrics+v1
 
 COPY bundle/manifests /manifests/
 COPY bundle/metadata /metadata/
+COPY bundle/tests/scorecard /tests/scorecard/

@@ -27,7 +27,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
-	jiraservicedeskclient "github.com/stakater/jira-service-desk-operator/jiraservicedesk/client"
+	jiraservicedeskclient "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
+	"github.com/stakater/jira-service-desk-operator/pkg/util"
 )
 
 const (
@@ -63,14 +64,19 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			return r.handleDelete(req, instance)
 		}
 		// Error reading the object - requeue the request.
-		return ctrl.Result{}, err
+		return util.RequeueWithError(err)
+	}
+
+	// Validate Custom Resource
+	if ok, err := instance.IsValid(); !ok {
+		return util.ManageError(r.Client, instance, err)
 	}
 
 	// Check if the Project already exists
 	if len(instance.Status.ID) > 0 {
 		project, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
 		if err != nil {
-			return ctrl.Result{}, err
+			return util.ManageError(r.Client, instance, err)
 		}
 		// Project already exists
 		if len(project.Id) > 0 {
@@ -81,7 +87,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				return r.handleUpdate(req, instance)
 			} else {
 				log.Info("Skipping update. No changes found")
-				return ctrl.Result{}, nil
+				return util.DoNotRequeue()
 			}
 		}
 	}
@@ -102,7 +108,7 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 	project := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
 	projectId, err := r.JiraServiceDeskClient.CreateProject(project)
 	if err != nil {
-		return ctrl.Result{}, err
+		return util.ManageError(r.Client, instance, err)
 	}
 
 	instance.Status.ID = projectId
@@ -110,12 +116,12 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 	err = r.Status().Update(context.Background(), instance)
 	if err != nil {
 		log.Error(err, "Failed to update status of Project")
-		return ctrl.Result{}, err
+		return util.RequeueWithError(err)
 	}
 
 	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
 
-	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
+	return util.RequeueAfter(defaultRequeueTime)
 }
 
 func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
@@ -125,10 +131,10 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 
 	if instance == nil {
 		// Instance not found, nothing to do
-		return ctrl.Result{}, nil
+		return util.DoNotRequeue()
 	}
 
-	return ctrl.Result{}, nil
+	return util.DoNotRequeue()
 }
 
 func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
@@ -136,5 +142,5 @@ func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservice
 
 	log.Info("Updating Jira Service Desk Project: " + instance.Spec.Name)
 
-	return ctrl.Result{RequeueAfter: defaultRequeueTime}, nil
+	return util.RequeueAfter(defaultRequeueTime)
 }
