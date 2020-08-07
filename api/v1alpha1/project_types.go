@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/operator-framework/operator-sdk/pkg/status"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -86,6 +87,9 @@ type ProjectSpec struct {
 type ProjectStatus struct {
 	// Jira service desk project ID
 	ID string `json:"id"`
+
+	// Status conditions
+	Conditions status.Conditions `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -112,4 +116,22 @@ type ProjectList struct {
 
 func init() {
 	SchemeBuilder.Register(&Project{}, &ProjectList{})
+}
+
+func (project *Project) GetReconcileStatus() status.Conditions {
+	return project.Status.Conditions
+}
+
+func (project *Project) SetReconcileStatus(reconcileStatus status.Conditions) {
+	project.Status.Conditions = reconcileStatus
+}
+
+func (project *Project) IsValid() (bool, error) {
+	// Add logic for additional validation here
+	return true, nil
+}
+
+func (project *Project) ValidateForUpdate() (bool, error) {
+	// Add logic for additional validation here
+	return true, nil
 }
