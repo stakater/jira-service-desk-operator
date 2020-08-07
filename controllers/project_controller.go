@@ -32,7 +32,8 @@ import (
 )
 
 const (
-	defaultRequeueTime = 60 * time.Second
+	defaultRequeueTime        = 60 * time.Second
+	ProjectFinalizer   string = "jiraservicedesk.stakater.com/project"
 )
 
 // ProjectReconciler reconciles a Project object
@@ -61,7 +62,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
-			return r.handleDelete(req, instance)
+			return util.DoNotRequeue()
 		}
 		// Error reading the object - requeue the request.
 		return util.RequeueWithError(err)
@@ -70,6 +71,24 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// Validate Custom Resource
 	if ok, err := instance.IsValid(); !ok {
 		return util.ManageError(r.Client, instance, err)
+	}
+
+	// Resource is marked for deletion
+	if instance.DeletionTimestamp != nil {
+		if util.HasFinalizer(instance, ProjectFinalizer) {
+			return r.handleDelete(req, instance)
+		}
+		// Finalizer doesn't exist so clean up is already done
+		return util.DoNotRequeue()
+	}
+
+	// Add finalizer if it doesn't exist
+	if !util.HasFinalizer(instance, ProjectFinalizer) {
+		util.AddFinalizer(instance, ProjectFinalizer)
+		err := r.Client.Update(context.TODO(), instance)
+		if err != nil {
+			return util.ManageError(r.Client, instance, err)
+		}
 	}
 
 	// Check if the Project already exists
@@ -124,6 +143,21 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	if instance == nil {
 		// Instance not found, nothing to do
 		return util.DoNotRequeue()
+	}
+
+	// Delete project from JSD
+	err := r.JiraServiceDeskClient.DeleteProject(instance.Status.ID)
+	if err != nil {
+		return util.ManageError(r.Client, instance, err)
+	}
+
+	// Delete finalizer
+	util.DeleteFinalizer(instance, ProjectFinalizer)
+
+	// Update instance
+	err = r.Client.Update(context.TODO(), instance)
+	if err != nil {
+		return util.ManageError(r.Client, instance, err)
 	}
 
 	return util.DoNotRequeue()
