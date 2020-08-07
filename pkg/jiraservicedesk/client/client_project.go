@@ -130,7 +130,7 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 	}
 
 	if response.StatusCode != 204 {
-		return errors.New("Rest request to delete Project failed with status" + strconv.Itoa(response.StatusCode))
+		return errors.New("Rest request to delete Project failed with status: " + strconv.Itoa(response.StatusCode))
 	}
 
 	return err
