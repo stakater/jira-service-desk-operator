@@ -17,9 +17,9 @@ var Log = logf.Log.WithName("jiraServiceDeskClient")
 type Client interface {
 	// Methods for Project
 	GetProjectById(id string) (Project, error)
-	GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project
+	GetProjectFromProjectCR(project *jiraservicedeskv1alpha1.Project) Project
 	CreateProject(project Project) (string, error)
-	UpdateProject(updatedProject Project) (Project, error)
+	UpdateProject(updatedProject Project) error
 	ProjectEqual(oldProject Project, newProject Project) bool
 }
 

@@ -80,7 +80,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 		// Project already exists
 		if len(project.Id) > 0 {
-			updatedProject := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
+			updatedProject := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
 			// Compare retrieved project with current spec
 			if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
 				// Update if there are changes in the declared spec
@@ -105,23 +105,15 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 
 	log.Info("Creating Jira Service Desk Project: " + instance.Spec.Name)
 
-	project := r.JiraServiceDeskClient.GetProjectFromProjectSpec(instance.Spec)
+	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
 	projectId, err := r.JiraServiceDeskClient.CreateProject(project)
 	if err != nil {
 		return util.ManageError(r.Client, instance, err)
 	}
 
-	instance.Status.ID = projectId
-
-	err = r.Status().Update(context.Background(), instance)
-	if err != nil {
-		log.Error(err, "Failed to update status of Project")
-		return util.RequeueWithError(err)
-	}
-
 	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
-
-	return util.RequeueAfter(defaultRequeueTime)
+	instance.Status.ID = projectId
+	return util.ManageSuccess(r.Client, instance)
 }
 
 func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
@@ -142,5 +134,17 @@ func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservice
 
 	log.Info("Updating Jira Service Desk Project: " + instance.Spec.Name)
 
-	return util.RequeueAfter(defaultRequeueTime)
+	if ok, err := instance.IsValidUpdate(); !ok {
+		return util.ManageError(r.Client, instance, err)
+	}
+
+	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
+
+	err := r.JiraServiceDeskClient.UpdateProject(project)
+	if err != nil {
+		log.Error(err, "Failed to update status of Project")
+		return util.ManageError(r.Client, instance, err)
+	}
+
+	return util.ManageSuccess(r.Client, instance)
 }

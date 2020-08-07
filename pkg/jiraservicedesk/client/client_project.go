@@ -113,8 +113,9 @@ func (c *jiraServiceDeskClient) CreateProject(project Project) (string, error) {
 	return projectId, err
 }
 
-func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project) (Project, error) {
-	return Project{Name: updatedProject.Name}, nil
+func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project) error {
+	// Add logic for updating project here
+	return nil
 }
 
 func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Project) bool {
@@ -131,6 +132,6 @@ func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Proj
 		oldProject.URL == newProject.URL
 }
 
-func (c *jiraServiceDeskClient) GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project {
-	return projectSpecToProjectMapper(spec)
+func (c *jiraServiceDeskClient) GetProjectFromProjectCR(project *jiraservicedeskv1alpha1.Project) Project {
+	return projectCRToProjectMapper(project)
 }

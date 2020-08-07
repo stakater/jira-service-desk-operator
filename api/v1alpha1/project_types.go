@@ -127,11 +127,11 @@ func (project *Project) SetReconcileStatus(reconcileStatus status.Conditions) {
 }
 
 func (project *Project) IsValid() (bool, error) {
-	// Add logic for additional validation here
+	// TODO: Add logic for additional validation here
 	return true, nil
 }
 
-func (project *Project) ValidateForUpdate() (bool, error) {
-	// Add logic for additional validation here
+func (project *Project) IsValidUpdate() (bool, error) {
+	// TODO: Add logic for validating updated resource here
 	return true, nil
 }
