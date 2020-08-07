@@ -131,7 +131,7 @@ func (project *Project) IsValid() (bool, error) {
 	return true, nil
 }
 
-func (project *Project) ValidateForUpdate() (bool, error) {
-	// Add logic for additional validation here
+func (project *Project) validateUpdate() (bool, error) {
+	// Add logic for validating updated resource here
 	return true, nil
 }

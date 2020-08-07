@@ -19,7 +19,7 @@ type Client interface {
 	GetProjectById(id string) (Project, error)
 	GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project
 	CreateProject(project Project) (string, error)
-	UpdateProject(updatedProject Project) (Project, error)
+	UpdateProject(updatedProject Project) error
 	ProjectEqual(oldProject Project, newProject Project) bool
 }
 
