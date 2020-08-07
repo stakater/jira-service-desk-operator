@@ -86,7 +86,9 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// Add finalizer if it doesn't exist
 	if !util.HasFinalizer(instance, ProjectFinalizer) {
 		log.Info("Adding finalizer for instance " + req.Name)
+
 		util.AddFinalizer(instance, ProjectFinalizer)
+
 		err := r.Client.Update(context.TODO(), instance)
 		if err != nil {
 			return util.ManageError(r.Client, instance, err)
@@ -155,6 +157,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 
 	// Delete finalizer
 	util.DeleteFinalizer(instance, ProjectFinalizer)
+
 	log.Info("Finalizer removed for project : " + instance.Spec.Name)
 
 	// Update instance
