@@ -33,7 +33,7 @@ func ManageError(client client.Client, obj apis.Resource, issue error) (ctrl.Res
 			return ctrl.Result{}, err
 		}
 	} else {
-		log.Info("object is not RecocileStatusAware, not setting status")
+		log.Info("object is not ReconcileStatusAware, not setting status")
 	}
 	return ctrl.Result{}, issue
 }
@@ -55,7 +55,7 @@ func ManageSuccess(client client.Client, obj apis.Resource) (ctrl.Result, error)
 			return ctrl.Result{}, err
 		}
 	} else {
-		log.Info("object is not RecocileStatusAware, not setting status")
+		log.Info("object is not ReconcileStatusAware, not setting status")
 	}
 	return ctrl.Result{}, nil
 }
