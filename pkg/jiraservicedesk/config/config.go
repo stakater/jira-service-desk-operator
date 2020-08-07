@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
-	"github.com/stakater/jira-service-desk-operator/util"
+	"github.com/stakater/jira-service-desk-operator/pkg/util"
 	"os"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
