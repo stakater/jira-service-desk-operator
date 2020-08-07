@@ -132,6 +132,6 @@ func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Proj
 		oldProject.URL == newProject.URL
 }
 
-func (c *jiraServiceDeskClient) GetProjectFromProjectSpec(spec jiraservicedeskv1alpha1.ProjectSpec) Project {
-	return projectSpecToProjectMapper(spec)
+func (c *jiraServiceDeskClient) GetProjectFromProjectCR(project *jiraservicedeskv1alpha1.Project) Project {
+	return projectCRToProjectMapper(project)
 }
