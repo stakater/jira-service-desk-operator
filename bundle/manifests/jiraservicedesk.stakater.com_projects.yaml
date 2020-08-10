@@ -15,6 +15,7 @@ spec:
         name: jira-service-desk-operator-webhook-service
         namespace: jira-service-desk-operator-system
         path: /convert
+        port: 443
   group: jiraservicedesk.stakater.com
   names:
     kind: Project
