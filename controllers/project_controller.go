@@ -107,7 +107,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			// Compare retrieved project with current spec
 			if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
 				// Update if there are changes in the declared spec
-				return r.handleUpdate(req, instance)
+				return r.handleUpdate(req, project, instance)
 			} else {
 				log.Info("Skipping update. No changes found")
 				return util.DoNotRequeue()
@@ -169,7 +169,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	return util.DoNotRequeue()
 }
 
-func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+func (r *ProjectReconciler) handleUpdate(req ctrl.Request, oldProject jiraservicedeskclient.Project, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
 	log := r.Log.WithValues("project", req.NamespacedName)
 
 	log.Info("Updating Jira Service Desk Project: " + instance.Spec.Name)
@@ -177,10 +177,8 @@ func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservice
 	if ok, err := instance.IsValidUpdate(); !ok {
 		return util.ManageError(r.Client, instance, err)
 	}
-
-	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
-
-	err := r.JiraServiceDeskClient.UpdateProject(project)
+	updatedProject := r.JiraServiceDeskClient.GetProjectForUpdateRequest(oldProject, instance)
+	err := r.JiraServiceDeskClient.UpdateProject(updatedProject, oldProject.Id)
 	if err != nil {
 		log.Error(err, "Failed to update status of Project")
 		return util.ManageError(r.Client, instance, err)

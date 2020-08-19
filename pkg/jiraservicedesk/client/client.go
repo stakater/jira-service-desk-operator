@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	"io"
 	"net/http"
 	"net/url"
+
+	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
@@ -20,8 +21,9 @@ type Client interface {
 	GetProjectFromProjectCR(project *jiraservicedeskv1alpha1.Project) Project
 	CreateProject(project Project) (string, error)
 	DeleteProject(id string) error
-	UpdateProject(updatedProject Project) error
+	UpdateProject(updatedProject Project, id string) error
 	ProjectEqual(oldProject Project, newProject Project) bool
+	GetProjectForUpdateRequest(oldProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
 }
 
 // Client wraps http client
