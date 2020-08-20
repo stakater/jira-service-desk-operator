@@ -194,7 +194,6 @@ func (c *jiraServiceDeskClient) GetProjectForUpdateRequest(oldProject Project, n
 	if oldProject.URL != newProject.Spec.URL {
 		updatedProject.URL = newProject.Spec.URL
 	}
-	fmt.Println(updatedProject)
 	return updatedProject
 
 }
