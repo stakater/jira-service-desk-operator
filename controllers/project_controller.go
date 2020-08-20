@@ -97,17 +97,17 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Check if the Project already exists
 	if len(instance.Status.ID) > 0 {
-		project, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
+		existingProject, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
 		if err != nil {
 			return util.ManageError(r.Client, instance, err)
 		}
 		// Project already exists
-		if len(project.Id) > 0 {
+		if len(existingProject.Id) > 0 {
 			updatedProject := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
 			// Compare retrieved project with current spec
-			if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
+			if !r.JiraServiceDeskClient.ProjectEqual(existingProject, updatedProject) {
 				// Update if there are changes in the declared spec
-				return r.handleUpdate(req, project, instance)
+				return r.handleUpdate(req, existingProject, instance)
 			} else {
 				log.Info("Skipping update. No changes found")
 				return util.DoNotRequeue()
