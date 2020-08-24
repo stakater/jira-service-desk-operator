@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/prometheus/common/log"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -62,7 +63,11 @@ func (r *Project) ValidateCreate() error {
 func (r *Project) ValidateUpdate(old runtime.Object) error {
 	projectlog.Info("validate update", "name", r.Name)
 
-	_, err := r.IsValidUpdate()
+	oldProject, ok := old.(*Project)
+	if !ok {
+		log.Error(ok, "Error in finding the requested project")
+	}
+	_, err := r.IsValidUpdate(*oldProject)
 	return err
 }
 

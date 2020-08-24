@@ -19,11 +19,12 @@ type Client interface {
 	// Methods for Project
 	GetProjectById(id string) (Project, error)
 	GetProjectFromProjectCR(project *jiraservicedeskv1alpha1.Project) Project
+	GetProjectCRFromProject(project Project) jiraservicedeskv1alpha1.Project
 	CreateProject(project Project) (string, error)
 	DeleteProject(id string) error
 	UpdateProject(updatedProject Project, id string) error
 	ProjectEqual(oldProject Project, newProject Project) bool
-	GetProjectForUpdateRequest(oldProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
+	GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
 }
 
 // Client wraps http client

@@ -169,16 +169,17 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	return util.DoNotRequeue()
 }
 
-func (r *ProjectReconciler) handleUpdate(req ctrl.Request, oldProject jiraservicedeskclient.Project, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+func (r *ProjectReconciler) handleUpdate(req ctrl.Request, existingProject jiraservicedeskclient.Project, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
 	log := r.Log.WithValues("project", req.NamespacedName)
 
 	log.Info("Updating Jira Service Desk Project: " + instance.Spec.Name)
 
-	if ok, err := instance.IsValidUpdate(); !ok {
+	existingProjectInstance := r.JiraServiceDeskClient.GetProjectCRFromProject(existingProject)
+	if ok, err := instance.IsValidUpdate(existingProjectInstance); !ok {
 		return util.ManageError(r.Client, instance, err)
 	}
-	updatedProject := r.JiraServiceDeskClient.GetProjectForUpdateRequest(oldProject, instance)
-	err := r.JiraServiceDeskClient.UpdateProject(updatedProject, oldProject.Id)
+	updatedProject := r.JiraServiceDeskClient.GetProjectForUpdateRequest(existingProject, instance)
+	err := r.JiraServiceDeskClient.UpdateProject(updatedProject, existingProject.Id)
 	if err != nil {
 		log.Error(err, "Failed to update status of Project")
 		return util.ManageError(r.Client, instance, err)

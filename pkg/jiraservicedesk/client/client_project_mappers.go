@@ -17,7 +17,7 @@ func projectCRToProjectMapper(project *jiraservicedeskv1alpha1.Project) Project 
 		URL:                 project.Spec.URL,
 		AvatarId:            project.Spec.AvatarId,
 		IssueSecurityScheme: project.Spec.IssueSecurityScheme,
-		PermissionScheme:    project.Spec.IssueSecurityScheme,
+		PermissionScheme:    project.Spec.PermissionScheme,
 		NotificationScheme:  project.Spec.NotificationScheme,
 		CategoryId:          project.Spec.CategoryId,
 	}
@@ -50,4 +50,26 @@ func projectGetResponseToProjectMapper(response ProjectGetResponse) Project {
 		LeadAccountId:      response.Lead.AccountId,
 		URL:                response.URL,
 	}
+}
+
+func projectToProjectCRMapper(project Project) jiraservicedeskv1alpha1.Project {
+
+	var projectObject jiraservicedeskv1alpha1.Project
+
+	projectObject.Status.ID = project.Id
+	projectObject.Spec.Name = project.Name
+	projectObject.Spec.Key = project.Key
+	projectObject.Spec.ProjectTypeKey = project.ProjectTypeKey
+	projectObject.Spec.ProjectTemplateKey = project.ProjectTemplateKey
+	projectObject.Spec.Description = project.Description
+	projectObject.Spec.AssigneeType = project.AssigneeType
+	projectObject.Spec.LeadAccountId = project.LeadAccountId
+	projectObject.Spec.URL = project.URL
+	projectObject.Spec.AvatarId = project.AvatarId
+	projectObject.Spec.IssueSecurityScheme = project.IssueSecurityScheme
+	projectObject.Spec.PermissionScheme = project.PermissionScheme
+	projectObject.Spec.NotificationScheme = project.NotificationScheme
+	projectObject.Spec.CategoryId = project.CategoryId
+
+	return projectObject
 }

@@ -173,24 +173,28 @@ func (c *jiraServiceDeskClient) GetProjectFromProjectCR(project *jiraservicedesk
 	return projectCRToProjectMapper(project)
 }
 
-func (c *jiraServiceDeskClient) GetProjectForUpdateRequest(oldProject Project, newProject *jiraservicedeskv1alpha1.Project) Project {
+func (c *jiraServiceDeskClient) GetProjectCRFromProject(project Project) jiraservicedeskv1alpha1.Project {
+	return projectToProjectCRMapper(project)
+}
+
+func (c *jiraServiceDeskClient) GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project {
 	var updatedProject Project
-	if oldProject.Name != newProject.Spec.Name {
+	if existingProject.Name != newProject.Spec.Name {
 		updatedProject.Name = newProject.Spec.Name
 	}
-	if oldProject.Key != newProject.Spec.Key {
+	if existingProject.Key != newProject.Spec.Key {
 		updatedProject.Key = newProject.Spec.Key
 	}
-	if oldProject.AvatarId != newProject.Spec.AvatarId {
+	if existingProject.AvatarId != newProject.Spec.AvatarId {
 		updatedProject.AvatarId = newProject.Spec.AvatarId
 	}
-	if oldProject.Description != newProject.Spec.Description {
+	if existingProject.Description != newProject.Spec.Description {
 		updatedProject.Description = newProject.Spec.Description
 	}
-	if oldProject.AssigneeType != newProject.Spec.AssigneeType {
+	if existingProject.AssigneeType != newProject.Spec.AssigneeType {
 		updatedProject.AssigneeType = newProject.Spec.AssigneeType
 	}
-	if oldProject.URL != newProject.Spec.URL {
+	if existingProject.URL != newProject.Spec.URL {
 		updatedProject.URL = newProject.Spec.URL
 	}
 	return updatedProject
