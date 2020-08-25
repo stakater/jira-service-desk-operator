@@ -23,7 +23,7 @@ metadata:
         }
       ]
     capabilities: Basic Install
-    operators.operatorframework.io/builder: operator-sdk-v0.19.0
+    operators.operatorframework.io/builder: operator-sdk-v1.0.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
   name: jira-service-desk-operator.v0.0.1
   namespace: placeholder
@@ -32,6 +32,7 @@ spec:
   customresourcedefinitions:
     owned:
     - description: Project is the Schema for the projects API
+      displayName: Project
       kind: Project
       name: projects.jiraservicedesk.stakater.com
       version: v1alpha1
@@ -64,8 +65,6 @@ spec:
           - get
           - patch
           - update
-        serviceAccountName: jira-service-desk-operator-manager-role
-      - rules:
         - apiGroups:
           - authentication.k8s.io
           resources:
@@ -78,13 +77,7 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
-        serviceAccountName: jira-service-desk-operator-proxy-role
-      - rules:
-        - nonResourceURLs:
-          - /metrics
-          verbs:
-          - get
-        serviceAccountName: jira-service-desk-operator-metrics-reader
+        serviceAccountName: default
       deployments:
       - name: jira-service-desk-operator-controller-manager
         spec:
@@ -174,7 +167,7 @@ spec:
           verbs:
           - create
           - patch
-        serviceAccountName: jira-service-desk-operator-leader-election-role
+        serviceAccountName: default
     strategy: deployment
   installModes:
   - supported: true
