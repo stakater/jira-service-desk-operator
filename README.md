@@ -53,3 +53,4 @@ $ oc apply -f bundle/manifests
    - `make verify`
    - `make bundle`
    - `make packagemanifests`
+   
