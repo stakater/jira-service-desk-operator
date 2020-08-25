@@ -27,7 +27,8 @@ import (
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	jiraservicedeskclient "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
-	"github.com/stakater/jira-service-desk-operator/pkg/util"
+	finalizerUtil "github.com/stakater/operator-utils/util/finalizer"
+	reconcilerUtil "github.com/stakater/operator-utils/util/reconciler"
 )
 
 const (
@@ -62,36 +63,36 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
-			return util.DoNotRequeue()
+			return reconcilerUtil.DoNotRequeue()
 		}
 		// Error reading the object - requeue the request.
-		return util.RequeueWithError(err)
+		return reconcilerUtil.RequeueWithError(err)
 	}
 
 	// Validate Custom Resource
 	if ok, err := instance.IsValid(); !ok {
-		return util.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err)
 	}
 
 	// Resource is marked for deletion
 	if instance.DeletionTimestamp != nil {
 		log.Info("Deletion timestamp found for instance " + req.Name)
-		if util.HasFinalizer(instance, ProjectFinalizer) {
+		if finalizerUtil.HasFinalizer(instance, ProjectFinalizer) {
 			return r.handleDelete(req, instance)
 		}
 		// Finalizer doesn't exist so clean up is already done
-		return util.DoNotRequeue()
+		return reconcilerUtil.DoNotRequeue()
 	}
 
 	// Add finalizer if it doesn't exist
-	if !util.HasFinalizer(instance, ProjectFinalizer) {
+	if !finalizerUtil.HasFinalizer(instance, ProjectFinalizer) {
 		log.Info("Adding finalizer for instance " + req.Name)
 
-		util.AddFinalizer(instance, ProjectFinalizer)
+		finalizerUtil.AddFinalizer(instance, ProjectFinalizer)
 
 		err := r.Client.Update(context.TODO(), instance)
 		if err != nil {
-			return util.ManageError(r.Client, instance, err)
+			return reconcilerUtil.ManageError(r.Client, instance, err)
 		}
 	}
 
@@ -99,7 +100,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if len(instance.Status.ID) > 0 {
 		project, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
 		if err != nil {
-			return util.ManageError(r.Client, instance, err)
+			return reconcilerUtil.ManageError(r.Client, instance, err)
 		}
 		// Project already exists
 		if len(project.Id) > 0 {
@@ -110,7 +111,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				return r.handleUpdate(req, instance)
 			} else {
 				log.Info("Skipping update. No changes found")
-				return util.DoNotRequeue()
+				return reconcilerUtil.DoNotRequeue()
 			}
 		}
 	}
@@ -131,12 +132,12 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
 	projectId, err := r.JiraServiceDeskClient.CreateProject(project)
 	if err != nil {
-		return util.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err)
 	}
 
 	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
 	instance.Status.ID = projectId
-	return util.ManageSuccess(r.Client, instance)
+	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
 
 func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
@@ -144,7 +145,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 
 	if instance == nil {
 		// Instance not found, nothing to do
-		return util.DoNotRequeue()
+		return reconcilerUtil.DoNotRequeue()
 	}
 
 	log.Info("Deleting Jira Service Desk Project: " + instance.Spec.Name)
@@ -152,21 +153,21 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	// Delete project from JSD
 	err := r.JiraServiceDeskClient.DeleteProject(instance.Status.ID)
 	if err != nil {
-		return util.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err)
 	}
 
 	// Delete finalizer
-	util.DeleteFinalizer(instance, ProjectFinalizer)
+	finalizerUtil.DeleteFinalizer(instance, ProjectFinalizer)
 
 	log.Info("Finalizer removed for project : " + instance.Spec.Name)
 
 	// Update instance
 	err = r.Client.Update(context.TODO(), instance)
 	if err != nil {
-		return util.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err)
 	}
 
-	return util.DoNotRequeue()
+	return reconcilerUtil.DoNotRequeue()
 }
 
 func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
@@ -175,7 +176,7 @@ func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservice
 	log.Info("Updating Jira Service Desk Project: " + instance.Spec.Name)
 
 	if ok, err := instance.IsValidUpdate(); !ok {
-		return util.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err)
 	}
 
 	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
@@ -183,8 +184,8 @@ func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservice
 	err := r.JiraServiceDeskClient.UpdateProject(project)
 	if err != nil {
 		log.Error(err, "Failed to update status of Project")
-		return util.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err)
 	}
 
-	return util.ManageSuccess(r.Client, instance)
+	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
