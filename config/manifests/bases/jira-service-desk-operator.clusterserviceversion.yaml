@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    operators.operatorframework.io/builder: operator-sdk-v0.19.0
+    operators.operatorframework.io/builder: operator-sdk-v1.0.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
   name: jira-service-desk-operator.vX.Y.Z
   namespace: placeholder
@@ -13,6 +13,7 @@ spec:
   customresourcedefinitions:
     owned:
     - description: Project is the Schema for the projects API
+      displayName: Project
       kind: Project
       name: projects.jiraservicedesk.stakater.com
       version: v1alpha1

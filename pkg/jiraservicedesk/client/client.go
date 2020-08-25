@@ -9,8 +9,7 @@ import (
 	"net/url"
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
-
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var Log = logf.Log.WithName("jiraServiceDeskClient")

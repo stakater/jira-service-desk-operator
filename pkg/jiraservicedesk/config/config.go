@@ -1,11 +1,12 @@
 package config
 
 import (
-	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
-	"github.com/stakater/jira-service-desk-operator/pkg/util"
 	"os"
+
+	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
+	secretsUtil "github.com/stakater/operator-utils/util/secrets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var log = logf.Log.WithName("config")
@@ -52,17 +53,17 @@ func LoadControllerConfig(apiReader client.Reader) (ControllerConfig, error) {
 		operatorNamespace = operatorNamespaceTemp
 	}
 
-	apiToken, err := util.LoadSecretData(apiReader, JiraServiceDeskSecretName, operatorNamespace, JiraServiceDeskAPITokenSecretKey)
+	apiToken, err := secretsUtil.LoadSecretData(apiReader, JiraServiceDeskSecretName, operatorNamespace, JiraServiceDeskAPITokenSecretKey)
 	if err != nil {
 		log.Error(err, "Unable to fetch apiToken from secret")
 	}
 
-	apiBaseUrl, err := util.LoadSecretData(apiReader, JiraServiceDeskSecretName, operatorNamespace, JiraServiceDeskAPIBaseURLSecretKey)
+	apiBaseUrl, err := secretsUtil.LoadSecretData(apiReader, JiraServiceDeskSecretName, operatorNamespace, JiraServiceDeskAPIBaseURLSecretKey)
 	if err != nil {
 		log.Error(err, "Unable to fetch apiBaseUrl from secret")
 	}
 
-	email, err := util.LoadSecretData(apiReader, JiraServiceDeskSecretName, operatorNamespace, JiraServiceDeskEmailSecretKey)
+	email, err := secretsUtil.LoadSecretData(apiReader, JiraServiceDeskSecretName, operatorNamespace, JiraServiceDeskEmailSecretKey)
 	if err != nil {
 		log.Error(err, "Unable to fetch email from secret")
 	}
