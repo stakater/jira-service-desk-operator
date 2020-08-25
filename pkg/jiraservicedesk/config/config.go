@@ -1,11 +1,12 @@
 package config
 
 import (
+	"os"
+
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/stakater/jira-service-desk-operator/pkg/util"
-	"os"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var log = logf.Log.WithName("config")
