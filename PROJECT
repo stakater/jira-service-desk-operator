@@ -1,6 +1,7 @@
 domain: stakater.com
 layout: go.kubebuilder.io/v2
 repo: github.com/stakater/jira-service-desk-operator
+projectName: jira-service-desk-operator
 resources:
 - group: jiraservicedesk
   kind: Project
