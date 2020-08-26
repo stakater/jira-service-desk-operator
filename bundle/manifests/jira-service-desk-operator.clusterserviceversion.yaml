@@ -25,8 +25,8 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.0.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
-  name: jira-service-desk-operator.v0.0.3
-  namespace: placeholder
+  name: jira-service-desk-operator.v0.0.1
+  namespace: jira-service-desk-operator
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -195,8 +195,7 @@ spec:
   provider:
     name: stakater
     url: https://stakater.com
-  replaces: jira-service-desk-operator.v0.0.2
-  version: 0.0.3
+  version: 0.0.1
   webhookdefinitions:
   - admissionReviewVersions: null
     deploymentName: jira-service-desk-operator-webhook

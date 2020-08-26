@@ -50,9 +50,8 @@ jobs:
     - name: Build and push Docker images
       uses: docker/build-push-action@v1
       with:
-        username: ${{ secrets.STAKATER_NEXUS_USERNAME }}
-        password: ${{ secrets.STAKATER_NEXUS_PASSWORD }}
-        registry: ${{ secrets.STAKATER_NEXUS_REGISTRY }}
+        username: ${{ secrets.STAKATER_DOCKERHUB_USERNAME }}
+        password: ${{ secrets.STAKATER_DOCKERHUB_PASSWORD }}
         repository: ${{ env.GITHUB_REPOSITORY }}
         add_git_labels: true
         dockerfile: ${{ env.DOCKER_FILE_PATH  }}
@@ -103,6 +102,8 @@ jobs:
       run: |
         git config --local user.email "stakater@gmail.com"
         git config --local user.name "stakater-user"
+        git status 
+        git add .
         git commit -m "[skip-ci] Update artifacts" -a
     - name: Push changes
       uses: ad-m/github-push-action@master
