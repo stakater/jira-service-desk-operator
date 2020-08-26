@@ -38,6 +38,12 @@ type: Opaque
 
 ### Deploy operator
 
+- Make sure that [certman](https://cert-manager.io/) is deployed in your cluster since webhooks require certman to generate valid certs since webhooks serve using HTTPS
+- To install certman
+```terminal
+$ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.16.1/cert-manager.yaml
+```
+- Deploy operator
 ```terminal
 $ oc apply -f bundle/manifests
 ```
