@@ -103,6 +103,8 @@ jobs:
       run: |
         git config --local user.email "stakater@gmail.com"
         git config --local user.name "stakater-user"
+        git status 
+        git add .
         git commit -m "[skip-ci] Update artifacts" -a
     - name: Push changes
       uses: ad-m/github-push-action@master
