@@ -26,7 +26,7 @@ metadata:
     operators.operatorframework.io/builder: operator-sdk-v1.0.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
   name: jira-service-desk-operator.v0.0.3
-  namespace: placeholder
+  namespace: jira-service-desk-operator
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -115,7 +115,7 @@ spec:
                       fieldPath: metadata.annotations['olm.targetNamespaces']
                 - name: CONFIG_SECRET_NAME
                   value: jira-service-desk-config
-                image: stakater/jira-service-desk-operator:0.0.1
+                image: stakater/jira-service-desk-operator:SNAPSHOT-PR-12-dac3814b
                 name: manager
                 ports:
                 - containerPort: 9443
