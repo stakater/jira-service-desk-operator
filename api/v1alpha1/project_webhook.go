@@ -17,7 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/prometheus/common/log"
+	"fmt"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -65,7 +66,7 @@ func (r *Project) ValidateUpdate(old runtime.Object) error {
 
 	oldProject, ok := old.(*Project)
 	if !ok {
-		log.Error(ok, "Error in finding the requested project")
+		return fmt.Errorf("Error casting old runtime object to %T from %T", oldProject, old)
 	}
 	_, err := r.IsValidUpdate(*oldProject)
 	return err

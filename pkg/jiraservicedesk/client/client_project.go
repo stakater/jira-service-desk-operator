@@ -114,7 +114,6 @@ func (c *jiraServiceDeskClient) CreateProject(project Project) (string, error) {
 }
 
 func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project, id string) error {
-	// Add logic for updating project here
 	request, err := c.newRequest("PUT", EndpointApiVersion3Project+"/"+id, updatedProject)
 	if err != nil {
 		return err

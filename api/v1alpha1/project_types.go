@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	errorMsg string = " is an immutable field, can't be changed while updating"
+	errorMsg string = "is an immutable field, can't be changed while updating"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
