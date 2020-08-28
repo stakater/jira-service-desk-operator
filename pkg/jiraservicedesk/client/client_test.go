@@ -7,7 +7,7 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-const BaseURL = "https://stakater-cloud.atlassian.net/"
+const BaseURL = "https://sample.atlassian.net/"
 
 func TestJiraService_GetProject_shouldGetProjectById(t *testing.T) {
 	defer gock.Off()
@@ -22,7 +22,7 @@ func TestJiraService_GetProject_shouldGetProjectById(t *testing.T) {
 			"assigneeType":   "UNASSIGNED",
 			"projectTypeKey": "business",
 			"key":            "KEY",
-			"url":            "https://www.google.com",
+			"url":            "https://www.sample.com",
 		})
 
 	jiraClient := NewClient("", BaseURL, "")
@@ -33,7 +33,7 @@ func TestJiraService_GetProject_shouldGetProjectById(t *testing.T) {
 	st.Expect(t, project.AssigneeType, "UNASSIGNED")
 	st.Expect(t, project.ProjectTypeKey, "business")
 	st.Expect(t, project.Key, "KEY")
-	st.Expect(t, project.URL, "https://www.google.com")
+	st.Expect(t, project.URL, "https://www.sample.com")
 	st.Expect(t, err, nil)
 
 	st.Expect(t, gock.IsDone(), true)
