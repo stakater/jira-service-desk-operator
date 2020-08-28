@@ -8,8 +8,8 @@ import (
 )
 
 var endpoint = "177"
-var client = NewClient("", "https://stakater-cloud.atlassian.net/", "")
-var jira_url = "https://stakater-cloud.atlassian.net/rest/api/3"
+var client = NewClient("", "https://mock.atlassian.net/", "")
+var jira_url = "https://mock.atlassian.net/rest/api/3"
 
 var project = Project{
 	Name:               "Stakater",
@@ -18,11 +18,11 @@ var project = Project{
 	ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
 	Description:        "Sample project for jira-service-desk-operator",
 	AssigneeType:       "PROJECT_LEAD",
-	LeadAccountId:      "5ebfbc3ead226b0ba46c3590",
+	LeadAccountId:      "5ebfbc3wwe226gfda32c3590",
 	URL:                "https://stakater.com",
 }
 
-func TestJiraServiceDesk_DeleteProject_TrueCase(t *testing.T) {
+func TestJiraServiceDesk_DeleteProject_shouldDeleteProject(t *testing.T) {
 	defer gock.Off()
 
 	gock.New(jira_url).
@@ -36,7 +36,7 @@ func TestJiraServiceDesk_DeleteProject_TrueCase(t *testing.T) {
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestJiraServiceDesk_CreateProject__TrueCase(t *testing.T) {
+func TestJiraServiceDesk_CreateProject__shouldCreateProject(t *testing.T) {
 	defer gock.Off()
 
 	gock.New(jira_url).
@@ -47,10 +47,10 @@ func TestJiraServiceDesk_CreateProject__TrueCase(t *testing.T) {
 			"projectTemplateKey": "com.atlassian.servicedesk:itil-v2-service-desk-project",
 			"description":        "Sample project for jira-service-desk-operator",
 			"assigneeType":       "PROJECT_LEAD",
-			"leadAccountId":      "5ebfbc3ead226b0ba46c3590",
+			"leadAccountId":      "5ebfbc3wwe226gfda32c3590",
 			"url":                "https://stakater.com"}).
 		Reply(204).
-		JSON(map[string]interface{}{"self": "https://stakater-cloud.atlassian.net/rest/api/3/project/1007",
+		JSON(map[string]interface{}{"self": "https://mock.atlassian.net/rest/api/3/project/1007",
 			"id":  1007,
 			"key": "STK"})
 
