@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	errorMsg string = "is an immutable field, can't be changed while updating"
+	errorImmutableFieldMsg string = "is an immutable field, can't be changed while updating"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -140,25 +140,25 @@ func (project *Project) IsValid() (bool, error) {
 func (project *Project) IsValidUpdate(existingProject Project) (bool, error) {
 
 	if project.Spec.ProjectTemplateKey != existingProject.Spec.ProjectTemplateKey {
-		return false, fmt.Errorf("%s %s", "ProjectTemplateKey", errorMsg)
+		return false, fmt.Errorf("%s %s", "ProjectTemplateKey", errorImmutableFieldMsg)
 	}
 	if project.Spec.ProjectTypeKey != existingProject.Spec.ProjectTypeKey {
-		return false, fmt.Errorf("%s %s", "ProjectTypeKey", errorMsg)
+		return false, fmt.Errorf("%s %s", "ProjectTypeKey", errorImmutableFieldMsg)
 	}
 	if project.Spec.LeadAccountId != existingProject.Spec.LeadAccountId {
-		return false, fmt.Errorf("%s %s", "LeadAccountId", errorMsg)
+		return false, fmt.Errorf("%s %s", "LeadAccountId", errorImmutableFieldMsg)
 	}
 	if project.Spec.CategoryId != existingProject.Spec.CategoryId {
-		return false, fmt.Errorf("%s %s", "CategoryId", errorMsg)
+		return false, fmt.Errorf("%s %s", "CategoryId", errorImmutableFieldMsg)
 	}
 	if project.Spec.NotificationScheme != existingProject.Spec.NotificationScheme {
-		return false, fmt.Errorf("%s %s", "NotificationScheme", errorMsg)
+		return false, fmt.Errorf("%s %s", "NotificationScheme", errorImmutableFieldMsg)
 	}
 	if project.Spec.PermissionScheme != existingProject.Spec.PermissionScheme {
-		return false, fmt.Errorf("%s %s", "PermissionScheme", errorMsg)
+		return false, fmt.Errorf("%s %s", "PermissionScheme", errorImmutableFieldMsg)
 	}
 	if project.Spec.IssueSecurityScheme != existingProject.Spec.IssueSecurityScheme {
-		return false, fmt.Errorf("%s %s", "IssueSecurityScheme", errorMsg)
+		return false, fmt.Errorf("%s %s", "IssueSecurityScheme", errorImmutableFieldMsg)
 	}
 
 	return true, nil
