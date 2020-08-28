@@ -98,17 +98,17 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Check if the Project already exists
 	if len(instance.Status.ID) > 0 {
-		project, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
+		existingProject, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err)
 		}
 		// Project already exists
-		if len(project.Id) > 0 {
+		if len(existingProject.Id) > 0 {
 			updatedProject := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
 			// Compare retrieved project with current spec
-			if !r.JiraServiceDeskClient.ProjectEqual(project, updatedProject) {
+			if !r.JiraServiceDeskClient.ProjectEqual(existingProject, updatedProject) {
 				// Update if there are changes in the declared spec
-				return r.handleUpdate(req, instance)
+				return r.handleUpdate(req, existingProject, instance)
 			} else {
 				log.Info("Skipping update. No changes found")
 				return reconcilerUtil.DoNotRequeue()
@@ -170,18 +170,17 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	return reconcilerUtil.DoNotRequeue()
 }
 
-func (r *ProjectReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
+func (r *ProjectReconciler) handleUpdate(req ctrl.Request, existingProject jiraservicedeskclient.Project, instance *jiraservicedeskv1alpha1.Project) (ctrl.Result, error) {
 	log := r.Log.WithValues("project", req.NamespacedName)
 
 	log.Info("Updating Jira Service Desk Project: " + instance.Spec.Name)
 
-	if ok, err := instance.IsValidUpdate(); !ok {
+	existingProjectInstance := r.JiraServiceDeskClient.GetProjectCRFromProject(existingProject)
+	if ok, err := instance.IsValidUpdate(existingProjectInstance); !ok {
 		return reconcilerUtil.ManageError(r.Client, instance, err)
 	}
-
-	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
-
-	err := r.JiraServiceDeskClient.UpdateProject(project)
+	updatedProject := r.JiraServiceDeskClient.GetProjectForUpdateRequest(existingProject, instance)
+	err := r.JiraServiceDeskClient.UpdateProject(updatedProject, existingProject.Id)
 	if err != nil {
 		log.Error(err, "Failed to update status of Project")
 		return reconcilerUtil.ManageError(r.Client, instance, err)

@@ -113,8 +113,26 @@ func (c *jiraServiceDeskClient) CreateProject(project Project) (string, error) {
 	return projectId, err
 }
 
-func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project) error {
-	// Add logic for updating project here
+func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project, id string) error {
+	request, err := c.newRequest("PUT", EndpointApiVersion3Project+"/"+id, updatedProject)
+	if err != nil {
+		return err
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+	responseData, _ := ioutil.ReadAll(response.Body)
+
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		err := errors.New("Rest request to update Project failed with status " + strconv.Itoa(response.StatusCode) +
+			" and response: " + string(responseData))
+		return err
+	}
+
 	return nil
 }
 
@@ -152,4 +170,32 @@ func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Proj
 
 func (c *jiraServiceDeskClient) GetProjectFromProjectCR(project *jiraservicedeskv1alpha1.Project) Project {
 	return projectCRToProjectMapper(project)
+}
+
+func (c *jiraServiceDeskClient) GetProjectCRFromProject(project Project) jiraservicedeskv1alpha1.Project {
+	return projectToProjectCRMapper(project)
+}
+
+func (c *jiraServiceDeskClient) GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project {
+	var updatedProject Project
+	if existingProject.Name != newProject.Spec.Name {
+		updatedProject.Name = newProject.Spec.Name
+	}
+	if existingProject.Key != newProject.Spec.Key {
+		updatedProject.Key = newProject.Spec.Key
+	}
+	if existingProject.AvatarId != newProject.Spec.AvatarId {
+		updatedProject.AvatarId = newProject.Spec.AvatarId
+	}
+	if existingProject.Description != newProject.Spec.Description {
+		updatedProject.Description = newProject.Spec.Description
+	}
+	if existingProject.AssigneeType != newProject.Spec.AssigneeType {
+		updatedProject.AssigneeType = newProject.Spec.AssigneeType
+	}
+	if existingProject.URL != newProject.Spec.URL {
+		updatedProject.URL = newProject.Spec.URL
+	}
+	return updatedProject
+
 }

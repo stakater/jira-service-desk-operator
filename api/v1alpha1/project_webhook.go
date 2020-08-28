@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -62,7 +64,11 @@ func (r *Project) ValidateCreate() error {
 func (r *Project) ValidateUpdate(old runtime.Object) error {
 	projectlog.Info("validate update", "name", r.Name)
 
-	_, err := r.IsValidUpdate()
+	oldProject, ok := old.(*Project)
+	if !ok {
+		return fmt.Errorf("Error casting old runtime object to %T from %T", oldProject, old)
+	}
+	_, err := r.IsValidUpdate(*oldProject)
 	return err
 }
 

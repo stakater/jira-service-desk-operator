@@ -17,8 +17,14 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
 	"github.com/operator-framework/operator-sdk/pkg/status"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+const (
+	errorImmutableFieldMsg string = "is an immutable field, can't be changed while updating"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -131,7 +137,29 @@ func (project *Project) IsValid() (bool, error) {
 	return true, nil
 }
 
-func (project *Project) IsValidUpdate() (bool, error) {
-	// TODO: Add logic for validating updated resource here
+func (project *Project) IsValidUpdate(existingProject Project) (bool, error) {
+
+	if project.Spec.ProjectTemplateKey != existingProject.Spec.ProjectTemplateKey {
+		return false, fmt.Errorf("%s %s", "ProjectTemplateKey", errorImmutableFieldMsg)
+	}
+	if project.Spec.ProjectTypeKey != existingProject.Spec.ProjectTypeKey {
+		return false, fmt.Errorf("%s %s", "ProjectTypeKey", errorImmutableFieldMsg)
+	}
+	if project.Spec.LeadAccountId != existingProject.Spec.LeadAccountId {
+		return false, fmt.Errorf("%s %s", "LeadAccountId", errorImmutableFieldMsg)
+	}
+	if project.Spec.CategoryId != existingProject.Spec.CategoryId {
+		return false, fmt.Errorf("%s %s", "CategoryId", errorImmutableFieldMsg)
+	}
+	if project.Spec.NotificationScheme != existingProject.Spec.NotificationScheme {
+		return false, fmt.Errorf("%s %s", "NotificationScheme", errorImmutableFieldMsg)
+	}
+	if project.Spec.PermissionScheme != existingProject.Spec.PermissionScheme {
+		return false, fmt.Errorf("%s %s", "PermissionScheme", errorImmutableFieldMsg)
+	}
+	if project.Spec.IssueSecurityScheme != existingProject.Spec.IssueSecurityScheme {
+		return false, fmt.Errorf("%s %s", "IssueSecurityScheme", errorImmutableFieldMsg)
+	}
+
 	return true, nil
 }
