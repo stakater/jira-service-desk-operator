@@ -41,12 +41,12 @@ func TestJiraServiceDesk_DeleteProject_withInvaildProjectId_shouldNotDeleteProje
 	defer gock.Off()
 
 	gock.New(jira_url).
-		Delete("/" + endpoint).
-		Reply(210)
+		Delete("/").
+		Reply(404)
 
-	err := client.DeleteProject(endpoint + "3")
+	err := client.DeleteProject("1999")
 
-	st.Expect(t, err, errors.New("Rest request to delete Project failed with status: 210"))
+	st.Expect(t, err, errors.New("Rest request to delete Project failed with status: 404"))
 
 	// Verify no mock pending requests
 	st.Expect(t, gock.IsDone(), true)
