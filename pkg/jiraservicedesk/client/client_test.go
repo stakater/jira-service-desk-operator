@@ -1,6 +1,8 @@
 package client
 
 import (
+	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/nbio/st"
@@ -70,6 +72,8 @@ func TestJiraService_CreateProject_shouldCreateProject(t *testing.T) {
 	jiraClient := NewClient("", BaseURL, "")
 	id, err := jiraClient.CreateProject(sampleProject)
 
+	fmt.Println(err)
+
 	st.Expect(t, id, "10003")
 	st.Expect(t, err, nil)
 
@@ -90,6 +94,22 @@ func TestJiraService_DeleteProject_shouldDeleteProject(t *testing.T) {
 
 	err := jiraClient.DeleteProject("10003")
 	st.Expect(t, err, nil)
+
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestJiraService_DeleteProject_shouldNotDeleteProject(t *testing.T) {
+	defer gock.Off()
+
+	gock.New(BaseURL + "/rest/api/3/project").
+		Delete("/").
+		Reply(404)
+
+	jiraClient := NewClient("", BaseURL, "")
+
+	err := jiraClient.DeleteProject("10003")
+
+	st.Expect(t, err, errors.New("Rest request to delete Project failed with status: 404"))
 
 	st.Expect(t, gock.IsDone(), true)
 }
