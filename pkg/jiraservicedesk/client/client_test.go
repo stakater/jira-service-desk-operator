@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/nbio/st"
@@ -22,7 +23,7 @@ var project = Project{
 	URL:                "https://stakater.com",
 }
 
-func TestJiraServiceDesk_DeleteProject_shouldDeleteProject(t *testing.T) {
+func TestJiraServiceDesk_DeleteProject_withValidProjectId_shouldDeleteProject(t *testing.T) {
 	defer gock.Off()
 
 	gock.New(jira_url).
@@ -31,6 +32,21 @@ func TestJiraServiceDesk_DeleteProject_shouldDeleteProject(t *testing.T) {
 
 	err := client.DeleteProject(endpoint)
 	st.Expect(t, err, nil)
+
+	// Verify no mock pending requests
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestJiraServiceDesk_DeleteProject_withInvaildProjectId_shouldNotDeleteProject(t *testing.T) {
+	defer gock.Off()
+
+	gock.New(jira_url).
+		Delete("/" + endpoint).
+		Reply(210)
+
+	err := client.DeleteProject(endpoint + "3")
+
+	st.Expect(t, err, errors.New("Rest request to delete Project failed with status: 210"))
 
 	// Verify no mock pending requests
 	st.Expect(t, gock.IsDone(), true)
