@@ -2,77 +2,60 @@ package client
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/nbio/st"
 	"gopkg.in/h2non/gock.v1"
+
+	mockData "github.com/stakater/jira-service-desk-operator/mock"
 )
 
-const BaseURL = "https://sample.atlassian.net/"
-
-func TestJiraService_GetProject_shouldGetProjectById(t *testing.T) {
+func TestJiraService_GetProject_withValidId_shouldGetProjectByThatId(t *testing.T) {
 	defer gock.Off()
 
 	// The project.LeadAccountId & project.ProjectTemplateKey are not returned by the GET call. Therefore, those values are not returned and matched via Gock Server
-	gock.New(BaseURL + "rest/api/3/project").
+	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
 		Get("/10003").
 		Reply(200).
-		JSON(map[string]string{
-			"description":    "Sample Project",
-			"name":           "Sample",
-			"assigneeType":   "UNASSIGNED",
-			"projectTypeKey": "business",
-			"key":            "KEY",
-			"url":            "https://www.sample.com",
-		})
+		JSON(mockData.GetProjectByIdResponseJSON)
 
-	jiraClient := NewClient("", BaseURL, "")
+	jiraClient := NewClient("", mockData.BaseURL, "")
 	project, err := jiraClient.GetProjectById("/10003")
 
-	st.Expect(t, project.Description, "Sample Project")
-	st.Expect(t, project.Name, "Sample")
-	st.Expect(t, project.AssigneeType, "UNASSIGNED")
-	st.Expect(t, project.ProjectTypeKey, "business")
-	st.Expect(t, project.Key, "KEY")
-	st.Expect(t, project.URL, "https://www.sample.com")
+	st.Expect(t, project.Description, mockData.GetProjectByIdExpectedResponse.Description)
+	st.Expect(t, project.Name, mockData.GetProjectByIdExpectedResponse.Name)
+	st.Expect(t, project.AssigneeType, mockData.GetProjectByIdExpectedResponse.AssigneeType)
+	st.Expect(t, project.ProjectTypeKey, mockData.GetProjectByIdExpectedResponse.ProjectTypeKey)
+	st.Expect(t, project.Key, mockData.GetProjectByIdExpectedResponse.Key)
+	st.Expect(t, project.URL, mockData.GetProjectByIdExpectedResponse.URL)
 	st.Expect(t, err, nil)
 
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestJiraService_CreateProject_shouldCreateProject(t *testing.T) {
+func TestJiraService_CreateProject_withValidData_shouldCreateProject(t *testing.T) {
 	defer gock.Off()
 
-	gock.New(BaseURL + "/rest/api/3/project").
+	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
 		Post("/").
 		MatchType("json").
-		JSON(map[string]string{
-			"description":        "Sample Project",
-			"leadAccountId":      "5ebfbc3ead226b0ba46c3591",
-			"projectTemplateKey": "com.atlassian.jira.jira-incident-management-plugin:im-incident-management",
-			"name":               "Sample",
-			"assigneeType":       "UNASSIGNED",
-			"projectTypeKey":     "business",
-			"key":                "KEY",
-		}).
+		JSON(mockData.CreateProjectInputJSON).
 		Reply(200).
 		JSON(map[string]interface{}{"self": "https://jira-service-desk.net/rest/api/3/project/10003", "id": 10003, "key": "KEY"})
 
 	sampleProject := Project{
-		Description:        "Sample Project",
-		LeadAccountId:      "5ebfbc3ead226b0ba46c3591",
-		ProjectTemplateKey: "com.atlassian.jira.jira-incident-management-plugin:im-incident-management",
-		Name:               "Sample",
-		AssigneeType:       "UNASSIGNED",
-		ProjectTypeKey:     "business",
-		Key:                "KEY",
+		Name:               mockData.CreateProjectInput.Name,
+		Key:                mockData.CreateProjectInput.Key,
+		ProjectTypeKey:     mockData.CreateProjectInput.ProjectTypeKey,
+		ProjectTemplateKey: mockData.CreateProjectInput.ProjectTemplateKey,
+		Description:        mockData.CreateProjectInput.Description,
+		AssigneeType:       mockData.CreateProjectInput.AssigneeType,
+		LeadAccountId:      mockData.CreateProjectInput.LeadAccountId,
+		URL:                mockData.CreateProjectInput.URL,
 	}
 
-	jiraClient := NewClient("", BaseURL, "")
+	jiraClient := NewClient("", mockData.BaseURL, "")
 	id, err := jiraClient.CreateProject(sampleProject)
-
-	fmt.Println(err)
 
 	st.Expect(t, id, "10003")
 	st.Expect(t, err, nil)
@@ -80,17 +63,17 @@ func TestJiraService_CreateProject_shouldCreateProject(t *testing.T) {
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestJiraService_UpdateProject_shouldUpdateProject(t *testing.T) {
+func TestJiraService_UpdateProject_withValidData_shouldUpdateProject(t *testing.T) {
 }
 
-func TestJiraService_DeleteProject_shouldDeleteProject(t *testing.T) {
+func TestJiraService_DeleteProject_withValidId_shouldDeleteProject(t *testing.T) {
 	defer gock.Off()
 
-	gock.New(BaseURL + "/rest/api/3/project").
+	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
 		Delete("/10003").
 		Reply(204)
 
-	jiraClient := NewClient("", BaseURL, "")
+	jiraClient := NewClient("", mockData.BaseURL, "")
 
 	err := jiraClient.DeleteProject("10003")
 	st.Expect(t, err, nil)
@@ -98,14 +81,14 @@ func TestJiraService_DeleteProject_shouldDeleteProject(t *testing.T) {
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestJiraService_DeleteProject_shouldNotDeleteProject(t *testing.T) {
+func TestJiraService_DeleteProject_withInValidId_shouldNotDeleteProject(t *testing.T) {
 	defer gock.Off()
 
-	gock.New(BaseURL + "/rest/api/3/project").
+	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
 		Delete("/").
 		Reply(404)
 
-	jiraClient := NewClient("", BaseURL, "")
+	jiraClient := NewClient("", mockData.BaseURL, "")
 
 	err := jiraClient.DeleteProject("10003")
 
