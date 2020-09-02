@@ -45,8 +45,6 @@ var cfg *rest.Config
 var k8sClient client.Client
 var testEnv *envtest.Environment
 
-const BaseURL = "https://stakater-cloud.atlassian.net/"
-
 var ctx context.Context
 var r *ProjectReconciler
 var util *controllerUtil.TestUtil
