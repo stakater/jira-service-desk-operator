@@ -5,51 +5,33 @@ import (
 	"testing"
 
 	"github.com/nbio/st"
+	mock "github.com/stakater/jira-service-desk-operator/mock"
 	"gopkg.in/h2non/gock.v1"
 )
 
-var endpoint = "177"
-var client = NewClient("", "https://mock.atlassian.net/", "")
-var jira_url = "https://mock.atlassian.net/rest/api/3"
-
-var project = Project{
-	Name:               "Stakater",
-	Key:                "STK",
-	ProjectTypeKey:     "service_desk",
-	ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
-	Description:        "Sample project for jira-service-desk-operator",
-	AssigneeType:       "PROJECT_LEAD",
-	LeadAccountId:      "5ebfbc3wwe226gfda32c3590",
-	URL:                "https://stakater.com",
-}
-
-var update_project = Project{
-	Key:  "WEE",
-	Name: "Stakater2",
-}
-
-func TestJiraServiceDesk_DeleteProject_withValidProjectId_shouldDeleteProject(t *testing.T) {
+func TestJiraServiceDesk_DeleteProject_shouldDeleteProject_whenValidProjectIdIsGiven(t *testing.T) {
 	defer gock.Off()
 
-	gock.New(jira_url).
-		Delete("/" + endpoint).
+	gock.New(mock.BaseURL + EndpointApiVersion3Project).
+		Delete("/" + mock.DummyProjectIDStr).
 		Reply(204)
 
-	err := client.DeleteProject(endpoint)
+	client := NewClient("", mock.BaseURL, "")
+	err := client.DeleteProject(mock.DummyProjectIDStr)
 	st.Expect(t, err, nil)
 
 	// Verify no mock pending requests
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestJiraServiceDesk_DeleteProject_withInvaildProjectId_shouldNotDeleteProject(t *testing.T) {
+func TestJiraServiceDesk_DeleteProject_shouldNotDeleteProject_whenInvaildProjectIdIsGiven(t *testing.T) {
 	defer gock.Off()
 
-	gock.New(jira_url).
+	gock.New(mock.BaseURL + EndpointApiVersion3Project).
 		Delete("/").
 		Reply(404)
-
-	err := client.DeleteProject("1999")
+	client := NewClient("", mock.BaseURL, "")
+	err := client.DeleteProject(mock.DummyProjectIDStr)
 
 	st.Expect(t, err, errors.New("Rest request to delete Project failed with status: 404"))
 
@@ -60,84 +42,66 @@ func TestJiraServiceDesk_DeleteProject_withInvaildProjectId_shouldNotDeleteProje
 func TestJiraServiceDesk_CreateProject_shouldCreateProject(t *testing.T) {
 	defer gock.Off()
 
-	gock.New(jira_url).
+	gock.New(mock.BaseURL + EndpointApiVersion3Project).
 		Post("").
-		JSON(map[string]string{"name": "Stakater",
-			"key":                "STK",
-			"projectTypeKey":     "service_desk",
-			"projectTemplateKey": "com.atlassian.servicedesk:itil-v2-service-desk-project",
-			"description":        "Sample project for jira-service-desk-operator",
-			"assigneeType":       "PROJECT_LEAD",
-			"leadAccountId":      "5ebfbc3wwe226gfda32c3590",
-			"url":                "https://stakater.com"}).
+		JSON(mock.CreateProjectRequestJSON).
 		Reply(204).
-		JSON(map[string]interface{}{"self": "https://mock.atlassian.net/rest/api/3/project/1007",
-			"id":  1007,
-			"key": "STK"})
+		JSON(mock.CreateProjectResponseJSON)
 
-	projectId, err := client.CreateProject(project)
+	var project = Project{
+		Name:               mock.CreateProjectInput.Name,
+		Key:                mock.CreateProjectInput.Key,
+		ProjectTypeKey:     mock.CreateProjectInput.ProjectTypeKey,
+		ProjectTemplateKey: mock.CreateProjectInput.ProjectTemplateKey,
+		Description:        mock.CreateProjectInput.Description,
+		AssigneeType:       mock.CreateProjectInput.AssigneeType,
+		LeadAccountId:      mock.CreateProjectInput.LeadAccountId,
+		URL:                mock.CreateProjectInput.URL,
+	}
+
+	client := NewClient("", mock.BaseURL, "")
+	projectID, err := client.CreateProject(project)
 	st.Expect(t, err, nil)
-	st.Expect(t, projectId, "1007")
+	st.Expect(t, projectID, mock.DummyProjectIDStr)
 	// Verify no mock pending requests
 	st.Expect(t, gock.IsDone(), true)
 }
 
-// not done yet
-func TestJiraServiceDesk_CreateProject_withInvalidProjectField_shouldNotCreateProject(t *testing.T) {
+func TestJiraServiceDesk_UpdateProject_shouldUpdateProject_whenValidProjectIdIsGiven(t *testing.T) {
 	defer gock.Off()
 
-	gock.New(jira_url).
-		Post("").
-		JSON(map[string]string{"name": "Stakater",
-			"keen":               "STK", // instead of key sending keen
-			"projectTypeKey":     "service_desk",
-			"projectTemplateKey": "com.atlassian.servicedesk:itil-v2-service-desk-project",
-			"description":        "Sample project for jira-service-desk-operator",
-			"assigneeType":       "PROJECT_LEAD",
-			"leadAccountId":      "5ebfbc3wwe226gfda32c3590",
-			"url":                "https://stakater.com"}).
+	gock.New(mock.BaseURL + EndpointApiVersion3Project).
+		Put("/" + mock.DummyProjectIDStr).
+		JSON(mock.UpdateProjectRequestJSON).
 		Reply(204).
-		JSON(map[string]interface{}{"self": "https://mock.atlassian.net/rest/api/3/project/1007",
-			"id":  1007,
-			"key": "STK"})
+		JSON(mock.UpdateProjectResponseJSON)
 
-	projectId, err := client.CreateProject(project)
-	st.Expect(t, err, nil)
-	st.Expect(t, projectId, "1007")
-	// Verify no mock pending requests
-	st.Expect(t, gock.IsDone(), true)
-}
-
-func TestJiraServiceDesk_UpdateProject_withValidProjectId_shouldUpdateProject(t *testing.T) {
-	defer gock.Off()
-
-	gock.New(jira_url).
-		Put("/1007").
-		JSON(map[string]string{"name": "Stakater2",
-			"key": "WEE"}).
-		Reply(204).
-		JSON(map[string]interface{}{"self": "https://mock.atlassian.net/rest/api/3/project/1007",
-			"id":  1007,
-			"key": "STK"})
-
-	err := client.UpdateProject(update_project, "1007")
+	var updateProject = Project{
+		Key:  mock.UpdateProjectInput.Key,
+		Name: mock.UpdateProjectInput.Name,
+	}
+	client := NewClient("", mock.BaseURL, "")
+	err := client.UpdateProject(updateProject, mock.DummyProjectIDStr)
 	st.Expect(t, err, nil)
 	// Verify no mock pending requests
 	st.Expect(t, gock.IsDone(), true)
 }
 
-//needs changes
-func TestJiraServiceDesk_UpdateProject_withInvalidProjectId_shouldNotUpdateProject(t *testing.T) {
+func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenInvalidProjectIdIsGiven(t *testing.T) {
 	defer gock.Off()
 
-	gock.New(jira_url).
+	gock.New(mock.BaseURL + EndpointApiVersion3Project).
 		Put("/").
-		JSON(map[string]string{"name": "Stakater2",
-			"key": "WEE"}).
+		JSON(mock.UpdateProjectRequestJSON).
 		Reply(404)
-		//JSON(map[string]interface{}{})
+		//No Json is sent here, just checking the error
 
-	err := client.UpdateProject(update_project, "1007")
+	var updateProject = Project{
+		Key:  mock.UpdateProjectInput.Key,
+		Name: mock.UpdateProjectInput.Name,
+	}
+	client := NewClient("", mock.BaseURL, "")
+	err := client.UpdateProject(updateProject, mock.DummyProjectIDStr)
 	st.Expect(t, err, errors.New("Rest request to update Project failed with status 404 and response: "))
 	// Verify no mock pending requests
 	st.Expect(t, gock.IsDone(), true)

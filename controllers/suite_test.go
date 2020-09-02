@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,16 +17,20 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
+	c "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -40,6 +44,13 @@ import (
 var cfg *rest.Config
 var k8sClient client.Client
 var testEnv *envtest.Environment
+
+const BaseURL = "https://stakater-cloud.atlassian.net/"
+
+var ctx context.Context
+var r *ProjectReconciler
+var util *controllerUtil.TestUtil
+var ns = "test"
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -70,7 +81,17 @@ var _ = BeforeSuite(func(done Done) {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).ToNot(HaveOccurred())
 	Expect(k8sClient).ToNot(BeNil())
-
+	ctx = context.Background()
+	r = &ProjectReconciler{
+		Client:                k8sClient,
+		Scheme:                scheme.Scheme,
+		Log:                   log.Log.WithName("Reconciler"),
+		JiraServiceDeskClient: c.NewClient("", "", ""),
+	}
+	Expect(r).ToNot((BeNil()))
+	util = controllerUtil.New(ctx, k8sClient, r)
+	Expect(util).ToNot(BeNil())
+	util.CreateNamespace(ns)
 	close(done)
 }, 60)
 
