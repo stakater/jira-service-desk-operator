@@ -23,8 +23,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mockData "github.com/stakater/jira-service-desk-operator/mock"
-	"gopkg.in/h2non/gock.v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -84,15 +82,11 @@ var _ = BeforeSuite(func(done Done) {
 
 	ctx = context.Background()
 
-	// Turns on the Mock Gock Server with all the required testing hitpoints
-	// Real Networking Mode is enabled
-	TurnOnTheMockServer(mockData.BaseURL)
-
 	r = &ProjectReconciler{
 		Client:                k8sClient,
 		Scheme:                scheme.Scheme,
 		Log:                   log.Log.WithName("Reconciler"),
-		JiraServiceDeskClient: c.NewClient("", mockData.BaseURL, ""),
+		JiraServiceDeskClient: c.NewClient("", "", ""),
 	}
 	Expect(r).ToNot((BeNil()))
 
@@ -105,27 +99,7 @@ var _ = BeforeSuite(func(done Done) {
 }, 60)
 
 var _ = AfterSuite(func() {
-	defer TurnOffTheMockServer()
-
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).ToNot(HaveOccurred())
 })
-
-func TurnOnTheMockServer(baseURL string) {
-	// Enabling the Real Networking Mode
-	gock.EnableNetworking()
-
-	// HitPoint for the CreateProject Reconciler TestCase
-	gock.New(baseURL + "/rest/api/3/project").
-		Post("/").
-		MatchType("json").
-		JSON(mockData.CreateProjectInputJSON).
-		Reply(200).
-		JSON(mockData.CreateProjectResponseJSON)
-}
-
-func TurnOffTheMockServer() {
-	defer gock.DisableNetworking()
-	defer gock.Off()
-}

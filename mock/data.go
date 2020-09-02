@@ -8,14 +8,14 @@ var CreateProjectResponseID = "10003"
 var CreateProjectResponseIDInt, _ = strconv.Atoi(CreateProjectResponseID)
 
 var CreateProjectInputJSON = map[string]string{
-	"name":               "stakater",
-	"key":                "STK",
+	"name":               "testproject",
+	"key":                "TEST",
 	"projectTypeKey":     "service_desk",
 	"projectTemplateKey": "com.atlassian.servicedesk:itil-v2-service-desk-project",
 	"description":        "Sample project for jira-service-desk-operator",
 	"assigneeType":       "PROJECT_LEAD",
-	"leadAccountId":      "5ebfbc3ead226b0ba46c359Z",
-	"url":                "https://stakater.com",
+	"leadAccountId":      "5ebfbc3ead226b0ba46c3590",
+	"url":                "https://test.com",
 }
 
 var CreateProjectResponseJSON = map[string]interface{}{
@@ -34,14 +34,28 @@ var CreateProjectInput = struct {
 	LeadAccountId      string
 	URL                string
 }{
-	Name:               "stakater",
-	Key:                "STK",
+	Name:               "testproject",
+	Key:                "TEST",
 	ProjectTypeKey:     "service_desk",
 	ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
 	Description:        "Sample project for jira-service-desk-operator",
 	AssigneeType:       "PROJECT_LEAD",
-	LeadAccountId:      "5ebfbc3ead226b0ba46c359Z",
-	URL:                "https://stakater.com",
+	LeadAccountId:      "5ebfbc3ead226b0ba46c3590",
+	URL:                "https://test.com",
+}
+
+var UpdateMutableProjectFields = struct {
+	Name string
+	Key  string
+}{
+	"testupdated",
+	"TEST2",
+}
+
+var UpdateImmutableProjectFields = struct {
+	ProjectTypeKey string
+}{
+	"business",
 }
 
 var GetProjectByIdResponseJSON = map[string]string{

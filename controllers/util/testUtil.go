@@ -98,3 +98,30 @@ func (t *TestUtil) GetProject(name string, namespace string) *jiraservicedeskv1a
 
 	return projectObject
 }
+
+// DeleteProject deletes the project resource
+func (t *TestUtil) DeleteProject(name string, namespace string) {
+	projectObject := &jiraservicedeskv1alpha1.Project{}
+	err := t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, projectObject)
+	if err != nil {
+		ginko.Fail(err.Error())
+	}
+	err = t.k8sClient.Delete(t.ctx, projectObject)
+	if err != nil {
+		ginko.Fail(err.Error())
+	}
+	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
+	_, err = t.r.Reconcile(req)
+	if err != nil {
+		ginko.Fail(err.Error())
+	}
+}
+
+// TryDeleteProject - Tries to delete Project if it exists, does not fail on any error
+func (t *TestUtil) TryDeleteProject(name string, namespace string) {
+	projectObject := &jiraservicedeskv1alpha1.Project{}
+	_ = t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, projectObject)
+	_ = t.k8sClient.Delete(t.ctx, projectObject)
+	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
+	_, _ = t.r.Reconcile(req)
+}
