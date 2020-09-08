@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 
@@ -11,7 +12,8 @@ import (
 
 const (
 	// Endpoints
-	EndpointApiVersion3Project = "/rest/api/3/project"
+	EndpointApiVersion3Project   = "/rest/api/3/project"
+	EndpointCustomerAccessStatus = "/rest/servicedesk/1/servicedesk"
 
 	// Project Template Types
 	ClassicProjectTemplateKey = "com.atlassian.servicedesk:itil-v2-service-desk-project"
@@ -149,6 +151,38 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 
 	if response.StatusCode != 204 {
 		return errors.New("Rest request to delete Project failed with status: " + strconv.Itoa(response.StatusCode))
+	}
+
+	return err
+}
+
+func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(status bool, key string) error {
+	body := struct {
+		autocompleteEnabled     bool
+		manageEnabled           bool
+		serviceDeskOpenAccess   bool
+		serviceDeskPublicSignup bool
+	}{
+		false,
+		false,
+		status,
+		status,
+	}
+	request, err := c.newRequest("POST", EndpointCustomerAccessStatus+"/"+key+"/settings/requestsecurity", body)
+
+	response, err := c.do(request)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+	responseData, _ := ioutil.ReadAll(response.Body)
+
+	if response.StatusCode != 200 {
+		fmt.Println("Error2")
+		err := errors.New("Rest request to update Service Desk Open Access Status failed with status " + strconv.Itoa(response.StatusCode) +
+			" and response: " + string(responseData))
+		return err
 	}
 
 	return err

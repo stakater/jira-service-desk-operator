@@ -24,6 +24,7 @@ type Client interface {
 	UpdateProject(updatedProject Project, id string) error
 	ProjectEqual(oldProject Project, newProject Project) bool
 	GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
+	UpdateCustomerAccessStatus(status bool, key string) error
 }
 
 // Client wraps http client
