@@ -24,14 +24,11 @@ type Client interface {
 	UpdateProject(updatedProject Project, id string) error
 	ProjectEqual(oldProject Project, newProject Project) bool
 	GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
-<<<<<<< HEAD
-=======
 	UpdateCustomerAccessStatus(status bool, key string) error
 	CreateCustomer(customer Customer) (string, error)
 	GetCustomerFromCustomerCR(customer *jiraservicedeskv1alpha1.Customer) Customer
 	//	AddCustomerToProject()
 	//	DeleteCustomerFromProject()
->>>>>>> 3b9b661... Handle create customer
 }
 
 // Client wraps http client
