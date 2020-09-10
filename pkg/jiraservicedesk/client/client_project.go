@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 
@@ -154,8 +155,6 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 	return err
 }
 
-<<<<<<< HEAD
-=======
 func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(status bool, key string) error {
 	body := struct {
 		autocompleteEnabled     bool
@@ -191,7 +190,6 @@ func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(status bool, key stri
 	return err
 }
 
->>>>>>> 3b9b661... Handle create customer
 func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Project) bool {
 	// The fields AvatarId, IssueSecurityScheme, NotificationScheme, PermissionScheme, CategoryId are not retrieved
 	// through get project REST API call so they cannot be used in project comparison
