@@ -154,6 +154,44 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 	return err
 }
 
+<<<<<<< HEAD
+=======
+func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(status bool, key string) error {
+	body := struct {
+		autocompleteEnabled     bool
+		manageEnabled           bool
+		serviceDeskOpenAccess   bool
+		serviceDeskPublicSignup bool
+	}{
+		false,
+		false,
+		status,
+		status,
+	}
+	request, err := c.newRequest("POST", EndpointCustomerAccessStatus+"/"+key+"/settings/requestsecurity", body)
+	if err != nil {
+		return err
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+	responseData, _ := ioutil.ReadAll(response.Body)
+
+	if response.StatusCode != 200 {
+		fmt.Println("Error2")
+		err := errors.New("Rest request to update Service Desk Open Access Status failed with status " + strconv.Itoa(response.StatusCode) +
+			" and response: " + string(responseData))
+		return err
+	}
+
+	return err
+}
+
+>>>>>>> 3b9b661... Handle create customer
 func (c *jiraServiceDeskClient) ProjectEqual(oldProject Project, newProject Project) bool {
 	// The fields AvatarId, IssueSecurityScheme, NotificationScheme, PermissionScheme, CategoryId are not retrieved
 	// through get project REST API call so they cannot be used in project comparison

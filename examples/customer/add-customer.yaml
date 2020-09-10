@@ -1,0 +1,9 @@
+apiVersion: jiraservicedesk.stakater.com/v1alpha1
+kind: Customer
+metadata:
+  name: customer
+spec:
+  displayName: customer1
+  email: customer1@test.com
+  projectKeys:
+    - TP

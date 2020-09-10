@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.3.0
   creationTimestamp: null
-  name: projects.jiraservicedesk.stakater.com
+  name: customers.jiraservicedesk.stakater.com
 spec:
   group: jiraservicedesk.stakater.com
   names:
-    kind: Project
-    listKind: ProjectList
-    plural: projects
-    singular: project
-  scope: Cluster
+    kind: Customer
+    listKind: CustomerList
+    plural: customers
+    singular: customer
+  scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Project is the Schema for the projects API
+      description: Customer is the Schema for the customers API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -34,66 +34,26 @@ spec:
         metadata:
           type: object
         spec:
-          description: ProjectSpec defines the desired state of Project
+          description: CustomerSpec defines the desired state of Customer
           properties:
-            assigneeType:
-              description: Task assignee type
-              enum:
-              - PROJECT_LEAD
-              - UNASSIGNED
+            displayName:
+              description: Name of the customer
               type: string
-            avatarId:
-              description: An integer value for the project's avatar.
-              type: integer
-            categoryId:
-              description: The ID of the project's category
-              type: integer
-            customerAccessStatus:
-              description: The Custermer Access Status of a project
-              type: boolean
-            description:
-              description: Description for project
+            email:
+              description: Email of the customer
               type: string
-            issueSecurityScheme:
-              description: The ID of the issue security scheme for the project, which
-                enables you to control who can and cannot view issues
-              type: integer
-            key:
-              description: The project key is used as the prefix of your project's
-                issue keys
-              type: string
-            leadAccountId:
-              description: ID of project lead
-              maxLength: 128
-              type: string
-            name:
-              description: Name of the project
-              type: string
-            notificationScheme:
-              description: The ID of the notification scheme for the project
-              type: integer
-            permissionScheme:
-              description: The ID of the permission scheme for the project
-              type: integer
-            projectTemplateKey:
-              description: A prebuilt configuration for a project
-              type: string
-            projectTypeKey:
-              description: The project type, which dictates the application-specific
-                feature set
-              enum:
-              - business
-              - service_desk
-              - software
-              type: string
-            url:
-              description: A link to information about this project, such as project
-                documentation
-              type: string
+            projectKeys:
+              description: List of ProjectKeys in which customer will be added
+              items:
+                type: string
+              type: array
           type: object
         status:
-          description: ProjectStatus defines the observed state of Project
+          description: CustomerStatus defines the observed state of Customer
           properties:
+            accountId:
+              description: Jira Service Desk Customer Account Id
+              type: string
             conditions:
               description: Status conditions
               items:
@@ -134,11 +94,6 @@ spec:
                 - type
                 type: object
               type: array
-            id:
-              description: Jira service desk project ID
-              type: string
-          required:
-          - id
           type: object
       type: object
   version: v1alpha1

@@ -11,4 +11,5 @@ spec:
   assigneeType: PROJECT_LEAD
   leadAccountId: 5ebfbc3ead226b0ba46c3590
   url: https://stakater.com
+  customerAccessStatus: false
 

@@ -109,11 +109,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Need to still add webhook part for customer
 	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
 		if err = (&jiraservicedeskv1alpha1.Project{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "Project")
 			os.Exit(1)
 		}
+	}
+
+	if err = (&controllers.CustomerReconciler{
+		Client:                mgr.GetClient(),
+		Log:                   ctrl.Log.WithName("controllers").WithName("Customer"),
+		Scheme:                mgr.GetScheme(),
+		JiraServiceDeskClient: jiraservicedeskclient.NewClient(controllerConfig.ApiToken, controllerConfig.ApiBaseUrl, controllerConfig.Email),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Customer")
+		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder
 
