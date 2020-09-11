@@ -47,6 +47,7 @@ type ProjectReconciler struct {
 
 // +kubebuilder:rbac:groups=jiraservicedesk.stakater.com,resources=projects,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=jiraservicedesk.stakater.com,resources=projects/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list
 
 func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
@@ -71,7 +72,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Validate Custom Resource
 	if ok, err := instance.IsValid(); !ok {
-		return reconcilerUtil.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
 	// Resource is marked for deletion
@@ -92,7 +93,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 		err := r.Client.Update(context.TODO(), instance)
 		if err != nil {
-			return reconcilerUtil.ManageError(r.Client, instance, err)
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
 	}
 
@@ -100,7 +101,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if len(instance.Status.ID) > 0 {
 		existingProject, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
 		if err != nil {
-			return reconcilerUtil.ManageError(r.Client, instance, err)
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
 		// Project already exists
 		if len(existingProject.Id) > 0 {
@@ -132,7 +133,7 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
 	projectId, err := r.JiraServiceDeskClient.CreateProject(project)
 	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
 	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
@@ -153,7 +154,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	// Delete project from JSD
 	err := r.JiraServiceDeskClient.DeleteProject(instance.Status.ID)
 	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
 	// Delete finalizer
@@ -164,7 +165,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	// Update instance
 	err = r.Client.Update(context.TODO(), instance)
 	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
 	return reconcilerUtil.DoNotRequeue()
@@ -177,13 +178,13 @@ func (r *ProjectReconciler) handleUpdate(req ctrl.Request, existingProject jiras
 
 	existingProjectInstance := r.JiraServiceDeskClient.GetProjectCRFromProject(existingProject)
 	if ok, err := instance.IsValidUpdate(existingProjectInstance); !ok {
-		return reconcilerUtil.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 	updatedProject := r.JiraServiceDeskClient.GetProjectForUpdateRequest(existingProject, instance)
 	err := r.JiraServiceDeskClient.UpdateProject(updatedProject, existingProject.Id)
 	if err != nil {
 		log.Error(err, "Failed to update status of Project")
-		return reconcilerUtil.ManageError(r.Client, instance, err)
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
