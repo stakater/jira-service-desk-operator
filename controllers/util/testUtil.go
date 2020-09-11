@@ -50,34 +50,34 @@ func (t *TestUtil) CreateNamespaceObject(name string) *v1.Namespace {
 }
 
 // CreateProjectObject creates a jira project custom resource object
-func (t *TestUtil) CreateProjectObject(name string, key string, projectTypeKey string, projectTemplateKey string, description string, assigneeType string, leadAccountId string, url string, namespace string) *jiraservicedeskv1alpha1.Project {
+func (t *TestUtil) CreateProjectObject(project jiraservicedeskv1alpha1.Project, namespace string) *jiraservicedeskv1alpha1.Project {
 	return &jiraservicedeskv1alpha1.Project{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
+			Name:      project.Spec.Name,
 			Namespace: namespace,
 		},
 		Spec: jiraservicedeskv1alpha1.ProjectSpec{
-			Name:               name,
-			Key:                key,
-			ProjectTypeKey:     projectTypeKey,
-			ProjectTemplateKey: projectTemplateKey,
-			Description:        description,
-			AssigneeType:       assigneeType,
-			LeadAccountId:      leadAccountId,
-			URL:                url,
+			Name:               project.Spec.Name,
+			Key:                project.Spec.Key,
+			ProjectTypeKey:     project.Spec.ProjectTypeKey,
+			ProjectTemplateKey: project.Spec.ProjectTemplateKey,
+			Description:        project.Spec.Description,
+			AssigneeType:       project.Spec.AssigneeType,
+			LeadAccountId:      project.Spec.LeadAccountId,
+			URL:                project.Spec.URL,
 		},
 	}
 }
 
 // CreateProject creates and submits a Project object to the kubernetes server
-func (t *TestUtil) CreateProject(name string, key string, projectTypeKey string, projectTemplateKey string, description string, assigneeType string, leadAccountId string, url string, namespace string) *jiraservicedeskv1alpha1.Project {
-	projectObject := t.CreateProjectObject(name, key, projectTypeKey, projectTemplateKey, description, assigneeType, leadAccountId, url, namespace)
+func (t *TestUtil) CreateProject(project jiraservicedeskv1alpha1.Project, namespace string) *jiraservicedeskv1alpha1.Project {
+	projectObject := t.CreateProjectObject(project, namespace)
 	err := t.k8sClient.Create(t.ctx, projectObject)
 	if err != nil {
 		ginko.Fail(err.Error())
 	}
 
-	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
+	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: project.Spec.Name, Namespace: namespace}}
 
 	_, err = t.r.Reconcile(req)
 	if err != nil {

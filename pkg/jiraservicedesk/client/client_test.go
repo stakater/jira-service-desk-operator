@@ -44,14 +44,14 @@ func TestJiraService_CreateProject_shouldCreateProject_whenValidProjectDataIsGiv
 		JSON(mockData.CreateProjectResponseJSON)
 
 	sampleProject := Project{
-		Name:               mockData.CreateProjectInput.Name,
-		Key:                mockData.CreateProjectInput.Key,
-		ProjectTypeKey:     mockData.CreateProjectInput.ProjectTypeKey,
-		ProjectTemplateKey: mockData.CreateProjectInput.ProjectTemplateKey,
-		Description:        mockData.CreateProjectInput.Description,
-		AssigneeType:       mockData.CreateProjectInput.AssigneeType,
-		LeadAccountId:      mockData.CreateProjectInput.LeadAccountId,
-		URL:                mockData.CreateProjectInput.URL,
+		Name:               mockData.CreateProjectInput.Spec.Name,
+		Key:                mockData.CreateProjectInput.Spec.Key,
+		ProjectTypeKey:     mockData.CreateProjectInput.Spec.ProjectTypeKey,
+		ProjectTemplateKey: mockData.CreateProjectInput.Spec.ProjectTemplateKey,
+		Description:        mockData.CreateProjectInput.Spec.Description,
+		AssigneeType:       mockData.CreateProjectInput.Spec.AssigneeType,
+		LeadAccountId:      mockData.CreateProjectInput.Spec.LeadAccountId,
+		URL:                mockData.CreateProjectInput.Spec.URL,
 	}
 
 	jiraClient := NewClient("", mockData.BaseURL, "")

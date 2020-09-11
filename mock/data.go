@@ -2,6 +2,8 @@ package mock
 
 import (
 	"strconv"
+
+	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 )
 
 const BaseURL = "https://sample.atlassian.net"
@@ -26,24 +28,17 @@ var CreateProjectResponseJSON = map[string]interface{}{
 	"key":  "KEY",
 }
 
-var CreateProjectInput = struct {
-	Name               string
-	Key                string
-	ProjectTypeKey     string
-	ProjectTemplateKey string
-	Description        string
-	AssigneeType       string
-	LeadAccountId      string
-	URL                string
-}{
-	Name:               "testproject",
-	Key:                "TEST",
-	ProjectTypeKey:     "service_desk",
-	ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
-	Description:        "Sample project for jira-service-desk-operator",
-	AssigneeType:       "PROJECT_LEAD",
-	LeadAccountId:      "5ebfbc3ead226b0ba46c3590",
-	URL:                "https://test.com",
+var CreateProjectInput = jiraservicedeskv1alpha1.Project{
+	Spec: jiraservicedeskv1alpha1.ProjectSpec{
+		Name:               "testproject",
+		Key:                "TEST",
+		ProjectTypeKey:     "service_desk",
+		ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
+		Description:        "Sample project for jira-service-desk-operator",
+		AssigneeType:       "PROJECT_LEAD",
+		LeadAccountId:      "5ebfbc3ead226b0ba46c3590",
+		URL:                "https://test.com",
+	},
 }
 
 var UpdateMutableProjectFields = struct {

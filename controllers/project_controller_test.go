@@ -15,14 +15,14 @@ var _ = Describe("ProjectController", func() {
 	projectInput := mockData.CreateProjectInput
 
 	AfterEach(func() {
-		util.TryDeleteProject(projectInput.Name, ns)
+		util.TryDeleteProject(projectInput.Spec.Name, ns)
 	})
 
 	Describe("Create New JiraServiceDeskProject Resource", func() {
 		Context("With the required fields", func() {
 			It("should create a new project", func() {
-				_ = util.CreateProject(projectInput.Name, projectInput.Key, projectInput.ProjectTypeKey, projectInput.ProjectTemplateKey, projectInput.Description, projectInput.AssigneeType, projectInput.LeadAccountId, projectInput.URL, ns)
-				project := util.GetProject(projectInput.Name, ns)
+				_ = util.CreateProject(projectInput, ns)
+				project := util.GetProject(projectInput.Spec.Name, ns)
 
 				Expect(project.Status.ID).NotTo(BeEmpty())
 			})
@@ -32,15 +32,15 @@ var _ = Describe("ProjectController", func() {
 	Describe("Deleting jira service desk project resource", func() {
 		Context("When project on jira service desk was created", func() {
 			It("should remove resource and delete project ", func() {
-				_ = util.CreateProject(projectInput.Name, projectInput.Key, projectInput.ProjectTypeKey, projectInput.ProjectTemplateKey, projectInput.Description, projectInput.AssigneeType, projectInput.LeadAccountId, projectInput.URL, ns)
+				_ = util.CreateProject(projectInput, ns)
 
-				project := util.GetProject(projectInput.Name, ns)
+				project := util.GetProject(projectInput.Spec.Name, ns)
 				Expect(project.Status.ID).NotTo(BeEmpty())
 
 				util.DeleteProject(project.Name, ns)
 
 				projectObject := &jiraservicedeskv1alpha1.Project{}
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: projectInput.Name, Namespace: ns}, projectObject)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}, projectObject)
 
 				Expect(err).To(HaveOccurred())
 			})
@@ -50,8 +50,8 @@ var _ = Describe("ProjectController", func() {
 	Describe("Updating jira service desk resource", func() {
 		Context("With mutable fields ", func() {
 			It("should assign changed field values to Project", func() {
-				_ = util.CreateProject(projectInput.Name, projectInput.Key, projectInput.ProjectTypeKey, projectInput.ProjectTemplateKey, projectInput.Description, projectInput.AssigneeType, projectInput.LeadAccountId, projectInput.URL, ns)
-				project := util.GetProject(projectInput.Name, ns)
+				_ = util.CreateProject(projectInput, ns)
+				project := util.GetProject(projectInput.Spec.Name, ns)
 
 				project.Spec.Name = mockData.UpdateMutableProjectFields.Name
 				project.Spec.Key = mockData.UpdateMutableProjectFields.Key
@@ -61,13 +61,13 @@ var _ = Describe("ProjectController", func() {
 					Fail(err.Error())
 				}
 
-				req := reconcile.Request{NamespacedName: types.NamespacedName{Name: projectInput.Name, Namespace: ns}}
+				req := reconcile.Request{NamespacedName: types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}}
 				_, err = r.Reconcile(req)
 				if err != nil {
 					Fail(err.Error())
 				}
 
-				updatedProject := util.GetProject(projectInput.Name, ns)
+				updatedProject := util.GetProject(projectInput.Spec.Name, ns)
 
 				Expect(updatedProject.Spec.Name).To(Equal(mockData.UpdateMutableProjectFields.Name))
 				Expect(updatedProject.Spec.Key).To(Equal(mockData.UpdateMutableProjectFields.Key))
