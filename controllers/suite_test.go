@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -28,13 +29,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/envtest/printer"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
 	c "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
+	config "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/config"
+	secretsUtil "github.com/stakater/operator-utils/util/secrets"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -48,7 +50,9 @@ var testEnv *envtest.Environment
 var ctx context.Context
 var r *ProjectReconciler
 var util *controllerUtil.TestUtil
-var ns = "test"
+var ns = "rehanhaider"
+
+var log = logf.Log.WithName("config")
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -59,6 +63,7 @@ func TestAPIs(t *testing.T) {
 }
 
 var _ = BeforeSuite(func(done Done) {
+
 	logf.SetLogger(zap.LoggerTo(GinkgoWriter, true))
 
 	By("bootstrapping test environment")
@@ -82,11 +87,29 @@ var _ = BeforeSuite(func(done Done) {
 
 	ctx = context.Background()
 
+	// Retrieve operator namespace
+	operatorNamespace, _ := os.LookupEnv("OPERATOR_NAMESPACE")
+
+	apiToken, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskAPITokenSecretKey)
+	if err != nil {
+		log.Error(err, "Unable to fetch apiToken from secret")
+	}
+
+	apiBaseUrl, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskAPIBaseURLSecretKey)
+	if err != nil {
+		log.Error(err, "Unable to fetch apiBaseUrl from secret")
+	}
+
+	email, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskEmailSecretKey)
+	if err != nil {
+		log.Error(err, "Unable to fetch email from secret")
+	}
+
 	r = &ProjectReconciler{
 		Client:                k8sClient,
 		Scheme:                scheme.Scheme,
-		Log:                   log.Log.WithName("Reconciler"),
-		JiraServiceDeskClient: c.NewClient("", "", ""),
+		Log:                   log.WithName("Reconciler"),
+		JiraServiceDeskClient: c.NewClient(apiToken, apiBaseUrl, email),
 	}
 	Expect(r).ToNot((BeNil()))
 

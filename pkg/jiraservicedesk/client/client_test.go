@@ -7,20 +7,20 @@ import (
 	"github.com/nbio/st"
 	"gopkg.in/h2non/gock.v1"
 
+	"github.com/stakater/jira-service-desk-operator/mock"
 	mockData "github.com/stakater/jira-service-desk-operator/mock"
 )
 
-func TestJiraService_GetProject_withValidId_shouldGetProjectByThatId(t *testing.T) {
+func TestJiraService_GetProject_shouldGetProject_whenValidProjectIdIsGiven(t *testing.T) {
 	defer gock.Off()
 
-	// The project.LeadAccountId & project.ProjectTemplateKey are not returned by the GET call. Therefore, those values are not returned and matched via Gock Server
 	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
-		Get("/10003").
+		Get("/" + mockData.ProjectID).
 		Reply(200).
 		JSON(mockData.GetProjectByIdResponseJSON)
 
 	jiraClient := NewClient("", mockData.BaseURL, "")
-	project, err := jiraClient.GetProjectById("/10003")
+	project, err := jiraClient.GetProjectById("/" + mockData.ProjectID)
 
 	st.Expect(t, project.Description, mockData.GetProjectByIdExpectedResponse.Description)
 	st.Expect(t, project.Name, mockData.GetProjectByIdExpectedResponse.Name)
@@ -33,7 +33,7 @@ func TestJiraService_GetProject_withValidId_shouldGetProjectByThatId(t *testing.
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestJiraService_CreateProject_withValidData_shouldCreateProject(t *testing.T) {
+func TestJiraService_CreateProject_shouldCreateProject_whenValidProjectDataIsGiven(t *testing.T) {
 	defer gock.Off()
 
 	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
@@ -41,7 +41,7 @@ func TestJiraService_CreateProject_withValidData_shouldCreateProject(t *testing.
 		MatchType("json").
 		JSON(mockData.CreateProjectInputJSON).
 		Reply(200).
-		JSON(map[string]interface{}{"self": "https://jira-service-desk.net/rest/api/3/project/10003", "id": 10003, "key": "KEY"})
+		JSON(mockData.CreateProjectResponseJSON)
 
 	sampleProject := Project{
 		Name:               mockData.CreateProjectInput.Name,
@@ -57,31 +57,69 @@ func TestJiraService_CreateProject_withValidData_shouldCreateProject(t *testing.
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	id, err := jiraClient.CreateProject(sampleProject)
 
-	st.Expect(t, id, "10003")
+	st.Expect(t, id, mockData.ProjectID)
 	st.Expect(t, err, nil)
 
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestJiraService_UpdateProject_withValidData_shouldUpdateProject(t *testing.T) {
-}
-
-func TestJiraService_DeleteProject_withValidId_shouldDeleteProject(t *testing.T) {
+func TestJiraService_UpdateProject_shouldUpdateProject_whenValidProjectIdIsGiven(t *testing.T) {
 	defer gock.Off()
 
 	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
-		Delete("/10003").
+		Put("/" + mockData.ProjectID).
+		JSON(mock.UpdateProjectRequestJSON).
+		Reply(204).
+		JSON(mock.UpdateProjectResponseJSON)
+
+	var updateProject = Project{
+		Key:  mockData.UpdateProjectInput.Key,
+		Name: mockData.UpdateProjectInput.Name,
+	}
+
+	client := NewClient("", mock.BaseURL, "")
+	err := client.UpdateProject(updateProject, mock.ProjectID)
+	st.Expect(t, err, nil)
+
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenInvalidProjectIdIsGiven(t *testing.T) {
+	defer gock.Off()
+
+	gock.New(mock.BaseURL + EndpointApiVersion3Project).
+		Put("/").
+		JSON(mock.UpdateProjectRequestJSON).
+		Reply(404)
+		//No Json is sent here, just checking the error
+
+	var updateProject = Project{
+		Key:  mock.UpdateProjectInput.Key,
+		Name: mock.UpdateProjectInput.Name,
+	}
+	client := NewClient("", mock.BaseURL, "")
+	err := client.UpdateProject(updateProject, mock.ProjectID)
+	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
+	// Verify no mock pending requests
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestJiraService_DeleteProject_shouldDeleteProject_whenValidProjectIdIsGiven(t *testing.T) {
+	defer gock.Off()
+
+	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
+		Delete("/" + mockData.ProjectID).
 		Reply(204)
 
 	jiraClient := NewClient("", mockData.BaseURL, "")
 
-	err := jiraClient.DeleteProject("10003")
+	err := jiraClient.DeleteProject(mockData.ProjectID)
 	st.Expect(t, err, nil)
 
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestJiraService_DeleteProject_withInValidId_shouldNotDeleteProject(t *testing.T) {
+func TestJiraService_DeleteProject_shouldNotDeleteProject_whenInValidProjectIdIsGiven(t *testing.T) {
 	defer gock.Off()
 
 	gock.New(mockData.BaseURL + EndpointApiVersion3Project).
@@ -89,10 +127,9 @@ func TestJiraService_DeleteProject_withInValidId_shouldNotDeleteProject(t *testi
 		Reply(404)
 
 	jiraClient := NewClient("", mockData.BaseURL, "")
+	err := jiraClient.DeleteProject(mockData.ProjectID)
 
-	err := jiraClient.DeleteProject("10003")
-
-	st.Expect(t, err, errors.New("Rest request to delete Project failed with status: 404"))
+	st.Expect(t, err, errors.New(mockData.DeleteProjectFailedErrorMsg))
 
 	st.Expect(t, gock.IsDone(), true)
 }

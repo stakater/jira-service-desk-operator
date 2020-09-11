@@ -1,11 +1,13 @@
 package mock
 
-import "strconv"
+import (
+	"strconv"
+)
 
 const BaseURL = "https://sample.atlassian.net"
 
-var CreateProjectResponseID = "10003"
-var CreateProjectResponseIDInt, _ = strconv.Atoi(CreateProjectResponseID)
+var ProjectID = "10003"
+var ProjectIDInt, _ = strconv.Atoi(ProjectID)
 
 var CreateProjectInputJSON = map[string]string{
 	"name":               "testproject",
@@ -20,7 +22,7 @@ var CreateProjectInputJSON = map[string]string{
 
 var CreateProjectResponseJSON = map[string]interface{}{
 	"self": BaseURL + "/rest/api/3/project/10003",
-	"id":   CreateProjectResponseIDInt,
+	"id":   ProjectIDInt,
 	"key":  "KEY",
 }
 
@@ -82,3 +84,24 @@ var GetProjectByIdExpectedResponse = struct {
 	"KEY",
 	"https://www.sample.com",
 }
+
+var UpdateProjectInput = struct {
+	Name string
+	Key  string
+}{
+	Name: "stakater2",
+	Key:  "WEE",
+}
+
+var UpdateProjectRequestJSON = map[string]string{
+	"name": "stakater2",
+	"key":  "WEE",
+}
+
+var UpdateProjectResponseJSON = map[string]interface{}{
+	"self": BaseURL + "/rest/api/3/project/" + ProjectID,
+	"id":   ProjectIDInt,
+	"key":  "STK",
+}
+var UpdateProjectFailedErrorMsg = "Rest request to update Project failed with status 404 and response: "
+var DeleteProjectFailedErrorMsg = "Rest request to delete Project failed with status: 404"
