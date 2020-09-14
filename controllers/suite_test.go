@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -51,7 +50,7 @@ var testEnv *envtest.Environment
 var ctx context.Context
 var r *ProjectReconciler
 var util *controllerUtil.TestUtil
-var ns
+var ns string
 
 var log = logf.Log.WithName("config")
 
