@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -50,6 +51,7 @@ var testEnv *envtest.Environment
 var ctx context.Context
 var r *ProjectReconciler
 var util *controllerUtil.TestUtil
+var ns
 
 var log = logf.Log.WithName("config")
 
@@ -87,17 +89,17 @@ var _ = BeforeSuite(func(done Done) {
 	ctx = context.Background()
 
 	// Retrieve operator namespace
-	operatorNamespace, _ := os.LookupEnv("OPERATOR_NAMESPACE")
+	ns, _ := os.LookupEnv("OPERATOR_NAMESPACE")
 
-	apiToken, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskAPITokenSecretKey)
+	apiToken, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskAPITokenSecretKey)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(apiToken).ToNot(BeNil())
 
-	apiBaseUrl, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskAPIBaseURLSecretKey)
+	apiBaseUrl, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskAPIBaseURLSecretKey)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(apiBaseUrl).ToNot(BeNil())
 
-	email, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskEmailSecretKey)
+	email, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskEmailSecretKey)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(email).ToNot(BeNil())
 
