@@ -10,6 +10,12 @@ const BaseURL = "https://sample.atlassian.net"
 
 var ProjectID = "10003"
 var ProjectIDInt, _ = strconv.Atoi(ProjectID)
+var InvalidPermissionScheme = "4000"
+
+var GetProjectFailedErrorMsg = "Rest request to get Project failed with status: 404"
+var CreateProjectFailedErrorMsg = "Rest request to create Project failed with status 400 and response: "
+var UpdateProjectFailedErrorMsg = "Rest request to update Project failed with status 404 and response: "
+var DeleteProjectFailedErrorMsg = "Rest request to delete Project failed with status: 404"
 
 var CreateProjectInputJSON = map[string]string{
 	"name":               "testproject",
@@ -38,6 +44,24 @@ var CreateProjectInput = jiraservicedeskv1alpha1.Project{
 		AssigneeType:       "PROJECT_LEAD",
 		LeadAccountId:      "5ebfbc3ead226b0ba46c3590",
 		URL:                "https://test.com",
+	},
+}
+
+var CreateProjectInvalidInput = jiraservicedeskv1alpha1.Project{
+	Spec: jiraservicedeskv1alpha1.ProjectSpec{
+		Name:                "test",
+		Key:                 "TEST20000",
+		ProjectTypeKey:      "service_desk",
+		ProjectTemplateKey:  "com.atlassian.servicedesk:itil-v2-service-desk-project",
+		Description:         "Sample project for jira-service-desk-operator",
+		AssigneeType:        "PROJECT_LEAD",
+		LeadAccountId:       "5ebfbc3ead226b0ba46c3590",
+		URL:                 "https://test.com",
+		AvatarId:            10200,
+		IssueSecurityScheme: 10001,
+		PermissionScheme:    10011,
+		NotificationScheme:  10021,
+		CategoryId:          10120,
 	},
 }
 
@@ -98,5 +122,3 @@ var UpdateProjectResponseJSON = map[string]interface{}{
 	"id":   ProjectIDInt,
 	"key":  "STK",
 }
-var UpdateProjectFailedErrorMsg = "Rest request to update Project failed with status 404 and response: "
-var DeleteProjectFailedErrorMsg = "Rest request to delete Project failed with status: 404"

@@ -57,14 +57,19 @@ func (t *TestUtil) CreateProjectObject(project jiraservicedeskv1alpha1.Project, 
 			Namespace: namespace,
 		},
 		Spec: jiraservicedeskv1alpha1.ProjectSpec{
-			Name:               project.Spec.Name,
-			Key:                project.Spec.Key,
-			ProjectTypeKey:     project.Spec.ProjectTypeKey,
-			ProjectTemplateKey: project.Spec.ProjectTemplateKey,
-			Description:        project.Spec.Description,
-			AssigneeType:       project.Spec.AssigneeType,
-			LeadAccountId:      project.Spec.LeadAccountId,
-			URL:                project.Spec.URL,
+			Name:                project.Spec.Name,
+			Key:                 project.Spec.Key,
+			ProjectTypeKey:      project.Spec.ProjectTypeKey,
+			ProjectTemplateKey:  project.Spec.ProjectTemplateKey,
+			Description:         project.Spec.Description,
+			AssigneeType:        project.Spec.AssigneeType,
+			LeadAccountId:       project.Spec.LeadAccountId,
+			URL:                 project.Spec.URL,
+			AvatarId:            project.Spec.AvatarId,
+			IssueSecurityScheme: project.Spec.IssueSecurityScheme,
+			PermissionScheme:    project.Spec.PermissionScheme,
+			NotificationScheme:  project.Spec.NotificationScheme,
+			CategoryId:          project.Spec.CategoryId,
 		},
 	}
 }
@@ -74,14 +79,14 @@ func (t *TestUtil) CreateProject(project jiraservicedeskv1alpha1.Project, namesp
 	projectObject := t.CreateProjectObject(project, namespace)
 	err := t.k8sClient.Create(t.ctx, projectObject)
 	if err != nil {
-		ginko.Fail(err.Error())
+		ginkgo.Fail(err.Error())
 	}
 
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: project.Spec.Name, Namespace: namespace}}
 
 	_, err = t.r.Reconcile(req)
 	if err != nil {
-		ginko.Fail(err.Error())
+		ginkgo.Fail(err.Error())
 	}
 
 	return projectObject

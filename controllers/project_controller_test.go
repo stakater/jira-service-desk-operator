@@ -3,75 +3,120 @@ package controllers
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mockData "github.com/stakater/jira-service-desk-operator/mock"
-
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
+	mockData "github.com/stakater/jira-service-desk-operator/mock"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-var _ = Describe("ProjectController", func() {
+var _ = Describe("ProjectController Positive Test cases", func() {
 
-	projectInput := mockData.CreateProjectInput
+	Describe("Positive Test Cases", func() {
 
-	AfterEach(func() {
-		util.TryDeleteProject(projectInput.Spec.Name, ns)
-	})
+		projectInput := mockData.CreateProjectInput
 
-	Describe("Create New JiraServiceDeskProject Resource", func() {
-		Context("With the required fields", func() {
-			It("should create a new project", func() {
-				_ = util.CreateProject(projectInput, ns)
-				project := util.GetProject(projectInput.Spec.Name, ns)
+		AfterEach(func() {
+			util.TryDeleteProject(projectInput.Spec.Name, ns)
+		})
 
-				Expect(project.Status.ID).NotTo(BeEmpty())
+		Describe("Create new Jira service desk project resource", func() {
+			Context("With valid fields", func() {
+				It("should create a new project", func() {
+					_ = util.CreateProject(projectInput, ns)
+					project := util.GetProject(projectInput.Spec.Name, ns)
+
+					Expect(project.Status.ID).ToNot(Equal(""))
+				})
 			})
 		})
-	})
 
-	Describe("Deleting jira service desk project resource", func() {
-		Context("When project on jira service desk was created", func() {
-			It("should remove resource and delete project ", func() {
-				_ = util.CreateProject(projectInput, ns)
+		Describe("Deleting jira service desk project resource", func() {
+			Context("With valid project Id", func() {
+				It("should remove resource and delete project ", func() {
+					_ = util.CreateProject(projectInput, ns)
 
-				project := util.GetProject(projectInput.Spec.Name, ns)
-				Expect(project.Status.ID).NotTo(BeEmpty())
+					project := util.GetProject(projectInput.Spec.Name, ns)
+					Expect(project.Status.ID).NotTo(BeEmpty())
 
-				util.DeleteProject(project.Name, ns)
+					util.DeleteProject(project.Name, ns)
 
-				projectObject := &jiraservicedeskv1alpha1.Project{}
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}, projectObject)
+					projectObject := &jiraservicedeskv1alpha1.Project{}
+					err := k8sClient.Get(ctx, types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}, projectObject)
 
-				Expect(err).To(HaveOccurred())
+					Expect(err).To(HaveOccurred())
+				})
 			})
 		})
-	})
 
-	Describe("Updating jira service desk resource", func() {
-		Context("With mutable fields ", func() {
-			It("should assign changed field values to Project", func() {
-				_ = util.CreateProject(projectInput, ns)
-				project := util.GetProject(projectInput.Spec.Name, ns)
+		Describe("Updating jira service desk resource", func() {
+			Context("With mutable fields ", func() {
+				It("should assign changed field values to Project", func() {
+					_ = util.CreateProject(projectInput, ns)
+					project := util.GetProject(projectInput.Spec.Name, ns)
 
-				project.Spec.Name = mockData.UpdateMutableProjectFields.Name
-				project.Spec.Key = mockData.UpdateMutableProjectFields.Key
+					project.Spec.Name = mockData.UpdateMutableProjectFields.Name
+					project.Spec.Key = mockData.UpdateMutableProjectFields.Key
 
-				err := k8sClient.Update(ctx, project)
-				if err != nil {
-					Fail(err.Error())
-				}
+					err := k8sClient.Update(ctx, project)
+					if err != nil {
+						Fail(err.Error())
+					}
 
-				req := reconcile.Request{NamespacedName: types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}}
-				_, err = r.Reconcile(req)
-				if err != nil {
-					Fail(err.Error())
-				}
+					req := reconcile.Request{NamespacedName: types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}}
+					_, err = r.Reconcile(req)
+					if err != nil {
+						Fail(err.Error())
+					}
 
-				updatedProject := util.GetProject(projectInput.Spec.Name, ns)
+					updatedProject := util.GetProject(projectInput.Spec.Name, ns)
 
-				Expect(updatedProject.Spec.Name).To(Equal(mockData.UpdateMutableProjectFields.Name))
-				Expect(updatedProject.Spec.Key).To(Equal(mockData.UpdateMutableProjectFields.Key))
+					Expect(updatedProject.Spec.Name).To(Equal(mockData.UpdateMutableProjectFields.Name))
+					Expect(updatedProject.Spec.Key).To(Equal(mockData.UpdateMutableProjectFields.Key))
+				})
+			})
+			Context("With immutable fields ", func() {
+				It("should not assign changed field values to Project", func() {
+					_ = util.CreateProject(projectInput, ns)
+					project := util.GetProject(projectInput.Spec.Name, ns)
+
+					oldTypeKey := project.Spec.ProjectTypeKey
+					project.Spec.ProjectTemplateKey = mockData.UpdateImmutableProjectFields.ProjectTypeKey
+
+					err := k8sClient.Update(ctx, project)
+					if err != nil {
+						Fail(err.Error())
+					}
+
+					req := reconcile.Request{NamespacedName: types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}}
+					_, err = r.Reconcile(req)
+					if err != nil {
+						Fail(err.Error())
+					}
+
+					updatedProject := util.GetProject(projectInput.Spec.Name, ns)
+
+					Expect(updatedProject.Spec.ProjectTypeKey).To(Equal(oldTypeKey))
+				})
 			})
 		})
+
 	})
+
+	Describe("ProjectController Negative Test cases", func() {
+
+		projectInvalidInput := mockData.CreateProjectInvalidInput
+
+		Describe("Create new Jira servie desk project resource", func() {
+			Context("which exists", func() {
+				It("should not create a new project", func() {
+					_ = util.CreateProject(projectInvalidInput, ns)
+					project := util.GetProject(projectInvalidInput.Spec.Name, ns)
+
+					Expect(project.Status.ID).To(Equal(""))
+				})
+			})
+		})
+
+	})
+
 })

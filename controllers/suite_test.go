@@ -35,7 +35,7 @@ import (
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
 	c "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
-	config "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/config"
+	"github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/config"
 	secretsUtil "github.com/stakater/operator-utils/util/secrets"
 	// +kubebuilder:scaffold:imports
 )
