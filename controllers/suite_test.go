@@ -50,7 +50,6 @@ var testEnv *envtest.Environment
 var ctx context.Context
 var r *ProjectReconciler
 var util *controllerUtil.TestUtil
-var ns = "rehanhaider"
 
 var log = logf.Log.WithName("config")
 
@@ -91,19 +90,16 @@ var _ = BeforeSuite(func(done Done) {
 	operatorNamespace, _ := os.LookupEnv("OPERATOR_NAMESPACE")
 
 	apiToken, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskAPITokenSecretKey)
-	if err != nil {
-		log.Error(err, "Unable to fetch apiToken from secret")
-	}
+	Expect(err).ToNot(HaveOccurred())
+	Expect(apiToken).ToNot(BeNil())
 
 	apiBaseUrl, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskAPIBaseURLSecretKey)
-	if err != nil {
-		log.Error(err, "Unable to fetch apiBaseUrl from secret")
-	}
+	Expect(err).ToNot(HaveOccurred())
+	Expect(apiBaseUrl).ToNot(BeNil())
 
 	email, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, operatorNamespace, config.JiraServiceDeskEmailSecretKey)
-	if err != nil {
-		log.Error(err, "Unable to fetch email from secret")
-	}
+	Expect(err).ToNot(HaveOccurred())
+	Expect(email).ToNot(BeNil())
 
 	r = &ProjectReconciler{
 		Client:                k8sClient,
@@ -115,8 +111,6 @@ var _ = BeforeSuite(func(done Done) {
 
 	util = controllerUtil.New(ctx, k8sClient, r)
 	Expect(util).ToNot(BeNil())
-
-	util.CreateNamespace(ns)
 
 	close(done)
 }, 60)
