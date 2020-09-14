@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -35,8 +34,6 @@ import (
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
 	c "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
-	config "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/config"
-	secretsUtil "github.com/stakater/operator-utils/util/secrets"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -88,25 +85,25 @@ var _ = BeforeSuite(func(done Done) {
 	ctx = context.Background()
 
 	// Retrieve operator namespace
-	ns, _ := os.LookupEnv("OPERATOR_NAMESPACE")
+	// ns, _ := os.LookupEnv("OPERATOR_NAMESPACE")
 
-	apiToken, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskAPITokenSecretKey)
-	Expect(err).ToNot(HaveOccurred())
-	Expect(apiToken).ToNot(BeNil())
+	// apiToken, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskAPITokenSecretKey)
+	// Expect(err).ToNot(HaveOccurred())
+	// Expect(apiToken).ToNot(BeNil())
 
-	apiBaseUrl, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskAPIBaseURLSecretKey)
-	Expect(err).ToNot(HaveOccurred())
-	Expect(apiBaseUrl).ToNot(BeNil())
+	// apiBaseUrl, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskAPIBaseURLSecretKey)
+	// Expect(err).ToNot(HaveOccurred())
+	// Expect(apiBaseUrl).ToNot(BeNil())
 
-	email, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskEmailSecretKey)
-	Expect(err).ToNot(HaveOccurred())
-	Expect(email).ToNot(BeNil())
+	// email, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskEmailSecretKey)
+	// Expect(err).ToNot(HaveOccurred())
+	// Expect(email).ToNot(BeNil())
 
 	r = &ProjectReconciler{
 		Client:                k8sClient,
 		Scheme:                scheme.Scheme,
 		Log:                   log.WithName("Reconciler"),
-		JiraServiceDeskClient: c.NewClient(apiToken, apiBaseUrl, email),
+		JiraServiceDeskClient: c.NewClient("20ns1bNBObCXoABy6tqL084D", "https://stakater-cloud.atlassian.net/", "sre.1@stakater.com"),
 	}
 	Expect(r).ToNot((BeNil()))
 
