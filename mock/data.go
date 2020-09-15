@@ -105,9 +105,11 @@ var GetProjectByIdExpectedResponse = struct {
 }
 
 var UpdateProjectInput = struct {
+	Id   string
 	Name string
 	Key  string
 }{
+	Id:   "99999",
 	Name: "stakater2",
 	Key:  "WEE",
 }

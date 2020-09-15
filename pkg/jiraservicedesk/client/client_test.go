@@ -137,6 +137,24 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenInvalidProject
 	st.Expect(t, gock.IsDone(), true)
 }
 
+func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenImmutableFieldIsGiven(t *testing.T) {
+	defer gock.Off()
+
+	gock.New(mock.BaseURL + EndpointApiVersion3Project).
+		Put("/" + mockData.ProjectID).
+		Reply(404)
+
+	var updateProject = Project{
+		Key: mock.UpdateProjectInput.Id,
+	}
+
+	client := NewClient("", mock.BaseURL, "")
+	err := client.UpdateProject(updateProject, mock.ProjectID)
+	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
+
+	st.Expect(t, gock.IsDone(), true)
+}
+
 func TestJiraService_DeleteProject_shouldDeleteProject_whenValidProjectIdIsGiven(t *testing.T) {
 	defer gock.Off()
 

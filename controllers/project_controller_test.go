@@ -9,9 +9,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-var _ = Describe("ProjectController Positive Test cases", func() {
+var _ = Describe("ProjectController", func() {
 
-	Describe("Positive Test Cases", func() {
+	Describe("Positive test cases", func() {
 
 		projectInput := mockData.CreateProjectInput
 
@@ -50,6 +50,7 @@ var _ = Describe("ProjectController Positive Test cases", func() {
 
 		Describe("Updating jira service desk resource", func() {
 			Context("With mutable fields ", func() {
+
 				It("should assign changed field values to Project", func() {
 					_ = util.CreateProject(projectInput, ns)
 					project := util.GetProject(projectInput.Spec.Name, ns)
@@ -73,8 +74,10 @@ var _ = Describe("ProjectController Positive Test cases", func() {
 					Expect(updatedProject.Spec.Name).To(Equal(mockData.UpdateMutableProjectFields.Name))
 					Expect(updatedProject.Spec.Key).To(Equal(mockData.UpdateMutableProjectFields.Key))
 				})
+
 			})
 			Context("With immutable fields ", func() {
+
 				It("should not assign changed field values to Project", func() {
 					_ = util.CreateProject(projectInput, ns)
 					project := util.GetProject(projectInput.Spec.Name, ns)
@@ -97,17 +100,18 @@ var _ = Describe("ProjectController Positive Test cases", func() {
 
 					Expect(updatedProject.Spec.ProjectTypeKey).To(Equal(oldTypeKey))
 				})
+
 			})
 		})
 
 	})
 
-	Describe("ProjectController Negative Test cases", func() {
+	Describe("Negative test cases", func() {
 
 		projectInvalidInput := mockData.CreateProjectInvalidInput
 
 		Describe("Create new Jira servie desk project resource", func() {
-			Context("which exists", func() {
+			Context("with invalid fields", func() {
 				It("should not create a new project", func() {
 					_ = util.CreateProject(projectInvalidInput, ns)
 					project := util.GetProject(projectInvalidInput.Spec.Name, ns)

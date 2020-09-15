@@ -73,7 +73,7 @@ func (c *jiraServiceDeskClient) GetProjectById(id string) (Project, error) {
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode == 404 {
+	if response.StatusCode < 200 || response.StatusCode > 299 {
 		err := errors.New("Rest request to get Project failed with status: " + strconv.Itoa(response.StatusCode))
 		return project, err
 	}
