@@ -25,7 +25,7 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.0.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
-  name: jira-service-desk-operator.v0.0.6
+  name: jira-service-desk-operator.v0.0.8
   namespace: jira-service-desk-operator
 spec:
   apiservicedefinitions: {}
@@ -122,7 +122,7 @@ spec:
                       fieldPath: metadata.annotations['olm.targetNamespaces']
                 - name: CONFIG_SECRET_NAME
                   value: jira-service-desk-config
-                image: stakater/jira-service-desk-operator:0.0.6
+                image: stakater/jira-service-desk-operator:0.0.8
                 name: manager
                 ports:
                 - containerPort: 9443
@@ -202,8 +202,8 @@ spec:
   provider:
     name: stakater
     url: https://stakater.com
-  replaces: jira-service-desk-operator.v0.0.5
-  version: 0.0.6
+  replaces: jira-service-desk-operator.v0.0.7
+  version: 0.0.8
   webhookdefinitions:
   - admissionReviewVersions: null
     deploymentName: jira-service-desk-operator-webhook
