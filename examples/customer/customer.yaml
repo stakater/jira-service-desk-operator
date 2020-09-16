@@ -2,11 +2,9 @@ apiVersion: jiraservicedesk.stakater.com/v1alpha1
 kind: Customer
 metadata:
   name: customer
-  namespace: rehanhaider
 spec:
-  displayName: t43
-  email: t43@test.com
+  displayName: test-customer
+  email: test@test.com
   projectKeys:
-    - TP
-    - CUS
-  operation: add
+    - 1
+    - 2

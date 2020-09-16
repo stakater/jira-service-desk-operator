@@ -78,8 +78,10 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// Resource is marked for deletion
 	if instance.DeletionTimestamp != nil {
 		log.Info("Deletion timestamp found for instance " + req.Name)
-		log.Info("Warning! Customer should not be deleted")
-
+		if finalizerUtil.HasFinalizer(instance, CustomerFinalizer) {
+			return r.handleDelete(req, instance)
+		}
+		// Finalizer doesn't exist so clean up is already done
 		return reconcilerUtil.DoNotRequeue()
 	}
 
@@ -160,6 +162,39 @@ func (r *CustomerReconciler) handleRemove(req ctrl.Request, instance *jiraservic
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
 		log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
+	}
+
+	return reconcilerUtil.ManageSuccess(r.Client, instance)
+}
+
+func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
+	log := r.Log.WithValues("customer", req.NamespacedName)
+
+	if instance == nil {
+		// Instance not found, nothing to do
+		return reconcilerUtil.DoNotRequeue()
+	}
+
+	log.Info("Removing Jira Service Desk Customer: " + instance.Spec.DisplayName)
+
+	// Remove customer from JSD project
+	for _, projectKey := range instance.Spec.ProjectKeys {
+		err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.AccountId, projectKey)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+		log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
+	}
+
+	// Delete Finalizer
+	finalizerUtil.DeleteFinalizer(instance, CustomerFinalizer)
+
+	log.Info("Finalizer removed for customer: " + instance.Spec.DisplayName)
+
+	// Update instance
+	err := r.Client.Update(context.TODO(), instance)
+	if err != nil {
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
 	return reconcilerUtil.DoNotRequeue()
