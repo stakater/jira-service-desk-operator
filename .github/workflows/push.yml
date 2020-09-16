@@ -61,7 +61,8 @@ jobs:
         kubectl create namespace test
         echo "${{ secrets.SECRET_KUBERNETES_RESOURCES }}"> kube.yaml
         kubectl apply -f kube.yaml
-        
+        rm -f kube.yaml
+
     - name: Test
       run: make test OPERATOR_NAMESPACE=test USE_EXISTING_CLUSTER=true
 
@@ -100,7 +101,7 @@ jobs:
         DRY_RUN: true
 
     # Install operator-sdk
-    - name: Install operator-sdk
+    - name: Install operator-sdk       
       env:
         OPERATOR_SDK_VERSION: ${{ env.OPERATOR_SDK_VERSION }}
       run: |
