@@ -16,6 +16,26 @@ rules:
 - apiGroups:
   - jiraservicedesk.stakater.com
   resources:
+  - customers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - jiraservicedesk.stakater.com
+  resources:
+  - customers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - jiraservicedesk.stakater.com
+  resources:
   - projects
   verbs:
   - create

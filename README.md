@@ -1,4 +1,4 @@
-# [WIP] jira-service-desk-operator
+# jira-service-desk-operator
 Kubernetes operator for Jira Service Desk
 
 ## About
@@ -60,3 +60,6 @@ $ oc apply -f bundle/manifests
    - `make bundle`
    - `make packagemanifests`
    
+## Running Tests
+
+To run the tests either use `go test` or `ginkgo` in the directory where test_suite.go is located.

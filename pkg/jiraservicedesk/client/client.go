@@ -24,6 +24,10 @@ type Client interface {
 	UpdateProject(updatedProject Project, id string) error
 	ProjectEqual(oldProject Project, newProject Project) bool
 	GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
+	CreateCustomer(customer Customer) (string, error)
+	GetCustomerFromCustomerCRForCreateCustomer(customer *jiraservicedeskv1alpha1.Customer) Customer
+	AddCustomerToProject(customerAccountId string, projectKey string) error
+	RemoveCustomerFromProject(customerAccountId string, projectKey string) error
 }
 
 // Client wraps http client
@@ -69,6 +73,36 @@ func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "golang httpClient")
+	req.SetBasicAuth(c.email, c.apiToken)
+	return req, nil
+}
+
+func (c *jiraServiceDeskClient) newRequestWithExperimentalHeader(method, path string, body interface{}) (*http.Request, error) {
+	endpoint := c.baseURL + path
+	url, err := url.Parse(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	var buf io.ReadWriter
+
+	if body != nil {
+		buf = new(bytes.Buffer)
+		err := json.NewEncoder(buf).Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+	req, err := http.NewRequest(method, url.String(), buf)
+	if err != nil {
+		return nil, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", "golang httpClient")
+	req.Header.Set("X-ExperimentalApi", "opt-in")
 	req.SetBasicAuth(c.email, c.apiToken)
 	return req, nil
 }
