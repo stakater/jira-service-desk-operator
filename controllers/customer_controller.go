@@ -147,7 +147,7 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 		}
 	}
 
-	instance.Status.AssociatedProjects = deleteEmpty(instance.Status.AssociatedProjects)
+	instance.Status.AssociatedProjects = removeEmptyProjects(instance.Status.AssociatedProjects)
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
@@ -185,6 +185,7 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 	return reconcilerUtil.DoNotRequeue()
 }
 
+// Checks if a string is present in the slice
 func contains(slice []string, search string) bool {
 	for _, value := range slice {
 		if value == search {
@@ -194,7 +195,7 @@ func contains(slice []string, search string) bool {
 	return false
 }
 
-func deleteEmpty(slice []string) []string {
+func removeEmptyProjects(slice []string) []string {
 	var output []string
 	for _, str := range slice {
 		if str != "" {
