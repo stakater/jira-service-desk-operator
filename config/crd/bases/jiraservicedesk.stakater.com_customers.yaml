@@ -42,10 +42,6 @@ spec:
             email:
               description: Email of the customer
               type: string
-            operation:
-              description: If false, customer is added to the project else removed
-                from project
-              type: string
             projectKeys:
               description: List of ProjectKeys in which customer will be added
               items:
@@ -97,6 +93,11 @@ spec:
                 - status
                 - type
                 type: object
+              type: array
+            projectKeys:
+              description: List of ProjectKeys in which customer has bee added
+              items:
+                type: string
               type: array
           required:
           - accountId

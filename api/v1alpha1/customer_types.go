@@ -40,17 +40,15 @@ type CustomerSpec struct {
 	// List of ProjectKeys in which customer will be added
 	// +optional
 	ProjectKeys []string `json:"projectKeys,omitempty"`
-
-	//
-	// If false, customer is added to the project else removed from project
-	// +optional
-	Operation string `json:"operation,omitempty"`
 }
 
 // CustomerStatus defines the observed state of Customer
 type CustomerStatus struct {
 	// Jira Service Desk Customer Account Id
 	AccountId string `json:"accountId"`
+
+	// List of ProjectKeys in which customer has bee added
+	ProjectKeys []string `json:"projectKeys,omitempty"`
 
 	// Status conditions
 	Conditions status.Conditions `json:"conditions,omitempty"`

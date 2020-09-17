@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"strings"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -99,15 +98,7 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return reconcilerUtil.DoNotRequeue()
 	}
 
-	if strings.ToLower(instance.Spec.Operation) == "remove" {
-		return r.handleRemove(req, instance)
-	} else if strings.ToLower(instance.Spec.Operation) == "add" {
-		return r.handleCreate(req, instance)
-	} else {
-		log.Info("Invalid Operation is provided in CR")
-	}
-
-	return reconcilerUtil.DoNotRequeue()
+	return r.handleCreate(req, instance)
 }
 
 func (r *CustomerReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -132,37 +123,29 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 		log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.DisplayName)
 	}
 
-	log.Info("Adding Jira Service Desk Customer: " + instance.Spec.DisplayName)
-
 	for _, projectKey := range instance.Spec.ProjectKeys {
-		err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.AccountId, projectKey)
-		if err != nil {
-			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		if !contains(instance.Status.ProjectKeys, projectKey) {
+			err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.AccountId, projectKey)
+			if err != nil {
+				return reconcilerUtil.ManageError(r.Client, instance, err, false)
+			}
+			instance.Status.ProjectKeys = append(instance.Status.ProjectKeys, projectKey)
+			log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 		}
-		log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 	}
 
-	return reconcilerUtil.ManageSuccess(r.Client, instance)
-}
-
-func (r *CustomerReconciler) handleRemove(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
-	log := r.Log.WithValues("customer", req.NamespacedName)
-
-	if instance == nil {
-		// Instance not found, nothing to do
-		return reconcilerUtil.DoNotRequeue()
-	}
-
-	log.Info("Removing Jira Service Desk Customer: " + instance.Spec.DisplayName)
-
-	// Remove customer from JSD project
-	for _, projectKey := range instance.Spec.ProjectKeys {
-		err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.AccountId, projectKey)
-		if err != nil {
-			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	for index, projectKey := range instance.Status.ProjectKeys {
+		if !contains(instance.Spec.ProjectKeys, projectKey) {
+			err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.AccountId, projectKey)
+			if err != nil {
+				return reconcilerUtil.ManageError(r.Client, instance, err, false)
+			}
+			instance.Status.ProjectKeys[index] = ""
+			log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
 		}
-		log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
 	}
+
+	instance.Status.ProjectKeys = deleteEmpty(instance.Status.ProjectKeys)
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
@@ -178,7 +161,7 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 	log.Info("Removing Jira Service Desk Customer: " + instance.Spec.DisplayName)
 
 	// Remove customer from JSD project
-	for _, projectKey := range instance.Spec.ProjectKeys {
+	for _, projectKey := range instance.Status.ProjectKeys {
 		err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.AccountId, projectKey)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
@@ -198,4 +181,23 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 	}
 
 	return reconcilerUtil.DoNotRequeue()
+}
+
+func contains(slice []string, search string) bool {
+	for _, value := range slice {
+		if value == search {
+			return true
+		}
+	}
+	return false
+}
+
+func deleteEmpty(slice []string) []string {
+	var output []string
+	for _, str := range slice {
+		if str != "" {
+			output = append(output, str)
+		}
+	}
+	return output
 }

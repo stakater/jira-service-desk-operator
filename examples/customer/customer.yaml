@@ -3,8 +3,8 @@ kind: Customer
 metadata:
   name: customer
 spec:
-  displayName: test-customer
-  email: test@test.com
+  displayName: test4
+  email: test4@test.com
   projectKeys:
-    - 1
-    - 2
+    - TES
+    - TES2
