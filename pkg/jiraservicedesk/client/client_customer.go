@@ -33,7 +33,7 @@ type AddCustomerResponse struct {
 }
 
 func (c *jiraServiceDeskClient) CreateCustomer(customer Customer) (string, error) {
-	request, err := c.newRequest("POST", EndpointCreateCustomer, customer)
+	request, err := c.newRequest("POST", EndpointCreateCustomer, customer, false)
 	if err != nil {
 		return "", err
 	}
@@ -66,7 +66,7 @@ func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, p
 		AccountIds: []string{customerAccountId},
 	}
 
-	request, err := c.newRequest("POST", EndpointAddCustomer+projectKey+"/customer", addCustomerBody)
+	request, err := c.newRequest("POST", EndpointAddCustomer+projectKey+"/customer", addCustomerBody, false)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (c *jiraServiceDeskClient) RemoveCustomerFromProject(customerAccountId stri
 		AccountIds: []string{customerAccountId},
 	}
 
-	request, err := c.newRequestWithExperimentalHeader("DELETE", EndpointAddCustomer+projectKey+"/customer", removeCustomerBody)
+	request, err := c.newRequest("DELETE", EndpointAddCustomer+projectKey+"/customer", removeCustomerBody, true)
 	if err != nil {
 		return err
 	}

@@ -48,7 +48,7 @@ func NewClient(apiToken string, baseURL string, email string) Client {
 	}
 }
 
-func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}) (*http.Request, error) {
+func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}, experimental bool) (*http.Request, error) {
 	endpoint := c.baseURL + path
 	url, err := url.Parse(endpoint)
 	if err != nil {
@@ -73,36 +73,11 @@ func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "golang httpClient")
-	req.SetBasicAuth(c.email, c.apiToken)
-	return req, nil
-}
 
-func (c *jiraServiceDeskClient) newRequestWithExperimentalHeader(method, path string, body interface{}) (*http.Request, error) {
-	endpoint := c.baseURL + path
-	url, err := url.Parse(endpoint)
-	if err != nil {
-		return nil, err
+	if experimental {
+		req.Header.Set("X-ExperimentalApi", "opt-in")
 	}
 
-	var buf io.ReadWriter
-
-	if body != nil {
-		buf = new(bytes.Buffer)
-		err := json.NewEncoder(buf).Encode(body)
-		if err != nil {
-			return nil, err
-		}
-	}
-	req, err := http.NewRequest(method, url.String(), buf)
-	if err != nil {
-		return nil, err
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", "golang httpClient")
-	req.Header.Set("X-ExperimentalApi", "opt-in")
 	req.SetBasicAuth(c.email, c.apiToken)
 	return req, nil
 }

@@ -21,9 +21,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // CustomerSpec defines the desired state of Customer
 type CustomerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -31,7 +28,7 @@ type CustomerSpec struct {
 
 	// Name of the customer
 	// +required
-	DisplayName string `json:"displayName,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	// Email of the customer
 	// +required
@@ -39,16 +36,16 @@ type CustomerSpec struct {
 
 	// List of ProjectKeys in which customer will be added
 	// +optional
-	ProjectKeys []string `json:"projectKeys,omitempty"`
+	Projects []string `json:"projects,omitempty"`
 }
 
 // CustomerStatus defines the observed state of Customer
 type CustomerStatus struct {
 	// Jira Service Desk Customer Account Id
-	AccountId string `json:"accountId"`
+	CustomerId string `json:"customerId"`
 
 	// List of ProjectKeys in which customer has bee added
-	ProjectKeys []string `json:"projectKeys,omitempty"`
+	AssociatedProjects []string `json:"associatedProjects,omitempty"`
 
 	// Status conditions
 	Conditions status.Conditions `json:"conditions,omitempty"`

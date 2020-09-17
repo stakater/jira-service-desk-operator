@@ -36,13 +36,13 @@ spec:
         spec:
           description: CustomerSpec defines the desired state of Customer
           properties:
-            displayName:
-              description: Name of the customer
-              type: string
             email:
               description: Email of the customer
               type: string
-            projectKeys:
+            name:
+              description: Name of the customer
+              type: string
+            projects:
               description: List of ProjectKeys in which customer will be added
               items:
                 type: string
@@ -51,9 +51,11 @@ spec:
         status:
           description: CustomerStatus defines the observed state of Customer
           properties:
-            accountId:
-              description: Jira Service Desk Customer Account Id
-              type: string
+            associatedProjects:
+              description: List of ProjectKeys in which customer has bee added
+              items:
+                type: string
+              type: array
             conditions:
               description: Status conditions
               items:
@@ -94,13 +96,11 @@ spec:
                 - type
                 type: object
               type: array
-            projectKeys:
-              description: List of ProjectKeys in which customer has bee added
-              items:
-                type: string
-              type: array
+            customerId:
+              description: Jira Service Desk Customer Account Id
+              type: string
           required:
-          - accountId
+          - customerId
           type: object
       type: object
   version: v1alpha1

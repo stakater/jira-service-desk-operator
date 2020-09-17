@@ -110,8 +110,8 @@ func (r *CustomerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
 	log := r.Log.WithValues("customer", req.NamespacedName)
 
-	if len(instance.Status.AccountId) == 0 {
-		log.Info("Creating Jira Service Desk Customer: " + instance.Spec.DisplayName)
+	if len(instance.Status.CustomerId) == 0 {
+		log.Info("Creating Jira Service Desk Customer: " + instance.Spec.Name)
 
 		customer := r.JiraServiceDeskClient.GetCustomerFromCustomerCRForCreateCustomer(instance)
 		customerId, err := r.JiraServiceDeskClient.CreateCustomer(customer)
@@ -119,33 +119,35 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
 
-		instance.Status.AccountId = customerId
-		log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.DisplayName)
+		instance.Status.CustomerId = customerId
+		log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
 	}
 
-	for _, projectKey := range instance.Spec.ProjectKeys {
-		if !contains(instance.Status.ProjectKeys, projectKey) {
-			err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.AccountId, projectKey)
+	log.Info("Modifying project associations for jsd customer: " + instance.Spec.Name)
+
+	for _, projectKey := range instance.Spec.Projects {
+		if !contains(instance.Status.AssociatedProjects, projectKey) {
+			err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, projectKey)
 			if err != nil {
 				return reconcilerUtil.ManageError(r.Client, instance, err, false)
 			}
-			instance.Status.ProjectKeys = append(instance.Status.ProjectKeys, projectKey)
+			instance.Status.AssociatedProjects = append(instance.Status.AssociatedProjects, projectKey)
 			log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 		}
 	}
 
-	for index, projectKey := range instance.Status.ProjectKeys {
-		if !contains(instance.Spec.ProjectKeys, projectKey) {
-			err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.AccountId, projectKey)
+	for index, projectKey := range instance.Status.AssociatedProjects {
+		if !contains(instance.Spec.Projects, projectKey) {
+			err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.CustomerId, projectKey)
 			if err != nil {
 				return reconcilerUtil.ManageError(r.Client, instance, err, false)
 			}
-			instance.Status.ProjectKeys[index] = ""
+			instance.Status.AssociatedProjects[index] = ""
 			log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
 		}
 	}
 
-	instance.Status.ProjectKeys = deleteEmpty(instance.Status.ProjectKeys)
+	instance.Status.AssociatedProjects = deleteEmpty(instance.Status.AssociatedProjects)
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
@@ -158,11 +160,11 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 		return reconcilerUtil.DoNotRequeue()
 	}
 
-	log.Info("Removing Jira Service Desk Customer: " + instance.Spec.DisplayName)
+	log.Info("Removing project associations for jsd customer: " + instance.Spec.Name)
 
 	// Remove customer from JSD project
-	for _, projectKey := range instance.Status.ProjectKeys {
-		err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.AccountId, projectKey)
+	for _, projectKey := range instance.Status.AssociatedProjects {
+		err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.CustomerId, projectKey)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
@@ -172,7 +174,7 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 	// Delete Finalizer
 	finalizerUtil.DeleteFinalizer(instance, CustomerFinalizer)
 
-	log.Info("Finalizer removed for customer: " + instance.Spec.DisplayName)
+	log.Info("Finalizer removed for customer: " + instance.Spec.Name)
 
 	// Update instance
 	err := r.Client.Update(context.TODO(), instance)

@@ -62,4 +62,10 @@ $ oc apply -f bundle/manifests
    
 ## Running Tests
 
-To run the tests either use `go test` or `ginkgo` in the directory where test_suite.go is located.
+### Pre-requisites:
+1. Create a namespace with the name `test`
+2. Create `jira-service-desk-config` secret in test namespace
+
+### To run tests:
+Use the following command to run tests:
+`make test OPERATOR_NAMESPACE=test USE_EXISTING_CLUSTER=true`
