@@ -2,6 +2,7 @@ apiVersion: jiraservicedesk.stakater.com/v1alpha1
 kind: Customer
 metadata:
   name: customer
+  namespace: default
 spec:
   name: testCustomer
   email: testCustomer@test.com

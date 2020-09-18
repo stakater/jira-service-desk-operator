@@ -85,11 +85,6 @@ spec:
     - <AssociatedProjectKey>
 ```
 
-#### Limitations
-- Once a customer is created with the Jira Service Desk Operator, it can only be added or removed from the projects. Customers can't be deleted. The Jira Service Desk Api don't provides a support for this.
-- Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can't be accessed later with the Jira Service Desk Operator.
-- The Api call to remove the customer from the project is in experimental phase at the moment.
-
 ## Local Development
 
 [Operator-sdk v0.19.0](https://github.com/operator-framework/operator-sdk/releases/tag/v0.19.0) is required for local development.
@@ -112,4 +107,7 @@ spec:
 Use the following command to run tests:
 `make test OPERATOR_NAMESPACE=test USE_EXISTING_CLUSTER=true`
 
-
+### Limitations
+- Once a customer is created with the Jira Service Desk Operator, it can only be added or removed from the projects. Customers can't be deleted. The Jira Service Desk Api don't provides a support for this.
+- Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can't be accessed later with the Jira Service Desk Operator.
+- The Api call to remove the customer from the project is in experimental phase at the moment.
