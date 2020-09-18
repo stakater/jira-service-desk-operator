@@ -48,6 +48,48 @@ $ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/rel
 $ oc apply -f bundle/manifests
 ```
 
+### Create Project
+
+Create the project on jira-service-desk with the following custom resource:
+
+```yaml
+apiVersion: jiraservicedesk.stakater.com/v1alpha1
+kind: Project
+metadata:
+  name: <Name>
+  namespace: default
+spec:
+  name: <ProjectName>
+  key: <ProjectKey>
+  projectTypeKey: <ProjectTypeKey>
+  projectTemplateKey: <ProjectTemplateKey>
+  description: <ProjectDescription>
+  assigneeType: <ProjectAssigneeType>
+  leadAccountId: <ProjectLeadAccountId>
+  url: <ProjectUrl>
+```
+
+### Add/Remove Customers to JSD Project
+
+Create a customer and than add/remove customer into jira-service desk project with the following custom resource
+
+```yaml
+apiVersion: jiraservicedesk.stakater.com/v1alpha1
+kind: Customer
+metadata:
+  name: <Name>
+spec:
+  name: <CustomerName>
+  email: <CustomerEmail>
+  projects:
+    - <AssociatedProjectKey>
+```
+
+#### Limitations
+- Once a customer is created with the Jira Service Desk Operator, it can only be added or removed from the projects. Customers can't be deleted. The Jira Service Desk Api don't provides a support for this.
+- Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can't be accessed later with the Jira Service Desk Operator.
+- The Api call to remove the customer from the project is in experimental phase at the moment.
+
 ## Local Development
 
 [Operator-sdk v0.19.0](https://github.com/operator-framework/operator-sdk/releases/tag/v0.19.0) is required for local development.
@@ -69,3 +111,5 @@ $ oc apply -f bundle/manifests
 ### To run tests:
 Use the following command to run tests:
 `make test OPERATOR_NAMESPACE=test USE_EXISTING_CLUSTER=true`
+
+
