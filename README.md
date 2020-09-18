@@ -111,3 +111,4 @@ Use the following command to run tests:
 - Once a customer is created with the Jira Service Desk Operator, it can only be added or removed from the projects. Customers can't be deleted. The Jira Service Desk Api don't provides a support for this.
 - Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can't be accessed later with the Jira Service Desk Operator.
 - The Api call to remove the customer from the project is in experimental phase at the moment.
+
