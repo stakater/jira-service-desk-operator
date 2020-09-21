@@ -32,8 +32,6 @@ import (
 )
 
 const (
-	// TODO: Check if this is required in our case
-	// defaultRequeueTime = 60 * time.Second
 	CustomerFinalizer string = "jiraservicedesk.stakater.com/customer"
 )
 
