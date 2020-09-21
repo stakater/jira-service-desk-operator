@@ -98,6 +98,10 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return reconcilerUtil.DoNotRequeue()
 	}
 
+	if len(instance.Status.CustomerId) > 0 {
+		return r.handleUpdate(req, instance)
+	}
+
 	return r.handleCreate(req, instance)
 }
 
@@ -107,44 +111,60 @@ func (r *CustomerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
+func (r *CustomerReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
 	log := r.Log.WithValues("customer", req.NamespacedName)
 
-	if len(instance.Status.CustomerId) == 0 {
-		log.Info("Creating Jira Service Desk Customer: " + instance.Spec.Name)
+	log.Info("Modifying project associations for jsd customer: " + instance.Spec.Name)
 
-		customer := r.JiraServiceDeskClient.GetCustomerFromCustomerCRForCreateCustomer(instance)
-		customerId, err := r.JiraServiceDeskClient.CreateCustomer(customer)
+	addedProjects := difference(instance.Spec.Projects, instance.Status.AssociatedProjects)
+	removedProjects := difference(instance.Status.AssociatedProjects, instance.Spec.Projects)
+
+	for _, projectKey := range addedProjects {
+		err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, projectKey)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
-
-		instance.Status.CustomerId = customerId
-		log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
+		instance.Status.AssociatedProjects = append(instance.Status.AssociatedProjects, projectKey)
+		log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 	}
+
+	for index, projectKey := range removedProjects {
+		err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.CustomerId, projectKey)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+		instance.Status.AssociatedProjects[index] = ""
+		log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
+	}
+
+	instance.Status.AssociatedProjects = removeEmptyProjects(instance.Status.AssociatedProjects)
+
+	return reconcilerUtil.ManageSuccess(r.Client, instance)
+}
+
+func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
+	log := r.Log.WithValues("customer", req.NamespacedName)
+
+	log.Info("Creating Jira Service Desk Customer: " + instance.Spec.Name)
+
+	customer := r.JiraServiceDeskClient.GetCustomerFromCustomerCRForCreateCustomer(instance)
+	customerId, err := r.JiraServiceDeskClient.CreateCustomer(customer)
+	if err != nil {
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	}
+
+	instance.Status.CustomerId = customerId
+	log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
 
 	log.Info("Modifying project associations for jsd customer: " + instance.Spec.Name)
 
 	for _, projectKey := range instance.Spec.Projects {
-		if !contains(instance.Status.AssociatedProjects, projectKey) {
-			err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, projectKey)
-			if err != nil {
-				return reconcilerUtil.ManageError(r.Client, instance, err, false)
-			}
-			instance.Status.AssociatedProjects = append(instance.Status.AssociatedProjects, projectKey)
-			log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
+		err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, projectKey)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
-	}
-
-	for index, projectKey := range instance.Status.AssociatedProjects {
-		if !contains(instance.Spec.Projects, projectKey) {
-			err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.CustomerId, projectKey)
-			if err != nil {
-				return reconcilerUtil.ManageError(r.Client, instance, err, false)
-			}
-			instance.Status.AssociatedProjects[index] = ""
-			log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
-		}
+		instance.Status.AssociatedProjects = append(instance.Status.AssociatedProjects, projectKey)
+		log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 	}
 
 	instance.Status.AssociatedProjects = removeEmptyProjects(instance.Status.AssociatedProjects)
@@ -185,16 +205,6 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 	return reconcilerUtil.DoNotRequeue()
 }
 
-// Checks if a string is present in the slice
-func contains(slice []string, search string) bool {
-	for _, value := range slice {
-		if value == search {
-			return true
-		}
-	}
-	return false
-}
-
 func removeEmptyProjects(slice []string) []string {
 	var output []string
 	for _, str := range slice {
@@ -203,4 +213,22 @@ func removeEmptyProjects(slice []string) []string {
 		}
 	}
 	return output
+}
+
+// returns the difference between the two slices
+func difference(slice1 []string, slice2 []string) []string {
+	var diff []string
+	for _, obj1 := range slice1 {
+		found := false
+		for _, obj2 := range slice2 {
+			if obj1 == obj2 {
+				found = true
+				break
+			}
+		}
+		if !found {
+			diff = append(diff, obj1)
+		}
+	}
+	return diff
 }

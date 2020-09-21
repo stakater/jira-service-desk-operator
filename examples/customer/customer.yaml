@@ -7,4 +7,7 @@ spec:
   name: testCustomer
   email: testCustomer@test.com
   projects:
-    - TEST
+    - TEST1
+    - TEST2
+    - TEST3
+    - TEST4
