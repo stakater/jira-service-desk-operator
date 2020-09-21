@@ -12,7 +12,7 @@ import (
 const (
 	// Endpoints
 	EndpointCreateCustomer = "/rest/servicedeskapi/customer"
-	EndpointAddCustomer    = "/rest/servicedeskapi/servicedesk/"
+	AddCustomerApiPath     = "/rest/servicedeskapi/servicedesk/"
 )
 
 type Customer struct {
@@ -66,7 +66,7 @@ func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, p
 		AccountIds: []string{customerAccountId},
 	}
 
-	request, err := c.newRequest("POST", EndpointAddCustomer+projectKey+"/customer", addCustomerBody, false)
+	request, err := c.newRequest("POST", AddCustomerApiPath+projectKey+"/customer", addCustomerBody, false)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (c *jiraServiceDeskClient) RemoveCustomerFromProject(customerAccountId stri
 		AccountIds: []string{customerAccountId},
 	}
 
-	request, err := c.newRequest("DELETE", EndpointAddCustomer+projectKey+"/customer", removeCustomerBody, true)
+	request, err := c.newRequest("DELETE", AddCustomerApiPath+projectKey+"/customer", removeCustomerBody, true)
 	if err != nil {
 		return err
 	}
