@@ -86,7 +86,7 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Add finalizer if it doesn't exist
 	if !finalizerUtil.HasFinalizer(instance, CustomerFinalizer) {
-		log.Info("Adding finalizer for instance" + req.Name)
+		log.Info("Adding finalizer for instance " + req.Name)
 
 		finalizerUtil.AddFinalizer(instance, CustomerFinalizer)
 

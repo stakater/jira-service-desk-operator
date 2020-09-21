@@ -31,6 +31,7 @@ type CustomerSpec struct {
 	Name string `json:"name,omitempty"`
 
 	// Email of the customer
+	// +kubebuilder:validation:Pattern=\S+@\S+\.\S+
 	// +required
 	Email string `json:"email,omitempty"`
 
