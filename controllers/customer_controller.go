@@ -167,8 +167,6 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 		log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 	}
 
-	instance.Status.AssociatedProjects = removeEmptyProjects(instance.Status.AssociatedProjects)
-
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
 
