@@ -116,35 +116,48 @@ func (r *CustomerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func (r *CustomerReconciler) handleUpdate(req ctrl.Request, existingCustomer jiraservicedeskclient.Customer, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
 	log := r.Log.WithValues("customer", req.NamespacedName)
 
-	log.Info("Modifying project associations for jsd customer: " + instance.Spec.Name)
+	log.Info("Modifying project associations for JSD Customer: " + instance.Spec.Name)
 
 	existingCustomerInstance := r.JiraServiceDeskClient.GetCustomerCRFromCustomer(existingCustomer)
 	if ok, err := instance.IsValidUpdate(existingCustomerInstance); !ok {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
-	addedProjects := updatedProjectList(instance.Spec.Projects, instance.Status.AssociatedProjects)
-	removedProjects := updatedProjectList(instance.Status.AssociatedProjects, instance.Spec.Projects)
-
-	for _, projectKey := range addedProjects {
-		err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, projectKey)
-		if err != nil {
-			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	for _, specProjectKey := range instance.Spec.Projects {
+		found := false
+		for _, statusProjectKey := range instance.Status.AssociatedProjects {
+			if specProjectKey == statusProjectKey {
+				found = true
+				break
+			}
 		}
-		instance.Status.AssociatedProjects = append(instance.Status.AssociatedProjects, projectKey)
-		log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
+		if !found {
+			err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, specProjectKey)
+			if err != nil {
+				return reconcilerUtil.ManageError(r.Client, instance, err, false)
+			}
+			log.Info("Successfully added Jira Service Desk Customer into project: " + specProjectKey)
+		}
 	}
 
-	for index, projectKey := range removedProjects {
-		err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.CustomerId, projectKey)
-		if err != nil {
-			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	for _, statusProjectKey := range instance.Status.AssociatedProjects {
+		found := false
+		for _, specProjectKey := range instance.Spec.Projects {
+			if specProjectKey == statusProjectKey {
+				found = true
+				break
+			}
 		}
-		instance.Status.AssociatedProjects[index] = ""
-		log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
+		if !found {
+			err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.CustomerId, statusProjectKey)
+			if err != nil {
+				return reconcilerUtil.ManageError(r.Client, instance, err, false)
+			}
+			log.Info("Successfully removed Jira Service Desk Customer from project: " + statusProjectKey)
+		}
 	}
 
-	instance.Status.AssociatedProjects = removeEmptyProjects(instance.Status.AssociatedProjects)
+	instance.Status.AssociatedProjects = instance.Spec.DeepCopy().Projects
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
@@ -163,16 +176,16 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 
 	log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
 
-	log.Info("Modifying project associations for jsd customer: " + instance.Spec.Name)
+	log.Info("Modifying project associations for JSD Customer: " + instance.Spec.Name)
 
 	for _, projectKey := range instance.Spec.Projects {
 		err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, projectKey)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
-		instance.Status.AssociatedProjects = append(instance.Status.AssociatedProjects, projectKey)
 		log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 	}
+	instance.Status.AssociatedProjects = instance.Spec.DeepCopy().Projects
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
@@ -217,19 +230,19 @@ func removeEmptyProjects(slice []string) []string {
 	return output
 }
 
-func updatedProjectList(slice1 []string, slice2 []string) []string {
-	var diff []string
-	for _, obj1 := range slice1 {
-		found := false
-		for _, obj2 := range slice2 {
-			if obj1 == obj2 {
-				found = true
-				break
-			}
-		}
-		if !found {
-			diff = append(diff, obj1)
-		}
-	}
-	return diff
-}
+// func updatedProjectList(slice1 []string, slice2 []string) []string {
+// 	var diff []string
+// 	for _, obj1 := range slice1 {
+// 		found := false
+// 		for _, obj2 := range slice2 {
+// 			if obj1 == obj2 {
+// 				found = true
+// 				break
+// 			}
+// 		}
+// 		if !found {
+// 			diff = append(diff, obj1)
+// 		}
+// 	}
+// 	return diff
+// }
