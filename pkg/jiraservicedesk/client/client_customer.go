@@ -171,6 +171,10 @@ func (c *jiraServiceDeskClient) DeleteCustomer(customerAccountId string) error {
 	return nil
 }
 
+func (c *jiraServiceDeskClient) GetCustomerCRFromCustomer(customer Customer) jiraservicedeskv1alpha1.Customer {
+	return customerToCustomerCRMapper(customer)
+}
+
 func (c *jiraServiceDeskClient) GetCustomerFromCustomerCRForCreateCustomer(customer *jiraservicedeskv1alpha1.Customer) Customer {
 	return customerCRToCustomerMapperForCreateCustomer(customer)
 }

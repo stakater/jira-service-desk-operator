@@ -19,13 +19,14 @@ package v1alpha1
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/operator-framework/operator-sdk/pkg/status"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
-	invalidUpdateErrorMsg string = "can not be updated."
+	invalidUpdateErrorMsg string = "can not be modified."
 )
 
 // CustomerSpec defines the desired state of Customer
@@ -107,11 +108,11 @@ func (customer *Customer) IsValid() (bool, error) {
 
 func (customer *Customer) IsValidUpdate(existingCustomer Customer) (bool, error) {
 
-	if customer.Spec.Email != existingCustomer.Spec.Email {
-		return false, fmt.Errorf("%s %s", "Customer email ", invalidUpdateErrorMsg)
+	if strings.ToLower(customer.Spec.Email) != existingCustomer.Spec.Email {
+		return false, fmt.Errorf("%s %s", "Customer email", invalidUpdateErrorMsg)
 	}
 	if customer.Spec.Name != existingCustomer.Spec.Name {
-		return false, fmt.Errorf("%s %s", "Customer name ", invalidUpdateErrorMsg)
+		return false, fmt.Errorf("%s %s", "Customer name", invalidUpdateErrorMsg)
 	}
 
 	return true, nil

@@ -118,6 +118,11 @@ func (r *CustomerReconciler) handleUpdate(req ctrl.Request, existingCustomer jir
 
 	log.Info("Modifying project associations for jsd customer: " + instance.Spec.Name)
 
+	existingCustomerInstance := r.JiraServiceDeskClient.GetCustomerCRFromCustomer(existingCustomer)
+	if ok, err := instance.IsValidUpdate(existingCustomerInstance); !ok {
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	}
+
 	addedProjects := updatedProjectList(instance.Spec.Projects, instance.Status.AssociatedProjects)
 	removedProjects := updatedProjectList(instance.Status.AssociatedProjects, instance.Spec.Projects)
 

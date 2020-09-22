@@ -29,6 +29,7 @@ type Client interface {
 	AddCustomerToProject(customerAccountId string, projectKey string) error
 	RemoveCustomerFromProject(customerAccountId string, projectKey string) error
 	DeleteCustomer(customerAccountId string) error
+	GetCustomerCRFromCustomer(customer Customer) jiraservicedeskv1alpha1.Customer
 	GetCustomerFromCustomerCRForCreateCustomer(customer *jiraservicedeskv1alpha1.Customer) Customer
 }
 
