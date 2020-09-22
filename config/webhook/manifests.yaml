@@ -11,6 +11,24 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
+      path: /mutate-jiraservicedesk-stakater-com-v1alpha1-customer
+  failurePolicy: Fail
+  name: mcustomer.kb.io
+  rules:
+  - apiGroups:
+    - jiraservicedesk.stakater.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - customers
+- clientConfig:
+    caBundle: Cg==
+    service:
+      name: webhook-service
+      namespace: system
       path: /mutate-jiraservicedesk-stakater-com-v1alpha1-project
   failurePolicy: Fail
   name: mproject.kb.io
@@ -32,6 +50,24 @@ metadata:
   creationTimestamp: null
   name: validating-webhook-configuration
 webhooks:
+- clientConfig:
+    caBundle: Cg==
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-jiraservicedesk-stakater-com-v1alpha1-customer
+  failurePolicy: Fail
+  name: vcustomer.kb.io
+  rules:
+  - apiGroups:
+    - jiraservicedesk.stakater.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - customers
 - clientConfig:
     caBundle: Cg==
     service:

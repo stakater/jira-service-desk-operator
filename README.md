@@ -48,42 +48,36 @@ $ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/rel
 $ oc apply -f bundle/manifests
 ```
 
-### Create Project
+### Project
+We support the following CRUD operation on project via our Jira Service Desk Operator:
+* Create - Creates a new projects with the provided fields
+* Update - Updates an existing project with the updated fields
+* Delete - Removes and deletes the project 
 
-Create the project on jira-service-desk with the following custom resource:
+An example Custom Resource for a project can be viewed [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/project).
 
-```yaml
-apiVersion: jiraservicedesk.stakater.com/v1alpha1
-kind: Project
-metadata:
-  name: <Name>
-  namespace: default
-spec:
-  name: <ProjectName>
-  key: <ProjectKey>
-  projectTypeKey: <ProjectTypeKey>
-  projectTemplateKey: <ProjectTemplateKey>
-  description: <ProjectDescription>
-  assigneeType: <ProjectAssigneeType>
-  leadAccountId: <ProjectLeadAccountId>
-  url: <ProjectUrl>
-```
+##### Limitations:
+* We only support creating three types of JSD projects via our operator i.e Business, ServiceDesk, Software. The details and differences between these project types can be viewed [here](https://confluence.atlassian.com/adminjiraserver/jira-applications-and-project-types-overview-938846805.html).
+* Following 8 are the immutable fields and can't be shouldn't be provided while updating a project. 
+    * Id
+    * ProjectTemplateKey
+    * ProjectTypeKey
+    * leadAccountId 
+    * CategoryId 
+    * NotificationScheme
+    * PermissionScheme 
+    * issueSecurityScheme 
 
-### Add/Remove Customers to JSD Project
+    The details about these fields can be read [here](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-projects/#api-rest-api-3-project-post).
 
-Create a customer and than add/remove customer into jira-service desk project with the following custom resource
 
-```yaml
-apiVersion: jiraservicedesk.stakater.com/v1alpha1
-kind: Customer
-metadata:
-  name: <Name>
-spec:
-  name: <CustomerName>
-  email: <CustomerEmail>
-  projects:
-    - <AssociatedProjectKey>
-```
+### Customer:
+We support the following CRUD operations on customer via our Jira Service Desk Operator
+* Create - Create a new customer and assign the projects mentioned in the CR
+* Updates - Update (add/remove) the assigned/associated projects in the CR
+* Deletes - Deletes all the associated projects and deletes the customer
+
+An example Custom Resource for Customer can be viewed [here](https://github.com/stakater/jira-service-desk-operator/blob/handle-customers/examples/customer/customer.yaml).
 
 ## Local Development
 

@@ -97,7 +97,11 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	if len(instance.Status.CustomerId) > 0 {
-		return r.handleUpdate(req, instance)
+		existingCustomer, err := r.JiraServiceDeskClient.GetCustomerById(instance.Status.CustomerId)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+		return r.handleUpdate(req, existingCustomer, instance)
 	}
 
 	return r.handleCreate(req, instance)
@@ -109,13 +113,13 @@ func (r *CustomerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *CustomerReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
+func (r *CustomerReconciler) handleUpdate(req ctrl.Request, existingCustomer jiraservicedeskclient.Customer, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
 	log := r.Log.WithValues("customer", req.NamespacedName)
 
 	log.Info("Modifying project associations for jsd customer: " + instance.Spec.Name)
 
-	addedProjects := difference(instance.Spec.Projects, instance.Status.AssociatedProjects)
-	removedProjects := difference(instance.Status.AssociatedProjects, instance.Spec.Projects)
+	addedProjects := updatedProjectList(instance.Spec.Projects, instance.Status.AssociatedProjects)
+	removedProjects := updatedProjectList(instance.Status.AssociatedProjects, instance.Spec.Projects)
 
 	for _, projectKey := range addedProjects {
 		err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, projectKey)
@@ -150,8 +154,8 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 	if err != nil {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
-
 	instance.Status.CustomerId = customerId
+
 	log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
 
 	log.Info("Modifying project associations for jsd customer: " + instance.Spec.Name)
@@ -176,15 +180,12 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 		return reconcilerUtil.DoNotRequeue()
 	}
 
-	log.Info("Removing project associations for jsd customer: " + instance.Spec.Name)
+	log.Info("Deleting Jira Service Desk Customer: " + instance.Spec.Name)
 
-	// Remove customer from JSD project
-	for _, projectKey := range instance.Status.AssociatedProjects {
-		err := r.JiraServiceDeskClient.RemoveCustomerFromProject(instance.Status.CustomerId, projectKey)
-		if err != nil {
-			return reconcilerUtil.ManageError(r.Client, instance, err, false)
-		}
-		log.Info("Successfully removed Jira Service Desk Customer from project: " + projectKey)
+	// Delete Customer
+	err := r.JiraServiceDeskClient.DeleteCustomer(instance.Status.CustomerId)
+	if err != nil {
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
 	// Delete Finalizer
@@ -193,7 +194,7 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 	log.Info("Finalizer removed for customer: " + instance.Spec.Name)
 
 	// Update instance
-	err := r.Client.Update(context.TODO(), instance)
+	err = r.Client.Update(context.TODO(), instance)
 	if err != nil {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
@@ -211,8 +212,7 @@ func removeEmptyProjects(slice []string) []string {
 	return output
 }
 
-// returns the difference between the two slices
-func difference(slice1 []string, slice2 []string) []string {
+func updatedProjectList(slice1 []string, slice2 []string) []string {
 	var diff []string
 	for _, obj1 := range slice1 {
 		found := false

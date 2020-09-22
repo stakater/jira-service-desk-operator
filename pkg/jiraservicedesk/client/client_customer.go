@@ -11,8 +11,9 @@ import (
 
 const (
 	// Endpoints
-	EndpointCreateCustomer = "/rest/servicedeskapi/customer"
-	AddCustomerApiPath     = "/rest/servicedeskapi/servicedesk/"
+	CreateCustomerApiPath = "/rest/servicedeskapi/customer"
+	AddCustomerApiPath    = "/rest/servicedeskapi/servicedesk/"
+	EndpointCustomer      = "/rest/api/3/user?accountId="
 )
 
 type Customer struct {
@@ -28,12 +29,50 @@ type CustomerCreateResponse struct {
 	DisplayName  string `json:"displayName,omitempty"`
 }
 
-type AddCustomerResponse struct {
+type CustomerAddResponse struct {
 	AccountIds []string `json:"accountIds,omitempty"`
 }
 
+type CustomerGetResponse struct {
+	Self         string `json:"self,omitempty"`
+	AccountId    string `json:"accountId,omitempty"`
+	EmailAddress string `json:"emailAddress,omitempty"`
+	DisplayName  string `json:"displayName,omitempty"`
+	AccountType  string `json:"accountType,omitempty"`
+}
+
+func (c *jiraServiceDeskClient) GetCustomerById(customerAccountId string) (Customer, error) {
+	var customer Customer
+
+	request, err := c.newRequest("GET", EndpointCustomer+customerAccountId, nil, false)
+	if err != nil {
+		return customer, err
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return customer, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		err := errors.New("Rest request to get customer failed with status: " + strconv.Itoa(response.StatusCode))
+		return customer, err
+	}
+
+	var responseObject CustomerGetResponse
+	err = json.NewDecoder(response.Body).Decode(&responseObject)
+	if err != nil {
+		return customer, err
+	}
+
+	customer = customerGetResponseToCustomerMapper(responseObject)
+
+	return customer, err
+}
+
 func (c *jiraServiceDeskClient) CreateCustomer(customer Customer) (string, error) {
-	request, err := c.newRequest("POST", EndpointCreateCustomer, customer, false)
+	request, err := c.newRequest("POST", CreateCustomerApiPath, customer, false)
 	if err != nil {
 		return "", err
 	}
@@ -62,7 +101,7 @@ func (c *jiraServiceDeskClient) CreateCustomer(customer Customer) (string, error
 }
 
 func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, projectKey string) error {
-	addCustomerBody := AddCustomerResponse{
+	addCustomerBody := CustomerAddResponse{
 		AccountIds: []string{customerAccountId},
 	}
 
@@ -87,7 +126,7 @@ func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, p
 }
 
 func (c *jiraServiceDeskClient) RemoveCustomerFromProject(customerAccountId string, projectKey string) error {
-	removeCustomerBody := AddCustomerResponse{
+	removeCustomerBody := CustomerAddResponse{
 		AccountIds: []string{customerAccountId},
 	}
 
@@ -105,6 +144,27 @@ func (c *jiraServiceDeskClient) RemoveCustomerFromProject(customerAccountId stri
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
 		err = errors.New("Rest request to remove Customer failed with status " + strconv.Itoa(response.StatusCode))
+		return err
+	}
+
+	return nil
+}
+
+func (c *jiraServiceDeskClient) DeleteCustomer(customerAccountId string) error {
+	request, err := c.newRequest("DELETE", EndpointCustomer+customerAccountId, nil, false)
+	if err != nil {
+		return err
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		err = errors.New("Rest request to delete Customer failed with status " + strconv.Itoa(response.StatusCode))
 		return err
 	}
 

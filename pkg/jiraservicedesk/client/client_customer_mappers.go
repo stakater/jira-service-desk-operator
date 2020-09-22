@@ -9,3 +9,11 @@ func customerCRToCustomerMapperForCreateCustomer(customer *jiraservicedeskv1alph
 	}
 	return customerObject
 }
+
+func customerGetResponseToCustomerMapper(response CustomerGetResponse) Customer {
+	return Customer{
+		AccountId:   response.AccountId,
+		DisplayName: response.DisplayName,
+		Email:       response.EmailAddress,
+	}
+}
