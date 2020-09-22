@@ -17,6 +17,11 @@ spec:
       kind: Project
       name: projects.jiraservicedesk.stakater.com
       version: v1alpha1
+    - description: Customer is the Schema for the customers API
+      displayName: Customer
+      kind: Customer
+      name: customers.jiraservicedesk.stakater.com
+      version: v1alpha1
   description: Kubernetes operator for Jira Service Desk
   displayName: jira-service-desk-operator
   icon:
