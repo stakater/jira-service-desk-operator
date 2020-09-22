@@ -13,7 +13,7 @@ const (
 	// Endpoints
 	CreateCustomerApiPath = "/rest/servicedeskapi/customer"
 	AddCustomerApiPath    = "/rest/servicedeskapi/servicedesk/"
-	EndpointCustomer      = "/rest/api/3/user?accountId="
+	EndpointUser          = "/rest/api/3/user?accountId="
 )
 
 type Customer struct {
@@ -44,7 +44,7 @@ type CustomerGetResponse struct {
 func (c *jiraServiceDeskClient) GetCustomerById(customerAccountId string) (Customer, error) {
 	var customer Customer
 
-	request, err := c.newRequest("GET", EndpointCustomer+customerAccountId, nil, false)
+	request, err := c.newRequest("GET", EndpointUser+customerAccountId, nil, false)
 	if err != nil {
 		return customer, err
 	}
@@ -151,7 +151,7 @@ func (c *jiraServiceDeskClient) RemoveCustomerFromProject(customerAccountId stri
 }
 
 func (c *jiraServiceDeskClient) DeleteCustomer(customerAccountId string) error {
-	request, err := c.newRequest("DELETE", EndpointCustomer+customerAccountId, nil, false)
+	request, err := c.newRequest("DELETE", EndpointUser+customerAccountId, nil, false)
 	if err != nil {
 		return err
 	}

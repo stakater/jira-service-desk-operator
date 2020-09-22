@@ -54,11 +54,11 @@ We support the following CRUD operation on project via our Jira Service Desk Ope
 * Update - Updates an existing project with the updated fields
 * Delete - Removes and deletes the project 
 
-An example Custom Resource for a project can be viewed [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/project).
+Examples for Project Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/project).
 
 #### Limitations:
 * We only support creating three types of JSD projects via our operator i.e Business, ServiceDesk, Software. The details and differences between these project types can be viewed [here](https://confluence.atlassian.com/adminjiraserver/jira-applications-and-project-types-overview-938846805.html).
-* Following are the immutable fields and can't be provided while updating a project. 
+* Following are the immutable fields that cannot be updated:
     * ProjectTemplateKey
     * ProjectTypeKey
     * leadAccountId 
@@ -73,14 +73,15 @@ An example Custom Resource for a project can be viewed [here](https://github.com
 ### Customer:
 We support the following CRUD operations on customer via our Jira Service Desk Operator
 * Create - Create a new customer and assign the projects mentioned in the CR
-* Updates - Update (add/remove) the assigned/associated projects mentioned in the CR
-* Deletes - Remove all the project associations and deletes the customer
+* Update - Only updates(add/remove) the associated projects mentioned in the CR
+* Delete - Remove all the project associations and deletes the customer
 
-An example Custom Resource for Customer can be viewed [here](https://github.com/stakater/jira-service-desk-operator/blob/handle-customers/examples/customer/customer.yaml).
+Examples for Project Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/blob/handle-customers/examples/customer/customer.yaml).
 
 #### Limitations:
 * Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can’t be accessed later with the Jira Service Desk Operator.
-* Each custom resource is associated to a single customer. You can not update **customer name and email**.
+* Each custom resource is associated to a single customer. 
+* You can not update **customer name and email**.
 
 ## Local Development
 

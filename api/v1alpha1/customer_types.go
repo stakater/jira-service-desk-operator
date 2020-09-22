@@ -100,7 +100,7 @@ func (customer *Customer) IsValid() (bool, error) {
 		if _, value := keys[entry]; !value {
 			keys[entry] = true
 		} else {
-			return false, errors.New("Invalid CRUD operation. Duplicate Project Keys are found.")
+			return false, errors.New("Duplicate Project Keys are not allowed")
 		}
 	}
 
