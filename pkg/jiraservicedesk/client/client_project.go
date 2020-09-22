@@ -62,7 +62,7 @@ type ProjectCreateResponse struct {
 func (c *jiraServiceDeskClient) GetProjectById(id string) (Project, error) {
 	var project Project
 
-	request, err := c.newRequest("GET", EndpointApiVersion3Project+"/"+id, nil)
+	request, err := c.newRequest("GET", EndpointApiVersion3Project+"/"+id, nil, false)
 	if err != nil {
 		return project, err
 	}
@@ -89,7 +89,7 @@ func (c *jiraServiceDeskClient) GetProjectById(id string) (Project, error) {
 }
 
 func (c *jiraServiceDeskClient) CreateProject(project Project) (string, error) {
-	request, err := c.newRequest("POST", EndpointApiVersion3Project, project)
+	request, err := c.newRequest("POST", EndpointApiVersion3Project, project, false)
 	if err != nil {
 		return "", err
 	}
@@ -119,7 +119,7 @@ func (c *jiraServiceDeskClient) CreateProject(project Project) (string, error) {
 }
 
 func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project, id string) error {
-	request, err := c.newRequest("PUT", EndpointApiVersion3Project+"/"+id, updatedProject)
+	request, err := c.newRequest("PUT", EndpointApiVersion3Project+"/"+id, updatedProject, false)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project, id string)
 }
 
 func (c *jiraServiceDeskClient) DeleteProject(id string) error {
-	request, err := c.newRequest("DELETE", EndpointApiVersion3Project+"/"+id, nil)
+	request, err := c.newRequest("DELETE", EndpointApiVersion3Project+"/"+id, nil, false)
 	if err != nil {
 		return err
 	}

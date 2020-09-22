@@ -26,53 +26,62 @@ import (
 )
 
 // log is for logging in this package.
-var projectlog = logf.Log.WithName("project-resource")
+var customerlog = logf.Log.WithName("customer-resource")
 
-func (r *Project) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (r *Customer) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
 		For(r).
 		Complete()
 }
 
-// +kubebuilder:webhook:path=/mutate-jiraservicedesk-stakater-com-v1alpha1-project,mutating=true,failurePolicy=fail,groups=jiraservicedesk.stakater.com,resources=projects,verbs=create;update,versions=v1alpha1,name=mproject.kb.io
+// +kubebuilder:webhook:path=/mutate-jiraservicedesk-stakater-com-v1alpha1-customer,mutating=true,failurePolicy=fail,groups=jiraservicedesk.stakater.com,resources=customers,verbs=create;update,versions=v1alpha1,name=mcustomer.kb.io
 
-var _ webhook.Defaulter = &Project{}
+var _ webhook.Defaulter = &Customer{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *Project) Default() {
-	projectlog.Info("default", "name", r.Name)
+func (r *Customer) Default() {
+	customerlog.Info("default", "name", r.Name)
 
 	// TODO(user): fill in your defaulting logic.
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
-// +kubebuilder:webhook:verbs=create;update,path=/validate-jiraservicedesk-stakater-com-v1alpha1-project,mutating=false,failurePolicy=fail,groups=jiraservicedesk.stakater.com,resources=projects,versions=v1alpha1,name=vproject.kb.io
+// +kubebuilder:webhook:verbs=create;update,path=/validate-jiraservicedesk-stakater-com-v1alpha1-customer,mutating=false,failurePolicy=fail,groups=jiraservicedesk.stakater.com,resources=customers,versions=v1alpha1,name=vcustomer.kb.io
 
-var _ webhook.Validator = &Project{}
+var _ webhook.Validator = &Customer{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *Project) ValidateCreate() error {
-	projectlog.Info("validate create", "name", r.Name)
+func (r *Customer) ValidateCreate() error {
+	customerlog.Info("validate create", "name", r.Name)
 
 	_, err := r.IsValid()
 	return err
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *Project) ValidateUpdate(old runtime.Object) error {
-	projectlog.Info("validate update", "name", r.Name)
+func (r *Customer) ValidateUpdate(old runtime.Object) error {
+	customerlog.Info("validate update", "name", r.Name)
 
-	oldProject, ok := old.(*Project)
+	oldCustomer, ok := old.(*Customer)
 	if !ok {
-		return fmt.Errorf("Error casting old runtime object to %T from %T", oldProject, old)
+		return fmt.Errorf("Error casting old runtime object to %T from %T", oldCustomer, old)
 	}
-	_, err := r.IsValidUpdate(*oldProject)
-	return err
+
+	_, err := r.IsValid()
+	if err != nil {
+		return err
+	}
+	_, err = r.IsValidUpdate(*oldCustomer)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *Project) ValidateDelete() error {
-	projectlog.Info("validate delete", "name", r.Name)
+func (r *Customer) ValidateDelete() error {
+	customerlog.Info("validate delete", "name", r.Name)
 
 	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
