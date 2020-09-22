@@ -176,7 +176,7 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 
 	log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
 
-	log.Info("Modifying project associations for JSD Customer: " + instance.Spec.Name)
+	log.Info("Adding project associations for JSD Customer: " + instance.Spec.Name)
 
 	for _, projectKey := range instance.Spec.Projects {
 		err := r.JiraServiceDeskClient.AddCustomerToProject(instance.Status.CustomerId, projectKey)
