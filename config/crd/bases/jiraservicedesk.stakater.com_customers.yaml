@@ -38,6 +38,7 @@ spec:
           properties:
             email:
               description: Email of the customer
+              pattern: \S+@\S+\.\S+
               type: string
             name:
               description: Name of the customer
