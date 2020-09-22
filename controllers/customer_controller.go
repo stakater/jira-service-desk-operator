@@ -219,30 +219,3 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 
 	return reconcilerUtil.DoNotRequeue()
 }
-
-func removeEmptyProjects(slice []string) []string {
-	var output []string
-	for _, str := range slice {
-		if str != "" {
-			output = append(output, str)
-		}
-	}
-	return output
-}
-
-// func updatedProjectList(slice1 []string, slice2 []string) []string {
-// 	var diff []string
-// 	for _, obj1 := range slice1 {
-// 		found := false
-// 		for _, obj2 := range slice2 {
-// 			if obj1 == obj2 {
-// 				found = true
-// 				break
-// 			}
-// 		}
-// 		if !found {
-// 			diff = append(diff, obj1)
-// 		}
-// 	}
-// 	return diff
-// }
