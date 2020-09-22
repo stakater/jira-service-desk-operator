@@ -58,8 +58,7 @@ An example Custom Resource for a project can be viewed [here](https://github.com
 
 ##### Limitations:
 * We only support creating three types of JSD projects via our operator i.e Business, ServiceDesk, Software. The details and differences between these project types can be viewed [here](https://confluence.atlassian.com/adminjiraserver/jira-applications-and-project-types-overview-938846805.html).
-* Following 8 are the immutable fields and can't be shouldn't be provided while updating a project. 
-    * Id
+* Following are the immutable fields and can't be provided while updating a project. 
     * ProjectTemplateKey
     * ProjectTypeKey
     * leadAccountId 
@@ -68,16 +67,20 @@ An example Custom Resource for a project can be viewed [here](https://github.com
     * PermissionScheme 
     * issueSecurityScheme 
 
-    The details about these fields can be read [here](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-projects/#api-rest-api-3-project-post).
+    You can read more about these fields on [Jira Service Desk api docs](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-projects/#api-rest-api-3-project-post).
 
 
 ### Customer:
 We support the following CRUD operations on customer via our Jira Service Desk Operator
 * Create - Create a new customer and assign the projects mentioned in the CR
-* Updates - Update (add/remove) the assigned/associated projects in the CR
-* Deletes - Deletes all the associated projects and deletes the customer
+* Updates - Update (add/remove) the assigned/associated projects mentioned in the CR
+* Deletes - Remove all the project associations and deletes the customer
 
 An example Custom Resource for Customer can be viewed [here](https://github.com/stakater/jira-service-desk-operator/blob/handle-customers/examples/customer/customer.yaml).
+
+##### Limitations:
+* Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can’t be accessed later with the Jira Service Desk Operator.
+* Each custom resource is associated to a single customer. You can not update **customer name and email**.
 
 ## Local Development
 
@@ -101,8 +104,4 @@ An example Custom Resource for Customer can be viewed [here](https://github.com/
 Use the following command to run tests:
 `make test OPERATOR_NAMESPACE=test USE_EXISTING_CLUSTER=true`
 
-## Limitations
-- Once a customer is created with the Jira Service Desk Operator, it can only be added or removed from the projects. Customers can't be deleted. The Jira Service Desk Api don't provides a support for this.
-- Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can't be accessed later with the Jira Service Desk Operator.
-- The Api call to remove the customer from the project is in experimental phase at the moment.
 
