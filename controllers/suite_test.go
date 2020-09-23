@@ -105,10 +105,6 @@ var _ = BeforeSuite(func(done Done) {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(email).ToNot(BeNil())
 
-	// apiToken := "59NFBgyOavOOI9Bzfj0tC925"
-	// apiBaseUrl := "https://stakater-test.atlassian.net/"
-	// email := "test@stakater.com"
-
 	r = &ProjectReconciler{
 		Client:                k8sClient,
 		Scheme:                scheme.Scheme,
