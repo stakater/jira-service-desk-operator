@@ -24,7 +24,7 @@ var CreateProjectInputJSON = map[string]string{
 	"projectTemplateKey": "com.atlassian.servicedesk:itil-v2-service-desk-project",
 	"description":        "Sample project for jira-service-desk-operator",
 	"assigneeType":       "PROJECT_LEAD",
-	"leadAccountId":      "5ebfbc3ead226b0ba46c3590",
+	"leadAccountId":      "5f62e5902b42470070d1fb83",
 	"url":                "https://test.com",
 }
 
@@ -42,20 +42,20 @@ var CreateProjectInput = jiraservicedeskv1alpha1.Project{
 		ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
 		Description:        "Sample project for jira-service-desk-operator",
 		AssigneeType:       "PROJECT_LEAD",
-		LeadAccountId:      "5ebfbc3ead226b0ba46c3590",
+		LeadAccountId:      "5f62e5902b42470070d1fb83",
 		URL:                "https://test.com",
 	},
 }
 
 var CreateProjectInvalidInput = jiraservicedeskv1alpha1.Project{
 	Spec: jiraservicedeskv1alpha1.ProjectSpec{
-		Name:                "test",
+		Name:                "testproject",
 		Key:                 "TEST20000",
 		ProjectTypeKey:      "service_desk",
 		ProjectTemplateKey:  "com.atlassian.servicedesk:itil-v2-service-desk-project",
 		Description:         "Sample project for jira-service-desk-operator",
 		AssigneeType:        "PROJECT_LEAD",
-		LeadAccountId:       "5ebfbc3ead226b0ba46c3590",
+		LeadAccountId:       "5f62e5902b42470070d1fb83",
 		URL:                 "https://test.com",
 		AvatarId:            10200,
 		IssueSecurityScheme: 10001,

@@ -52,6 +52,9 @@ var r *ProjectReconciler
 var util *controllerUtil.TestUtil
 var ns string
 
+var cr *CustomerReconciler
+var cUtil *controllerUtil.TestUtil
+
 var log = logf.Log.WithName("config")
 
 func TestAPIs(t *testing.T) {
@@ -79,9 +82,6 @@ var _ = BeforeSuite(func(done Done) {
 	err = jiraservicedeskv1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = jiraservicedeskv1alpha1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
-
 	// +kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
@@ -105,6 +105,10 @@ var _ = BeforeSuite(func(done Done) {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(email).ToNot(BeNil())
 
+	// apiToken := "59NFBgyOavOOI9Bzfj0tC925"
+	// apiBaseUrl := "https://stakater-test.atlassian.net/"
+	// email := "test@stakater.com"
+
 	r = &ProjectReconciler{
 		Client:                k8sClient,
 		Scheme:                scheme.Scheme,
@@ -114,6 +118,17 @@ var _ = BeforeSuite(func(done Done) {
 	Expect(r).ToNot((BeNil()))
 
 	util = controllerUtil.New(ctx, k8sClient, r)
+	Expect(util).ToNot(BeNil())
+
+	cr = &CustomerReconciler{
+		Client:                k8sClient,
+		Scheme:                scheme.Scheme,
+		Log:                   log.WithName("Reconciler"),
+		JiraServiceDeskClient: c.NewClient(apiToken, apiBaseUrl, email),
+	}
+	Expect(r).ToNot((BeNil()))
+
+	cUtil = controllerUtil.New(ctx, k8sClient, cr)
 	Expect(util).ToNot(BeNil())
 
 	close(done)

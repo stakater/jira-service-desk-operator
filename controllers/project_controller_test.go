@@ -110,6 +110,10 @@ var _ = Describe("ProjectController", func() {
 
 		projectInvalidInput := mockData.CreateProjectInvalidInput
 
+		AfterEach(func() {
+			util.TryDeleteProject(projectInvalidInput.Spec.Name, ns)
+		})
+
 		Describe("Create new Jira servie desk project resource", func() {
 			Context("with invalid fields", func() {
 				It("should not create a new project", func() {

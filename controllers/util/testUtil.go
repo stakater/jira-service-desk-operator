@@ -74,9 +74,24 @@ func (t *TestUtil) CreateProjectObject(project jiraservicedeskv1alpha1.Project, 
 	}
 }
 
+// CreateCustomerObject creates a jira customer customer resource object
+func (t *TestUtil) CreateCustomerObject(customer jiraservicedeskv1alpha1.Customer, namespace string) *jiraservicedeskv1alpha1.Customer {
+	return &jiraservicedeskv1alpha1.Customer{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      customer.Spec.Name,
+			Namespace: namespace,
+		},
+		Spec: jiraservicedeskv1alpha1.CustomerSpec{
+			Name:  customer.Spec.Name,
+			Email: customer.Spec.Email,
+		},
+	}
+}
+
 // CreateProject creates and submits a Project object to the kubernetes server
 func (t *TestUtil) CreateProject(project jiraservicedeskv1alpha1.Project, namespace string) *jiraservicedeskv1alpha1.Project {
 	projectObject := t.CreateProjectObject(project, namespace)
+
 	err := t.k8sClient.Create(t.ctx, projectObject)
 	if err != nil {
 		ginkgo.Fail(err.Error())
@@ -92,6 +107,25 @@ func (t *TestUtil) CreateProject(project jiraservicedeskv1alpha1.Project, namesp
 	return projectObject
 }
 
+// CreateCustomer creates and submits a new Customer object to the kubernetes server
+func (t *TestUtil) CreateCustomer(customer jiraservicedeskv1alpha1.Customer, namespace string) *jiraservicedeskv1alpha1.Customer {
+	customerObject := t.CreateCustomerObject(customer, namespace)
+
+	err := t.k8sClient.Create(t.ctx, customerObject)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: customer.Spec.Name, Namespace: namespace}}
+
+	_, err = t.r.Reconcile(req)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	return customerObject
+}
+
 // GetProject fetches a project object from kubernetes
 func (t *TestUtil) GetProject(name string, namespace string) *jiraservicedeskv1alpha1.Project {
 	projectObject := &jiraservicedeskv1alpha1.Project{}
@@ -104,21 +138,57 @@ func (t *TestUtil) GetProject(name string, namespace string) *jiraservicedeskv1a
 	return projectObject
 }
 
+// GetCustomer fetches a customer object from kubernetes
+func (t *TestUtil) GetCustomer(name string, namespace string) *jiraservicedeskv1alpha1.Customer {
+	customerObject := &jiraservicedeskv1alpha1.Customer{}
+
+	err := t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, customerObject)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	return customerObject
+}
+
 // DeleteProject deletes the project resource
 func (t *TestUtil) DeleteProject(name string, namespace string) {
 	projectObject := &jiraservicedeskv1alpha1.Project{}
+
 	err := t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, projectObject)
 	if err != nil {
 		ginko.Fail(err.Error())
 	}
+
 	err = t.k8sClient.Delete(t.ctx, projectObject)
 	if err != nil {
 		ginko.Fail(err.Error())
 	}
+
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
 	_, err = t.r.Reconcile(req)
 	if err != nil {
 		ginko.Fail(err.Error())
+	}
+}
+
+// DeleteCustomer deletes the customer resource
+func (t *TestUtil) DeleteCustomer(name string, namespace string) {
+	customerObject := &jiraservicedeskv1alpha1.Customer{}
+
+	err := t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, customerObject)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	err = t.k8sClient.Delete(t.ctx, customerObject)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
+	_, err = t.r.Reconcile(req)
+	if err != nil {
+		ginkgo.Fail(err.Error())
 	}
 }
 
@@ -127,6 +197,15 @@ func (t *TestUtil) TryDeleteProject(name string, namespace string) {
 	projectObject := &jiraservicedeskv1alpha1.Project{}
 	_ = t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, projectObject)
 	_ = t.k8sClient.Delete(t.ctx, projectObject)
+	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
+	_, _ = t.r.Reconcile(req)
+}
+
+// TryDeleteCustomer - Tries to delete Customer if it exists, does not fail on any error
+func (t *TestUtil) TryDeleteCustomer(name string, namespace string) {
+	customerObject := &jiraservicedeskv1alpha1.Customer{}
+	_ = t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, customerObject)
+	_ = t.k8sClient.Delete(t.ctx, customerObject)
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
 	_, _ = t.r.Reconcile(req)
 }
