@@ -1,7 +1,6 @@
 package client
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/nbio/st"
@@ -43,7 +42,7 @@ func TestJiraService_GetProject_shouldNotGetProject_whenInValidProjectIdIsGiven(
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	_, err := jiraClient.GetProjectById("/" + mockData.ProjectID)
 
-	st.Expect(t, err, errors.New(mockData.GetProjectFailedErrorMsg))
+	st.Reject(t, err, nil)
 	st.Expect(t, gock.IsDone(), true)
 }
 
@@ -91,7 +90,7 @@ func TestJiraService_CreateProject_shouldNotCreateProject_whenInValidProjectData
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	_, err := jiraClient.CreateProject(sampleProject)
 
-	st.Expect(t, err, errors.New(mockData.CreateProjectFailedErrorMsg))
+	st.Reject(t, err, nil)
 	st.Expect(t, gock.IsDone(), true)
 }
 
@@ -132,7 +131,7 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenInvalidProject
 
 	client := NewClient("", mock.BaseURL, "")
 	err := client.UpdateProject(updateProject, mock.ProjectID)
-	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
+	st.Reject(t, err, nil)
 
 	st.Expect(t, gock.IsDone(), true)
 }
@@ -145,12 +144,12 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenImmutableField
 		Reply(404)
 
 	var updateProject = Project{
-		Key: mock.UpdateProjectInput.Id,
+		Id: mock.UpdateProjectInput.Id,
 	}
 
 	client := NewClient("", mock.BaseURL, "")
 	err := client.UpdateProject(updateProject, mock.ProjectID)
-	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
+	st.Reject(t, err, nil)
 
 	st.Expect(t, gock.IsDone(), true)
 }
@@ -180,6 +179,6 @@ func TestJiraService_DeleteProject_shouldNotDeleteProject_whenInValidProjectIdIs
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	err := jiraClient.DeleteProject(mockData.ProjectID)
 
-	st.Expect(t, err, errors.New(mockData.DeleteProjectFailedErrorMsg))
+	st.Reject(t, err, nil)
 	st.Expect(t, gock.IsDone(), true)
 }

@@ -1,114 +1,179 @@
 package client
 
-// func TestJiraClient_GetCustomerById_shouldGetCustomer_whenValidCustomerAccountIdIsGiven(t *testing.T) {
-// 	defer gock.Off()
+import (
+	"testing"
 
-// 	gock.New(mockData.BaseURL + "/rest/api/3/user?accountId=").
-// 		Get("sample12345").
-// 		Reply(200).
-// 		JSON(map[string]string{
-// 			"self":         "https://sample.net/user?accountId=sample12345",
-// 			"accountId":    "sample12345",
-// 			"emailAddress": "sample@test.com",
-// 			"displayName":  "Sample Customer",
-// 			"accountType":  "customer",
-// 		})
+	"github.com/nbio/st"
+	mockData "github.com/stakater/jira-service-desk-operator/mock"
+	"gopkg.in/h2non/gock.v1"
+)
 
-// 	jiraClient := NewClient("", mockData.BaseURL, "")
-// 	customer, err := jiraClient.GetCustomerById("sample12345")
+func TestJiraClient_GetCustomerById_shouldGetCustomer_whenValidCustomerAccountIdIsGiven(t *testing.T) {
+	defer gock.Off()
 
-// 	st.Expect(t, customer.AccountId, "sample12345")
-// 	st.Expect(t, customer.DisplayName, "Sample Customer")
-// 	st.Expect(t, customer.Email, "sample@test.com")
-// 	st.Expect(t, err, nil)
+	gock.New(mockData.BaseURL+EndpointUser).
+		Get("/").
+		MatchParam("accountId", mockData.CustomerAccountId).
+		Reply(200).
+		JSON(mockData.GetCustomerResponseJSON)
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	customer, err := jiraClient.GetCustomerById(mockData.CustomerAccountId)
 
-// func TestJiraClient_GetCustomerById_shouldNotGetCustomer_whenInValidCustomerAccountIdIsGiven(t *testing.T) {
-// 	defer gock.Off()
+	st.Expect(t, customer.AccountId, mockData.GetCustomerResponse.AccountId)
+	st.Expect(t, customer.DisplayName, mockData.GetCustomerResponse.DisplayName)
+	st.Expect(t, customer.Email, mockData.GetCustomerResponse.Email)
+	st.Expect(t, err, nil)
 
-// 	gock.New(mockData.BaseURL)
+	st.Expect(t, gock.IsDone(), true)
+}
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+func TestJiraClient_GetCustomerById_shouldNotGetCustomer_whenInValidCustomerAccountIdIsGiven(t *testing.T) {
+	defer gock.Off()
 
-// var CustomerAccountId = "sample12345"
+	gock.New(mockData.BaseURL + EndpointUser).
+		Get("/").
+		Reply(400)
 
-// var CreateCustomerInput = Customer{
-// 	DisplayName: "Sample Customer",
-// 	Email:       "sample@test.com",
-// }
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	customer, err := jiraClient.GetCustomerById(mockData.CustomerAccountId)
 
-// var CreateCustomerInputJSON = map[string]string{
-// 	"displayName": "Sample Customer",
-// 	"email":       "sample@test.com",
-// }
+	st.Expect(t, customer.AccountId, "")
+	st.Expect(t, customer.DisplayName, "")
+	st.Expect(t, customer.Email, "")
+	st.Reject(t, err, nil)
 
-// var CreateCustomerResponseJSON = map[string]string{
-// 	"accountId":    "sample12345",
-// 	"displayName":  "Sample Customer",
-// 	"emailAddress": "sample@test.com",
-// }
+	st.Expect(t, gock.IsDone(), true)
+}
 
-// func TestJiraClient_CreateCustomer_shouldCreateCustomer_whenValidCustomerDataIsGiven(t *testing.T) {
-// 	defer gock.Off()
+func TestJiraClient_CreateCustomer_shouldCreateCustomer_whenValidCustomerDataIsGiven(t *testing.T) {
+	defer gock.Off()
 
-// 	gock.New(mockData.BaseURL + CreateCustomerApiPath).
-// 		Post("/").
-// 		MatchType("json").
-// 		JSON(CreateCustomerInputJSON).
-// 		Reply(201).
-// 		JSON(CreateCustomerResponseJSON)
+	gock.New(mockData.BaseURL + CreateCustomerApiPath).
+		Post("/").
+		MatchType("json").
+		JSON(mockData.CreateCustomerInputJSON).
+		Reply(201).
+		JSON(mockData.CreateCustomerResponseJSON)
 
-// 	jiraClient := NewClient("", mockData.BaseURL, "")
-// 	id, err := jiraClient.CreateCustomer(CreateCustomerInput)
+	sampleCustomer := Customer{
+		Email:       mockData.GetCustomerResponse.Email,
+		DisplayName: mockData.GetCustomerResponse.DisplayName,
+	}
 
-// 	st.Expect(t, id, CustomerAccountId)
-// 	st.Expect(t, err, nil)
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	id, err := jiraClient.CreateCustomer(sampleCustomer)
 
-// 	// Verify that we don't have pending mocks
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+	st.Expect(t, id, mockData.CustomerAccountId)
+	st.Expect(t, err, nil)
 
-// func TestJiraClient_CreateCustomer_shouldNotCreateCustomer_whenInValidCustomerDataIsGiven(t *testing.T) {
-// 	defer gock.Off()
+	st.Expect(t, gock.IsDone(), true)
+}
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+func TestJiraClient_CreateCustomer_shouldNotCreateCustomer_whenInValidCustomerDataIsGiven(t *testing.T) {
+	defer gock.Off()
+	gock.New(mockData.BaseURL + CreateCustomerApiPath).
+		Post("/").
+		Reply(400)
 
-// func TestJiraClient_AddCustomerToProject_shouldAddCustomerToProject_whenValidProjectIsGiven(t *testing.T) {
-// 	defer gock.Off()
+	sampleCustomer := Customer{
+		DisplayName: mockData.GetCustomerResponse.DisplayName,
+	}
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	id, err := jiraClient.CreateCustomer(sampleCustomer)
 
-// func TestJiraClient_AddCustomerToProject_shouldNotAddCustomerToProject_whenInValidProjectIsGiven(t *testing.T) {
-// 	defer gock.Off()
+	st.Expect(t, id, "")
+	st.Reject(t, err, nil)
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+	st.Expect(t, gock.IsDone(), true)
+}
 
-// func TestJiraClient_RemoveCustomerFromProject_shouldRemoveCustomerFromProject_whenValidProjectIsGiven(t *testing.T) {
-// 	defer gock.Off()
+func TestJiraClient_AddCustomerToProject_shouldAddCustomerToProject_whenValidProjectIsGiven(t *testing.T) {
+	defer gock.Off()
+	gock.New(mockData.BaseURL + AddCustomerApiPath + mockData.AddProjectKey).
+		Post(mockData.CustomerEndPoint).
+		MatchType("json").
+		JSON(map[string]interface{}{
+			"accountIds": []string{mockData.CustomerAccountId},
+		}).
+		Reply(201)
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	err := jiraClient.AddCustomerToProject(mockData.CustomerAccountId, mockData.AddProjectKey)
 
-// func TestJiraClient_RemoveCustomerFromProject_shouldNotRemoveCustomerFromProject_whenInvalidProjectIsGiven(t *testing.T) {
-// 	defer gock.Off()
+	st.Expect(t, err, nil)
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+	st.Expect(t, gock.IsDone(), true)
+}
 
-// func TestJiraClient_DeleteCustomer_shouldDeleteCustomer_whenValidCustomerIsGiven(t *testing.T) {
-// 	defer gock.Off()
+func TestJiraClient_AddCustomerToProject_shouldNotAddCustomerToProject_whenInValidProjectIsGiven(t *testing.T) {
+	defer gock.Off()
+	gock.New(mockData.BaseURL + AddCustomerApiPath + mockData.AddProjectKey).
+		Post(mockData.CustomerEndPoint).
+		Reply(400)
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	err := jiraClient.AddCustomerToProject(mockData.CustomerAccountId, mockData.AddProjectKey)
 
-// func TestJiraClient_DeleteCustomer_shouldNotDeleteCustomer_whenInvalidCustomerIsGiven(t *testing.T) {
-// 	defer gock.Off()
+	st.Reject(t, err, nil)
 
-// 	st.Expect(t, gock.IsDone(), true)
-// }
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestJiraClient_RemoveCustomerFromProject_shouldRemoveCustomerFromProject_whenValidProjectIsGiven(t *testing.T) {
+	defer gock.Off()
+	gock.New(mockData.BaseURL + AddCustomerApiPath + mockData.RemoveProjectKey).
+		Post(mockData.CustomerEndPoint).
+		Reply(201)
+
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	err := jiraClient.AddCustomerToProject(mockData.CustomerAccountId, mockData.RemoveProjectKey)
+
+	st.Expect(t, err, nil)
+
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestJiraClient_RemoveCustomerFromProject_shouldNotRemoveCustomerFromProject_whenInvalidProjectIsGiven(t *testing.T) {
+	defer gock.Off()
+	gock.New(mockData.BaseURL + AddCustomerApiPath + mockData.RemoveProjectKey).
+		Post(mockData.CustomerEndPoint).
+		Reply(400)
+
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	err := jiraClient.AddCustomerToProject(mockData.CustomerAccountId, mockData.RemoveProjectKey)
+
+	st.Reject(t, err, nil)
+
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestJiraClient_DeleteCustomer_shouldDeleteCustomer_whenValidCustomerIsGiven(t *testing.T) {
+	defer gock.Off()
+	gock.New(mockData.BaseURL+EndpointUser).
+		Delete("/").
+		MatchParam("accountId", mockData.CustomerAccountId).
+		Reply(200)
+
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	err := jiraClient.DeleteCustomer(mockData.CustomerAccountId)
+
+	st.Expect(t, err, nil)
+
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestJiraClient_DeleteCustomer_shouldNotDeleteCustomer_whenInvalidCustomerIsGiven(t *testing.T) {
+	defer gock.Off()
+	gock.New(mockData.BaseURL + EndpointUser).
+		Delete("/").
+		Reply(400)
+
+	jiraClient := NewClient("", mockData.BaseURL, "")
+	err := jiraClient.DeleteCustomer(mockData.CustomerAccountId)
+
+	st.Reject(t, err, nil)
+
+	st.Expect(t, gock.IsDone(), true)
+}

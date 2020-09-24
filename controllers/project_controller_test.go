@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
@@ -9,7 +11,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-var _ = Describe("ProjectController", func() {
+var _ = Describe("Project Controller", func() {
+
+	ns, _ = os.LookupEnv("OPERATOR_NAMESPACE")
 
 	Describe("Positive test cases", func() {
 
