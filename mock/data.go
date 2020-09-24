@@ -12,6 +12,13 @@ var ProjectID = "10003"
 var ProjectIDInt, _ = strconv.Atoi(ProjectID)
 var InvalidPermissionScheme = "4000"
 
+var SampleCustomer = jiraservicedeskv1alpha1.Customer{
+	Spec: jiraservicedeskv1alpha1.CustomerSpec{
+		Name:  "sample",
+		Email: "sample@email.com",
+	},
+}
+
 var CreateProjectInputJSON = map[string]string{
 	"name":               "testproject",
 	"key":                "TEST",

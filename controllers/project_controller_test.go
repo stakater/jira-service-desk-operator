@@ -110,25 +110,25 @@ var _ = Describe("Project Controller", func() {
 
 	})
 
-	// Describe("Negative test cases", func() {
+	Describe("Negative test cases", func() {
 
-	// 	projectInvalidInput := mockData.CreateProjectInvalidInput
+		projectInvalidInput := mockData.CreateProjectInvalidInput
 
-	// 	AfterEach(func() {
-	// 		util.TryDeleteProject(projectInvalidInput.Spec.Name, ns)
-	// 	})
+		AfterEach(func() {
+			util.TryDeleteProject(projectInvalidInput.Spec.Name, ns)
+		})
 
-	// 	Describe("Create new Jira servie desk project resource", func() {
-	// 		Context("with invalid fields", func() {
-	// 			It("should not create a new project", func() {
-	// 				_ = util.CreateProject(projectInvalidInput, ns)
-	// 				project := util.GetProject(projectInvalidInput.Spec.Name, ns)
+		Describe("Create new Jira servie desk project resource", func() {
+			Context("with invalid fields", func() {
+				It("should not create a new project", func() {
+					_ = util.CreateProject(projectInvalidInput, ns)
+					project := util.GetProject(projectInvalidInput.Spec.Name, ns)
 
-	// 				Expect(project.Status.ID).To(Equal(""))
-	// 			})
-	// 		})
-	// 	})
+					Expect(project.Status.ID).To(Equal(""))
+				})
+			})
+		})
 
-	// })
+	})
 
 })
