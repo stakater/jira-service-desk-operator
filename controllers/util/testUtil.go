@@ -2,7 +2,6 @@ package util
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/onsi/ginkgo"
 	ginko "github.com/onsi/ginkgo"
@@ -52,7 +51,6 @@ func (t *TestUtil) CreateNamespaceObject(name string) *v1.Namespace {
 
 // CreateProjectObject creates a jira project custom resource object
 func (t *TestUtil) CreateProjectObject(project jiraservicedeskv1alpha1.Project, namespace string) *jiraservicedeskv1alpha1.Project {
-	fmt.Println("Namespace7:", namespace)
 	return &jiraservicedeskv1alpha1.Project{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      project.Spec.Name,

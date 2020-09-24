@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 
@@ -72,6 +73,8 @@ func (c *jiraServiceDeskClient) GetCustomerById(customerAccountId string) (Custo
 }
 
 func (c *jiraServiceDeskClient) CreateCustomer(customer Customer) (string, error) {
+	fmt.Println("Check1")
+
 	request, err := c.newRequest("POST", CreateCustomerApiPath, customer, false)
 	if err != nil {
 		return "", err

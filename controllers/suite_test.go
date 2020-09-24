@@ -85,6 +85,7 @@ var _ = BeforeSuite(func(done Done) {
 	// +kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
+
 	Expect(err).ToNot(HaveOccurred())
 	Expect(k8sClient).ToNot(BeNil())
 
@@ -122,7 +123,7 @@ var _ = BeforeSuite(func(done Done) {
 		Log:                   log.WithName("Reconciler"),
 		JiraServiceDeskClient: c.NewClient(apiToken, apiBaseUrl, email),
 	}
-	Expect(r).ToNot((BeNil()))
+	Expect(cr).ToNot((BeNil()))
 
 	cUtil = controllerUtil.New(ctx, k8sClient, cr)
 	Expect(util).ToNot(BeNil())

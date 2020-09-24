@@ -12,8 +12,6 @@ var ProjectID = "10003"
 var ProjectIDInt, _ = strconv.Atoi(ProjectID)
 var InvalidPermissionScheme = "4000"
 
-var DeleteProjectFailedErrorMsg = "Rest request to delete Project failed with status: 404"
-
 var CreateProjectInputJSON = map[string]string{
 	"name":               "testproject",
 	"key":                "TEST",

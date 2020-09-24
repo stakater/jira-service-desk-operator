@@ -92,8 +92,6 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
-
-		return reconcilerUtil.DoNotRequeue()
 	}
 
 	if len(instance.Status.CustomerId) > 0 {
