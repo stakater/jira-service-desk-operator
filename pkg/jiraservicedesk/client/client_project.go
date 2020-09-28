@@ -61,6 +61,13 @@ type ProjectCreateResponse struct {
 	Key  string `json:"key"`
 }
 
+type CustomerAccessRequestBody struct {
+	autocompleteEnabled     bool
+	manageEnabled           bool
+	serviceDeskOpenAccess   bool
+	serviceDeskPublicSignup bool
+}
+
 func (c *jiraServiceDeskClient) GetProjectById(id string) (Project, error) {
 	var project Project
 
@@ -157,17 +164,13 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 }
 
 func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(key string) error {
-	body := struct {
-		autocompleteEnabled     bool
-		manageEnabled           bool
-		serviceDeskOpenAccess   bool
-		serviceDeskPublicSignup bool
-	}{
-		false,
-		false,
-		false,
-		false,
+	body := CustomerAccessRequestBody{
+		autocompleteEnabled:     false,
+		manageEnabled:           false,
+		serviceDeskOpenAccess:   false,
+		serviceDeskPublicSignup: false,
 	}
+
 	request, err := c.newRequest("POST", EndpointCustomerAccessStatus+"/"+key+"/settings/requestsecurity", body)
 	if err != nil {
 		return err
