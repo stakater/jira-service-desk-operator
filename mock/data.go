@@ -13,8 +13,8 @@ var ProjectIDInt, _ = strconv.Atoi(ProjectID)
 var InvalidPermissionScheme = "4000"
 
 var GetProjectFailedErrorMsg = "Rest request to get Project failed with status: 404"
-var CreateProjectFailedErrorMsg = "Rest request to create Project failed with status 400 and response: "
-var UpdateProjectFailedErrorMsg = "Rest request to update Project failed with status 404 and response: "
+var CreateProjectFailedErrorMsg = "Rest request to create Project failed with status: 400 and response: "
+var UpdateProjectFailedErrorMsg = "Rest request to update Project failed with status: 404 and response: "
 var DeleteProjectFailedErrorMsg = "Rest request to delete Project failed with status: 404"
 
 var CreateProjectInputJSON = map[string]string{
