@@ -88,9 +88,9 @@ type ProjectSpec struct {
 	// +optional
 	CategoryId int `json:"categoryId,omitempty"`
 
-	// The Access status of the project
+	// The Open Access status, which dictates who can access the project. If set to true all customers can access the project. If false, only customers added to project can access the project.
 	// +optional, if not provided default behaviour is False
-	ServiceDeskOpenAccess bool `json:"serviceDeskOpenAccess,omitempty"`
+	OpenAccess bool `json:"openAccess,omitempty"`
 }
 
 // ProjectStatus defines the observed state of Project
@@ -163,6 +163,9 @@ func (project *Project) IsValidUpdate(existingProject Project) (bool, error) {
 	}
 	if project.Spec.IssueSecurityScheme != existingProject.Spec.IssueSecurityScheme {
 		return false, fmt.Errorf("%s %s", "IssueSecurityScheme", errorImmutableFieldMsg)
+	}
+	if project.Spec.OpenAccess != existingProject.Spec.OpenAccess {
+		return false, fmt.Errorf("%s %s", "OpenAccess", errorImmutableFieldMsg)
 	}
 
 	return true, nil

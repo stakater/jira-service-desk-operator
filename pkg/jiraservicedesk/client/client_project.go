@@ -168,7 +168,7 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 	return err
 }
 
-func (c *jiraServiceDeskClient) ModifyProjectAccessPermissions(status bool, key string) error {
+func (c *jiraServiceDeskClient) UpdateProjectAccessPermissions(status bool, key string) error {
 	body := CustomerAccessRequestBody{
 		autocompleteEnabled:     false,
 		manageEnabled:           false,
