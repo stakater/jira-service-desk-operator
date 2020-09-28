@@ -156,7 +156,7 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 	return err
 }
 
-func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(status bool, key string) error {
+func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(key string) error {
 	body := struct {
 		autocompleteEnabled     bool
 		manageEnabled           bool
@@ -165,10 +165,13 @@ func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(status bool, key stri
 	}{
 		false,
 		false,
-		status,
-		status,
+		false,
+		false,
 	}
 	request, err := c.newRequest("POST", EndpointCustomerAccessStatus+"/"+key+"/settings/requestsecurity", body)
+	if err != nil {
+		return err
+	}
 
 	response, err := c.do(request)
 	if err != nil {

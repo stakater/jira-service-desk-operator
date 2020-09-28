@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -139,15 +138,12 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 
 	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
 
-	if instance.Spec.CustomerAccessStatus == false {
-		err = r.JiraServiceDeskClient.UpdateCustomerAccessStatus(instance.Spec.CustomerAccessStatus, project.Key)
-		if err != nil {
-			fmt.Println(err)
-			log.Info("Failed to update the Service Desk Open Access Permissions to Added Customers Only")
-		}
-
-		log.Info("Successfully updated the Service Desk Open Access Permissions to Added Customers Only")
+	err = r.JiraServiceDeskClient.UpdateCustomerAccessStatus(project.Key)
+	if err != nil {
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
+
+	log.Info("Successfully updated the Service Desk Open Access Permissions to Added Customers Only")
 
 	instance.Status.ID = projectId
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
