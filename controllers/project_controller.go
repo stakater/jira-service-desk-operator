@@ -141,7 +141,6 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 	if !instance.Spec.CustomerAccessStatus {
 		err = r.JiraServiceDeskClient.UpdateProjectAccessPermissions(instance.Spec.CustomerAccessStatus, project.Key)
 		if err != nil {
-			log.Info("Failed to update the Access Permissions to customer")
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
 
