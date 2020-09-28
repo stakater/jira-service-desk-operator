@@ -48,6 +48,9 @@ spec:
             categoryId:
               description: The ID of the project's category
               type: integer
+            customerAccessStatus:
+              description: The Custermer Access Status of a project
+              type: boolean
             description:
               description: Description for project
               type: string

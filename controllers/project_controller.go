@@ -138,9 +138,14 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 
 	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
 
-	err = r.JiraServiceDeskClient.UpdateProjectAccessPermissions(project.Key)
-	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	if !instance.Spec.CustomerAccessStatus {
+		err = r.JiraServiceDeskClient.UpdateProjectAccessPermissions(instance.Spec.CustomerAccessStatus, project.Key)
+		if err != nil {
+			log.Info("Failed to update the Service Desk Open Access Permissions to Added Customers Only")
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+
+		log.Info("Successfully updated the Service Desk Open Access Permissions to Added Customers Only")
 	}
 
 	log.Info("Successfully updated the Access Permissions to customer")

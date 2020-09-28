@@ -168,12 +168,12 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 	return err
 }
 
-func (c *jiraServiceDeskClient) UpdateProjectAccessPermissions(key string) error {
+func (c *jiraServiceDeskClient) UpdateProjectAccessPermissions(status bool, key string) error {
 	body := CustomerAccessRequestBody{
 		autocompleteEnabled:     false,
 		manageEnabled:           false,
-		serviceDeskOpenAccess:   false,
-		serviceDeskPublicSignup: false,
+		serviceDeskOpenAccess:   status,
+		serviceDeskPublicSignup: status,
 	}
 
 	request, err := c.newRequest("POST", ProjectPermissionsApiPath+key+RequestSecurityPath, body, false)
