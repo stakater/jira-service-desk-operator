@@ -9,6 +9,6 @@ spec:
   projectTemplateKey: com.atlassian.servicedesk:next-gen-it-service-desk
   description: "Sample project for jira-service-desk-operator"
   assigneeType: PROJECT_LEAD
-  leadAccountId: 5f60xxxxxxxxxxxxxx0db3
+  leadAccountId: 5f60xxxxxxxxxxxxxxxx0db3
   url: https://stakater.com
 

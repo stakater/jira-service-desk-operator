@@ -9,6 +9,6 @@ spec:
   projectTemplateKey: com.atlassian.servicedesk:itil-v2-service-desk-project
   description: "Sample project for jira-service-desk-operator"
   assigneeType: PROJECT_LEAD
-  leadAccountId: 5f60xxxxxxxxxxxxxx0db3
+  leadAccountId: 5f60xxxxxxxxxxxxxxxx0db3
   url: https://stakater.com
 

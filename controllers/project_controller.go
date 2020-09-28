@@ -141,14 +141,12 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 	if !instance.Spec.CustomerAccessStatus {
 		err = r.JiraServiceDeskClient.UpdateProjectAccessPermissions(instance.Spec.CustomerAccessStatus, project.Key)
 		if err != nil {
-			log.Info("Failed to update the Service Desk Open Access Permissions to Added Customers Only")
+			log.Info("Failed to update the Access Permissions to customer")
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
 
-		log.Info("Successfully updated the Service Desk Open Access Permissions to Added Customers Only")
+		log.Info("Successfully updated the Access Permissions to customer")
 	}
-
-	log.Info("Successfully updated the Access Permissions to customer")
 
 	instance.Status.ID = projectId
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
