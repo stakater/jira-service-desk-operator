@@ -25,6 +25,13 @@ type Client interface {
 	ProjectEqual(oldProject Project, newProject Project) bool
 	GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
 	UpdateCustomerAccessStatus(key string) error
+	GetCustomerById(customerAccountId string) (Customer, error)
+	CreateCustomer(customer Customer) (string, error)
+	AddCustomerToProject(customerAccountId string, projectKey string) error
+	RemoveCustomerFromProject(customerAccountId string, projectKey string) error
+	DeleteCustomer(customerAccountId string) error
+	GetCustomerCRFromCustomer(customer Customer) jiraservicedeskv1alpha1.Customer
+	GetCustomerFromCustomerCRForCreateCustomer(customer *jiraservicedeskv1alpha1.Customer) Customer
 }
 
 // Client wraps http client
@@ -45,7 +52,7 @@ func NewClient(apiToken string, baseURL string, email string) Client {
 	}
 }
 
-func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}) (*http.Request, error) {
+func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}, experimental bool) (*http.Request, error) {
 	endpoint := c.baseURL + path
 	url, err := url.Parse(endpoint)
 	if err != nil {
@@ -70,6 +77,11 @@ func (c *jiraServiceDeskClient) newRequest(method, path string, body interface{}
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "golang httpClient")
+
+	if experimental {
+		req.Header.Set("X-ExperimentalApi", "opt-in")
+	}
+
 	req.SetBasicAuth(c.email, c.apiToken)
 	return req, nil
 }

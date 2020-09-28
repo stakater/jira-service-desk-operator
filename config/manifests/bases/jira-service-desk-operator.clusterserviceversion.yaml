@@ -7,7 +7,7 @@ metadata:
     operators.operatorframework.io/builder: operator-sdk-v1.0.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
   name: jira-service-desk-operator.vX.Y.Z
-  namespace: jira-service-desk-operator
+  namespace: jira-service-desk-operator-system
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -16,6 +16,11 @@ spec:
       displayName: Project
       kind: Project
       name: projects.jiraservicedesk.stakater.com
+      version: v1alpha1
+    - description: Customer is the Schema for the customers API
+      displayName: Customer
+      kind: Customer
+      name: customers.jiraservicedesk.stakater.com
       version: v1alpha1
   description: Kubernetes operator for Jira Service Desk
   displayName: jira-service-desk-operator

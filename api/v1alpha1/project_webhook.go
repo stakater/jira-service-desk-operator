@@ -34,8 +34,6 @@ func (r *Project) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 // +kubebuilder:webhook:path=/mutate-jiraservicedesk-stakater-com-v1alpha1-project,mutating=true,failurePolicy=fail,groups=jiraservicedesk.stakater.com,resources=projects,verbs=create;update,versions=v1alpha1,name=mproject.kb.io
 
 var _ webhook.Defaulter = &Project{}

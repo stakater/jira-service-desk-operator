@@ -168,7 +168,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	// Delete finalizer
 	finalizerUtil.DeleteFinalizer(instance, ProjectFinalizer)
 
-	log.Info("Finalizer removed for project : " + instance.Spec.Name)
+	log.Info("Finalizer removed for project: " + instance.Spec.Name)
 
 	// Update instance
 	err = r.Client.Update(context.TODO(), instance)

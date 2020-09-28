@@ -25,3 +25,5 @@ bin
 /_output/
 /jira-service-desk-operator
 /.local/
+testbin/
+kube*
