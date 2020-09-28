@@ -12,7 +12,7 @@ import (
 const (
 	// Endpoints
 	EndpointApiVersion3Project = "/rest/api/3/project"
-	ProjectPermissionsApiPath  = "/rest/servicedesk/1/servicedesk/"
+	ServiceDeskV1ApiPath       = "/rest/servicedesk/1/servicedesk/"
 	RequestSecurityPath        = "/settings/requestsecurity"
 
 	// Project Template Types
@@ -168,7 +168,7 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 	return err
 }
 
-func (c *jiraServiceDeskClient) UpdateProjectAccessPermissions(status bool, key string) error {
+func (c *jiraServiceDeskClient) ModifyProjectAccessPermissions(status bool, key string) error {
 	body := CustomerAccessRequestBody{
 		autocompleteEnabled:     false,
 		manageEnabled:           false,
@@ -176,7 +176,7 @@ func (c *jiraServiceDeskClient) UpdateProjectAccessPermissions(status bool, key 
 		serviceDeskPublicSignup: status,
 	}
 
-	request, err := c.newRequest("POST", ProjectPermissionsApiPath+key+RequestSecurityPath, body, false)
+	request, err := c.newRequest("POST", ServiceDeskV1ApiPath+key+RequestSecurityPath, body, false)
 	if err != nil {
 		return err
 	}

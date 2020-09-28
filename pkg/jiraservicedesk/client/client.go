@@ -24,7 +24,7 @@ type Client interface {
 	UpdateProject(updatedProject Project, id string) error
 	ProjectEqual(oldProject Project, newProject Project) bool
 	GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
-	UpdateProjectAccessPermissions(status bool, key string) error
+	ModifyProjectAccessPermissions(status bool, key string) error
 	GetCustomerById(customerAccountId string) (Customer, error)
 	CreateCustomer(customer Customer) (string, error)
 	AddCustomerToProject(customerAccountId string, projectKey string) error

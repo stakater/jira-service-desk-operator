@@ -88,9 +88,9 @@ type ProjectSpec struct {
 	// +optional
 	CategoryId int `json:"categoryId,omitempty"`
 
-	// The Custermer Access Status of a project
+	// The Access status of the project
 	// +optional, if not provided default behaviour is False
-	CustomerAccessStatus bool `json:"customerAccessStatus,omitempty"`
+	ServiceDeskOpenAccess bool `json:"serviceDeskOpenAccess,omitempty"`
 }
 
 // ProjectStatus defines the observed state of Project

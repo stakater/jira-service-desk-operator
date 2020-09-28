@@ -138,8 +138,8 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 
 	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
 
-	if !instance.Spec.CustomerAccessStatus {
-		err = r.JiraServiceDeskClient.UpdateProjectAccessPermissions(instance.Spec.CustomerAccessStatus, project.Key)
+	if !instance.Spec.ServiceDeskOpenAccess {
+		err = r.JiraServiceDeskClient.ModifyProjectAccessPermissions(instance.Spec.ServiceDeskOpenAccess, project.Key)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
