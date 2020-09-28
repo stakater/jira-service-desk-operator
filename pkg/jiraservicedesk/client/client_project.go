@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"strconv"
 
@@ -156,7 +155,7 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 		return err
 	}
 
-	if response.StatusCode != 204 {
+	if response.StatusCode < 200 || response.StatusCode > 299 {
 		return errors.New("Rest request to delete Project failed with status: " + strconv.Itoa(response.StatusCode))
 	}
 
@@ -184,8 +183,7 @@ func (c *jiraServiceDeskClient) UpdateCustomerAccessStatus(key string) error {
 	defer response.Body.Close()
 	responseData, _ := ioutil.ReadAll(response.Body)
 
-	if response.StatusCode != 200 {
-		fmt.Println("Error2")
+	if response.StatusCode < 200 || response.StatusCode > 299 {
 		err := errors.New("Rest request to update Service Desk Open Access Status failed with status " + strconv.Itoa(response.StatusCode) +
 			" and response: " + string(responseData))
 		return err
