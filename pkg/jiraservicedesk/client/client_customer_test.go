@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/nbio/st"
@@ -41,8 +42,8 @@ func TestJiraClient_GetCustomerById_shouldNotGetCustomer_whenInValidCustomerAcco
 	st.Expect(t, customer.AccountId, "")
 	st.Expect(t, customer.DisplayName, "")
 	st.Expect(t, customer.Email, "")
-	st.Reject(t, err, nil)
 
+	st.Expect(t, err, errors.New(mockData.GetCustomerFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)
 }
 
@@ -84,7 +85,7 @@ func TestJiraClient_CreateCustomer_shouldNotCreateCustomer_whenInValidCustomerDa
 	id, err := jiraClient.CreateCustomer(sampleCustomer)
 
 	st.Expect(t, id, "")
-	st.Reject(t, err, nil)
+	st.Expect(t, err, errors.New(mockData.CreateCustomerFailedErrorMsg))
 
 	st.Expect(t, gock.IsDone(), true)
 }
@@ -94,9 +95,7 @@ func TestJiraClient_AddCustomerToProject_shouldAddCustomerToProject_whenValidPro
 	gock.New(mockData.BaseURL + AddCustomerApiPath + mockData.AddProjectKey).
 		Post(mockData.CustomerEndPoint).
 		MatchType("json").
-		JSON(map[string]interface{}{
-			"accountIds": []string{mockData.CustomerAccountId},
-		}).
+		JSON(mockData.AddCustomerSuccessResponse).
 		Reply(201)
 
 	jiraClient := NewClient("", mockData.BaseURL, "")
@@ -116,7 +115,7 @@ func TestJiraClient_AddCustomerToProject_shouldNotAddCustomerToProject_whenInVal
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	err := jiraClient.AddCustomerToProject(mockData.CustomerAccountId, mockData.AddProjectKey)
 
-	st.Reject(t, err, nil)
+	st.Expect(t, err, errors.New(mockData.AddCustomerFailedErrorMsg))
 
 	st.Expect(t, gock.IsDone(), true)
 }
@@ -124,11 +123,11 @@ func TestJiraClient_AddCustomerToProject_shouldNotAddCustomerToProject_whenInVal
 func TestJiraClient_RemoveCustomerFromProject_shouldRemoveCustomerFromProject_whenValidProjectIsGiven(t *testing.T) {
 	defer gock.Off()
 	gock.New(mockData.BaseURL + AddCustomerApiPath + mockData.RemoveProjectKey).
-		Post(mockData.CustomerEndPoint).
+		Delete(mockData.CustomerEndPoint).
 		Reply(201)
 
 	jiraClient := NewClient("", mockData.BaseURL, "")
-	err := jiraClient.AddCustomerToProject(mockData.CustomerAccountId, mockData.RemoveProjectKey)
+	err := jiraClient.RemoveCustomerFromProject(mockData.CustomerAccountId, mockData.RemoveProjectKey)
 
 	st.Expect(t, err, nil)
 
@@ -138,13 +137,13 @@ func TestJiraClient_RemoveCustomerFromProject_shouldRemoveCustomerFromProject_wh
 func TestJiraClient_RemoveCustomerFromProject_shouldNotRemoveCustomerFromProject_whenInvalidProjectIsGiven(t *testing.T) {
 	defer gock.Off()
 	gock.New(mockData.BaseURL + AddCustomerApiPath + mockData.RemoveProjectKey).
-		Post(mockData.CustomerEndPoint).
+		Delete(mockData.CustomerEndPoint).
 		Reply(400)
 
 	jiraClient := NewClient("", mockData.BaseURL, "")
-	err := jiraClient.AddCustomerToProject(mockData.CustomerAccountId, mockData.RemoveProjectKey)
+	err := jiraClient.RemoveCustomerFromProject(mockData.CustomerAccountId, mockData.RemoveProjectKey)
 
-	st.Reject(t, err, nil)
+	st.Expect(t, err, errors.New(mockData.RemoveCustomerFailedErrorMsg))
 
 	st.Expect(t, gock.IsDone(), true)
 }
@@ -173,7 +172,7 @@ func TestJiraClient_DeleteCustomer_shouldNotDeleteCustomer_whenInvalidCustomerIs
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	err := jiraClient.DeleteCustomer(mockData.CustomerAccountId)
 
-	st.Reject(t, err, nil)
+	st.Expect(t, err, errors.New(mockData.DeleteCustomerFailedErrorMsg))
 
 	st.Expect(t, gock.IsDone(), true)
 }

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/nbio/st"
@@ -42,7 +43,7 @@ func TestJiraService_GetProject_shouldNotGetProject_whenInValidProjectIdIsGiven(
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	_, err := jiraClient.GetProjectById("/" + mockData.ProjectID)
 
-	st.Reject(t, err, nil)
+	st.Expect(t, err, errors.New(mockData.GetProjectFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)
 }
 
@@ -90,7 +91,7 @@ func TestJiraService_CreateProject_shouldNotCreateProject_whenInValidProjectData
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	_, err := jiraClient.CreateProject(sampleProject)
 
-	st.Reject(t, err, nil)
+	st.Expect(t, err, errors.New(mockData.CreateProjectFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)
 }
 
@@ -122,7 +123,6 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenInvalidProject
 		Put("/").
 		JSON(mock.UpdateProjectRequestJSON).
 		Reply(404)
-		//No Json is sent here, just checking the error
 
 	var updateProject = Project{
 		Key:  mock.UpdateProjectInput.Key,
@@ -131,8 +131,8 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenInvalidProject
 
 	client := NewClient("", mock.BaseURL, "")
 	err := client.UpdateProject(updateProject, mock.ProjectID)
-	st.Reject(t, err, nil)
 
+	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)
 }
 
@@ -149,8 +149,8 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenImmutableField
 
 	client := NewClient("", mock.BaseURL, "")
 	err := client.UpdateProject(updateProject, mock.ProjectID)
-	st.Reject(t, err, nil)
 
+	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)
 }
 
@@ -179,6 +179,6 @@ func TestJiraService_DeleteProject_shouldNotDeleteProject_whenInValidProjectIdIs
 	jiraClient := NewClient("", mockData.BaseURL, "")
 	err := jiraClient.DeleteProject(mockData.ProjectID)
 
-	st.Reject(t, err, nil)
+	st.Expect(t, err, errors.New(mockData.DeleteProjectFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)
 }

@@ -82,8 +82,9 @@ func (t *TestUtil) CreateCustomerObject(customer jiraservicedeskv1alpha1.Custome
 			Namespace: namespace,
 		},
 		Spec: jiraservicedeskv1alpha1.CustomerSpec{
-			Name:  customer.Spec.Name,
-			Email: customer.Spec.Email,
+			Name:     customer.Spec.Name,
+			Email:    customer.Spec.Email,
+			Projects: customer.Spec.Projects,
 		},
 	}
 }
@@ -117,6 +118,24 @@ func (t *TestUtil) CreateCustomer(customer jiraservicedeskv1alpha1.Customer, nam
 	}
 
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: customer.Spec.Name, Namespace: namespace}}
+
+	_, err = t.r.Reconcile(req)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	return customerObject
+}
+
+// UpdateCustomer submits an updatedCustomer to the kubernetes server
+func (t *TestUtil) UpdateCustomer(customerObject *jiraservicedeskv1alpha1.Customer, namespace string) *jiraservicedeskv1alpha1.Customer {
+
+	err := t.k8sClient.Update(t.ctx, customerObject)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: customerObject.Spec.Name, Namespace: namespace}}
 
 	_, err = t.r.Reconcile(req)
 	if err != nil {

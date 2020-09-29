@@ -103,7 +103,7 @@ func (c *jiraServiceDeskClient) CreateProject(project Project) (string, error) {
 	responseData, _ := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err := errors.New("Rest request to create Project failed with status " + strconv.Itoa(response.StatusCode) +
+		err := errors.New("Rest request to create Project failed with status: " + strconv.Itoa(response.StatusCode) +
 			" and response: " + string(responseData))
 		return "", err
 	}
@@ -133,7 +133,7 @@ func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project, id string)
 	responseData, _ := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err := errors.New("Rest request to update Project failed with status " + strconv.Itoa(response.StatusCode) +
+		err := errors.New("Rest request to update Project failed with status: " + strconv.Itoa(response.StatusCode) +
 			" and response: " + string(responseData))
 		return err
 	}

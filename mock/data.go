@@ -12,10 +12,35 @@ var ProjectID = "10003"
 var ProjectIDInt, _ = strconv.Atoi(ProjectID)
 var InvalidPermissionScheme = "4000"
 
+var GetProjectFailedErrorMsg = "Rest request to get Project failed with status: 404"
+var CreateProjectFailedErrorMsg = "Rest request to create Project failed with status: 400 and response: "
+var UpdateProjectFailedErrorMsg = "Rest request to update Project failed with status: 404 and response: "
+var DeleteProjectFailedErrorMsg = "Rest request to delete Project failed with status: 404"
+
+var GetCustomerFailedErrorMsg = "Rest request to get customer failed with status: 400"
+var CreateCustomerFailedErrorMsg = "Rest request to create customer failed with status: 400 and response: "
+var AddCustomerFailedErrorMsg = "Rest request to add Customer failed with status: 400"
+var RemoveCustomerFailedErrorMsg = "Rest request to remove Customer failed with status: 400"
+var DeleteCustomerFailedErrorMsg = "Rest request to delete Customer failed with status: 400"
+
+var AddCustomerSuccessResponse = map[string]interface{}{
+	"accountIds": []string{CustomerAccountId},
+}
+
 var SampleCustomer = jiraservicedeskv1alpha1.Customer{
 	Spec: jiraservicedeskv1alpha1.CustomerSpec{
-		Name:  "sample",
-		Email: "sample@email.com",
+		Name:  "customer",
+		Email: "customer@sample.com",
+	},
+}
+
+var SampleUpdatedCustomer = jiraservicedeskv1alpha1.Customer{
+	Spec: jiraservicedeskv1alpha1.CustomerSpec{
+		Name:  "customer",
+		Email: "customer@sample.com",
+		Projects: []string{
+			"TEST",
+		},
 	},
 }
 
