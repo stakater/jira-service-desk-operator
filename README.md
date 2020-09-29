@@ -61,11 +61,12 @@ Examples for Project Custom Resource can be found at [here](https://github.com/s
 * Following are the immutable fields that cannot be updated:
     * ProjectTemplateKey
     * ProjectTypeKey
-    * leadAccountId 
+    * LeadAccountId 
     * CategoryId 
     * NotificationScheme
     * PermissionScheme 
-    * issueSecurityScheme 
+    * IssueSecurityScheme 
+    * OpenAccess
 
     You can read more about these fields on [Jira Service Desk api docs](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-projects/#api-rest-api-3-project-post).
 

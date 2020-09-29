@@ -138,6 +138,16 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 	}
 
 	log.Info("Successfully created Jira Service Desk Project: " + instance.Spec.Name)
+
+	if !instance.Spec.OpenAccess {
+		err = r.JiraServiceDeskClient.UpdateProjectAccessPermissions(instance.Spec.OpenAccess, project.Key)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+
+		log.Info("Successfully updated the Access Permissions to customer")
+	}
+
 	instance.Status.ID = projectId
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
@@ -181,6 +191,7 @@ func (r *ProjectReconciler) handleUpdate(req ctrl.Request, existingProject jiras
 	if ok, err := instance.IsValidUpdate(existingProjectInstance); !ok {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
+
 	updatedProject := r.JiraServiceDeskClient.GetProjectForUpdateRequest(existingProject, instance)
 	err := r.JiraServiceDeskClient.UpdateProject(updatedProject, existingProject.Id)
 	if err != nil {
