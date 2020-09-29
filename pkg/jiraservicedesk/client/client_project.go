@@ -12,6 +12,8 @@ import (
 const (
 	// Endpoints
 	EndpointApiVersion3Project = "/rest/api/3/project"
+	ServiceDeskV1ApiPath       = "/rest/servicedesk/1/servicedesk/"
+	RequestSecurityPath        = "/settings/requestsecurity"
 
 	// Project Template Types
 	ClassicProjectTemplateKey = "com.atlassian.servicedesk:itil-v2-service-desk-project"
@@ -59,6 +61,13 @@ type ProjectCreateResponse struct {
 	Key  string `json:"key"`
 }
 
+type CustomerAccessRequestBody struct {
+	autocompleteEnabled     bool
+	manageEnabled           bool
+	serviceDeskOpenAccess   bool
+	serviceDeskPublicSignup bool
+}
+
 func (c *jiraServiceDeskClient) GetProjectById(id string) (Project, error) {
 	var project Project
 
@@ -103,7 +112,7 @@ func (c *jiraServiceDeskClient) CreateProject(project Project) (string, error) {
 	responseData, _ := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err := errors.New("Rest request to create Project failed with status " + strconv.Itoa(response.StatusCode) +
+		err := errors.New("Rest request to create Project failed with status: " + strconv.Itoa(response.StatusCode) +
 			" and response: " + string(responseData))
 		return "", err
 	}
@@ -133,7 +142,7 @@ func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project, id string)
 	responseData, _ := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err := errors.New("Rest request to update Project failed with status " + strconv.Itoa(response.StatusCode) +
+		err := errors.New("Rest request to update Project failed with status: " + strconv.Itoa(response.StatusCode) +
 			" and response: " + string(responseData))
 		return err
 	}
@@ -152,8 +161,36 @@ func (c *jiraServiceDeskClient) DeleteProject(id string) error {
 		return err
 	}
 
-	if response.StatusCode != 204 {
+	if response.StatusCode < 200 || response.StatusCode > 299 {
 		return errors.New("Rest request to delete Project failed with status: " + strconv.Itoa(response.StatusCode))
+	}
+
+	return err
+}
+
+func (c *jiraServiceDeskClient) UpdateProjectAccessPermissions(status bool, key string) error {
+	body := CustomerAccessRequestBody{
+		autocompleteEnabled:     false,
+		manageEnabled:           false,
+		serviceDeskOpenAccess:   status,
+		serviceDeskPublicSignup: status,
+	}
+
+	request, err := c.newRequest("POST", ServiceDeskV1ApiPath+key+RequestSecurityPath, body, false)
+	if err != nil {
+		return err
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		err := errors.New("Rest request to update project permissions failed with status: " + strconv.Itoa(response.StatusCode))
+		return err
 	}
 
 	return err

@@ -69,6 +69,11 @@ spec:
             notificationScheme:
               description: The ID of the notification scheme for the project
               type: integer
+            openAccess:
+              description: The Open Access status, which dictates who can access the
+                project. If set to true all customers can access the project. If false,
+                only customers added to project can access the project.
+              type: boolean
             permissionScheme:
               description: The ID of the permission scheme for the project
               type: integer
