@@ -104,10 +104,8 @@ var _ = Describe("Project Controller", func() {
 
 					Expect(updatedProject.Spec.ProjectTypeKey).To(Equal(oldTypeKey))
 				})
-
 			})
 		})
-
 	})
 
 	Describe("Negative test cases", func() {
@@ -126,7 +124,5 @@ var _ = Describe("Project Controller", func() {
 				})
 			})
 		})
-
 	})
-
 })
