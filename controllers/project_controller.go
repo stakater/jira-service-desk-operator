@@ -116,6 +116,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			}
 		}
 	}
+
 	return r.handleCreate(req, instance)
 }
 

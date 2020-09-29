@@ -10,6 +10,7 @@ require (
 	github.com/operator-framework/operator-lib v0.1.0
 	github.com/operator-framework/operator-sdk v0.19.2
 	github.com/stakater/operator-utils v0.1.4
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/h2non/gock.v1 v1.0.15
 	k8s.io/api v0.18.8
 	k8s.io/apimachinery v0.18.8

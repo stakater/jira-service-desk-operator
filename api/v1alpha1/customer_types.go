@@ -109,7 +109,7 @@ func (customer *Customer) IsValid() (bool, error) {
 
 func (customer *Customer) IsValidUpdate(existingCustomer Customer) (bool, error) {
 
-	if strings.ToLower(customer.Spec.Email) != existingCustomer.Spec.Email {
+	if !strings.EqualFold(customer.Spec.Email, existingCustomer.Spec.Email) {
 		return false, fmt.Errorf("%s %s", "Customer email", invalidUpdateErrorMsg)
 	}
 	if customer.Spec.Name != existingCustomer.Spec.Name {

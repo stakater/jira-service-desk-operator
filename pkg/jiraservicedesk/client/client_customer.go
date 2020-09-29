@@ -86,7 +86,7 @@ func (c *jiraServiceDeskClient) CreateCustomer(customer Customer) (string, error
 	responseData, _ := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err = errors.New("Rest request to create Customer failed with status " + strconv.Itoa(response.StatusCode) +
+		err = errors.New("Rest request to create customer failed with status: " + strconv.Itoa(response.StatusCode) +
 			" and response: " + string(responseData))
 		return "", err
 	}
@@ -118,7 +118,7 @@ func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, p
 	defer response.Body.Close()
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err = errors.New("Rest request to add Customer failed with status " + strconv.Itoa(response.StatusCode))
+		err = errors.New("Rest request to add Customer failed with status: " + strconv.Itoa(response.StatusCode))
 		return err
 	}
 
@@ -143,7 +143,7 @@ func (c *jiraServiceDeskClient) RemoveCustomerFromProject(customerAccountId stri
 	defer response.Body.Close()
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err = errors.New("Rest request to remove Customer failed with status " + strconv.Itoa(response.StatusCode))
+		err = errors.New("Rest request to remove Customer failed with status: " + strconv.Itoa(response.StatusCode))
 		return err
 	}
 
@@ -164,7 +164,7 @@ func (c *jiraServiceDeskClient) DeleteCustomer(customerAccountId string) error {
 	defer response.Body.Close()
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err = errors.New("Rest request to delete Customer failed with status " + strconv.Itoa(response.StatusCode))
+		err = errors.New("Rest request to delete Customer failed with status: " + strconv.Itoa(response.StatusCode))
 		return err
 	}
 

@@ -123,7 +123,6 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenInvalidProject
 		Put("/").
 		JSON(mock.UpdateProjectRequestJSON).
 		Reply(404)
-		//No Json is sent here, just checking the error
 
 	var updateProject = Project{
 		Key:  mock.UpdateProjectInput.Key,
@@ -132,8 +131,8 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenInvalidProject
 
 	client := NewClient("", mock.BaseURL, "")
 	err := client.UpdateProject(updateProject, mock.ProjectID)
-	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
 
+	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)
 }
 
@@ -145,13 +144,13 @@ func TestJiraServiceDesk_UpdateProject_shouldNotUpdateProject_whenImmutableField
 		Reply(404)
 
 	var updateProject = Project{
-		Key: mock.UpdateProjectInput.Id,
+		Id: mock.UpdateProjectInput.Id,
 	}
 
 	client := NewClient("", mock.BaseURL, "")
 	err := client.UpdateProject(updateProject, mock.ProjectID)
-	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
 
+	st.Expect(t, err, errors.New(mockData.UpdateProjectFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)
 }
 

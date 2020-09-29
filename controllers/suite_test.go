@@ -34,6 +34,7 @@ import (
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
+	mockData "github.com/stakater/jira-service-desk-operator/mock"
 	c "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
 	"github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/config"
 	secretsUtil "github.com/stakater/operator-utils/util/secrets"
@@ -51,6 +52,9 @@ var ctx context.Context
 var r *ProjectReconciler
 var util *controllerUtil.TestUtil
 var ns string
+
+var cr *CustomerReconciler
+var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
 
@@ -79,12 +83,10 @@ var _ = BeforeSuite(func(done Done) {
 	err = jiraservicedeskv1alpha1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = jiraservicedeskv1alpha1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
-
 	// +kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
+
 	Expect(err).ToNot(HaveOccurred())
 	Expect(k8sClient).ToNot(BeNil())
 
@@ -116,10 +118,25 @@ var _ = BeforeSuite(func(done Done) {
 	util = controllerUtil.New(ctx, k8sClient, r)
 	Expect(util).ToNot(BeNil())
 
+	cr = &CustomerReconciler{
+		Client:                k8sClient,
+		Scheme:                scheme.Scheme,
+		Log:                   log.WithName("Reconciler"),
+		JiraServiceDeskClient: c.NewClient(apiToken, apiBaseUrl, email),
+	}
+	Expect(cr).ToNot((BeNil()))
+
+	cUtil = controllerUtil.New(ctx, k8sClient, cr)
+	Expect(util).ToNot(BeNil())
+
+	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
+
 	close(done)
 }, 60)
 
 var _ = AfterSuite(func() {
+	util.TryDeleteProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
+
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).ToNot(HaveOccurred())

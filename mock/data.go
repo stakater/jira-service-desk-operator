@@ -17,6 +17,36 @@ var CreateProjectFailedErrorMsg = "Rest request to create Project failed with st
 var UpdateProjectFailedErrorMsg = "Rest request to update Project failed with status: 404 and response: "
 var DeleteProjectFailedErrorMsg = "Rest request to delete Project failed with status: 404"
 
+var GetCustomerFailedErrorMsg = "Rest request to get customer failed with status: 400"
+var CreateCustomerFailedErrorMsg = "Rest request to create customer failed with status: 400 and response: "
+var AddCustomerFailedErrorMsg = "Rest request to add Customer failed with status: 400"
+var RemoveCustomerFailedErrorMsg = "Rest request to remove Customer failed with status: 400"
+var DeleteCustomerFailedErrorMsg = "Rest request to delete Customer failed with status: 400"
+
+var AddCustomerSuccessResponse = map[string]interface{}{
+	"accountIds": []string{CustomerAccountId},
+}
+
+var AddedProjectsList = []string{"CTP"}
+var RemovedProjectsList = []string{}
+
+var SampleCustomer = jiraservicedeskv1alpha1.Customer{
+	Spec: jiraservicedeskv1alpha1.CustomerSpec{
+		Name:  "customer",
+		Email: "customer@sample.com",
+	},
+}
+
+var SampleUpdatedCustomer = jiraservicedeskv1alpha1.Customer{
+	Spec: jiraservicedeskv1alpha1.CustomerSpec{
+		Name:  "customer",
+		Email: "customer@sample.com",
+		Projects: []string{
+			"TEST",
+		},
+	},
+}
+
 var CreateProjectInputJSON = map[string]string{
 	"name":               "testproject",
 	"key":                "TEST",
@@ -38,6 +68,19 @@ var CreateProjectInput = jiraservicedeskv1alpha1.Project{
 	Spec: jiraservicedeskv1alpha1.ProjectSpec{
 		Name:               "testproject",
 		Key:                "TEST",
+		ProjectTypeKey:     "service_desk",
+		ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
+		Description:        "Sample project for jira-service-desk-operator",
+		AssigneeType:       "PROJECT_LEAD",
+		LeadAccountId:      "5f62e5902b42470070d1fb83",
+		URL:                "https://test.com",
+	},
+}
+
+var CustomerTestProjectInput = jiraservicedeskv1alpha1.Project{
+	Spec: jiraservicedeskv1alpha1.ProjectSpec{
+		Name:               "customertestproject",
+		Key:                "CTP",
 		ProjectTypeKey:     "service_desk",
 		ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
 		Description:        "Sample project for jira-service-desk-operator",
@@ -124,3 +167,39 @@ var UpdateProjectResponseJSON = map[string]interface{}{
 	"id":   ProjectIDInt,
 	"key":  "STK",
 }
+
+var GetCustomerResponse = struct {
+	AccountId   string
+	DisplayName string
+	Email       string
+}{
+	AccountId:   "sample12345",
+	DisplayName: "Sample Customer",
+	Email:       "sample@test.com",
+}
+
+var GetCustomerResponseJSON = map[string]string{
+	"self":         "https://sample.net/user?accountId=sample12345",
+	"accountId":    "sample12345",
+	"emailAddress": "sample@test.com",
+	"displayName":  "Sample Customer",
+	"accountType":  "customer",
+}
+
+var CustomerAccountId = "sample12345"
+
+var CreateCustomerInputJSON = map[string]string{
+	"displayName": "Sample Customer",
+	"email":       "sample@test.com",
+}
+
+var CreateCustomerResponseJSON = map[string]string{
+	"accountId":    "sample12345",
+	"displayName":  "Sample Customer",
+	"emailAddress": "sample@test.com",
+}
+
+var AddProjectKey string = "ADD"
+var CustomerEndPoint string = "/customer"
+
+var RemoveProjectKey string = "REMOVE"
