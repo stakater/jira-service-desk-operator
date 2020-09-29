@@ -33,19 +33,10 @@ var _ = Describe("Customer Controller", func() {
 	})
 
 	Describe("Modifying customer associations", func() {
-
-		BeforeEach(func() {
-			_ = util.CreateProject(mockData.CreateProjectInput, ns)
-		})
-
-		AfterEach(func() {
-			util.TryDeleteProject(mockData.CreateProjectInput.Spec.Name, ns)
-		})
-
 		Describe("Add Jira Service Desk customer to project", func() {
 			Context("With Valid Project Id", func() {
 				It("Should add the customer in the project", func() {
-					project := util.GetProject(mockData.CreateProjectInput.Spec.Name, ns)
+					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
 
 					_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
@@ -68,7 +59,7 @@ var _ = Describe("Customer Controller", func() {
 		Describe("Remove Jira Service Desk customer from project", func() {
 			Context("With Valid Project Id", func() {
 				It("Should remove the customer from that project", func() {
-					project := util.GetProject(mockData.CreateProjectInput.Spec.Name, ns)
+					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
 
 					_ = cUtil.CreateCustomer(mockData.SampleUpdatedCustomer, ns)

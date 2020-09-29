@@ -27,7 +27,7 @@ var AddCustomerSuccessResponse = map[string]interface{}{
 	"accountIds": []string{CustomerAccountId},
 }
 
-var AddedProjectsList = []string{"TEST"}
+var AddedProjectsList = []string{"CTP"}
 var RemovedProjectsList = []string{}
 
 var SampleCustomer = jiraservicedeskv1alpha1.Customer{
@@ -64,17 +64,23 @@ var CreateProjectResponseJSON = map[string]interface{}{
 	"key":  "KEY",
 }
 
-var CreateCustomerInput = jiraservicedeskv1alpha1.Customer{
-	Spec: jiraservicedeskv1alpha1.CustomerSpec{
-		Name:  "sample",
-		Email: "sample@test.com",
-	},
-}
-
 var CreateProjectInput = jiraservicedeskv1alpha1.Project{
 	Spec: jiraservicedeskv1alpha1.ProjectSpec{
 		Name:               "testproject",
 		Key:                "TEST",
+		ProjectTypeKey:     "service_desk",
+		ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
+		Description:        "Sample project for jira-service-desk-operator",
+		AssigneeType:       "PROJECT_LEAD",
+		LeadAccountId:      "5f62e5902b42470070d1fb83",
+		URL:                "https://test.com",
+	},
+}
+
+var CustomerTestProjectInput = jiraservicedeskv1alpha1.Project{
+	Spec: jiraservicedeskv1alpha1.ProjectSpec{
+		Name:               "customertestproject",
+		Key:                "CTP",
 		ProjectTypeKey:     "service_desk",
 		ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
 		Description:        "Sample project for jira-service-desk-operator",
