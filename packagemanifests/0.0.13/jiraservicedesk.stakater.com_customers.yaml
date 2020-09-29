@@ -5,7 +5,7 @@ metadata:
     cert-manager.io/inject-ca-from: jira-service-desk-operator-system/jira-service-desk-operator-serving-cert
     controller-gen.kubebuilder.io/version: v0.3.0
   creationTimestamp: null
-  name: projects.jiraservicedesk.stakater.com
+  name: customers.jiraservicedesk.stakater.com
 spec:
   conversion:
     strategy: Webhook
@@ -18,17 +18,17 @@ spec:
         port: 443
   group: jiraservicedesk.stakater.com
   names:
-    kind: Project
-    listKind: ProjectList
-    plural: projects
-    singular: project
+    kind: Customer
+    listKind: CustomerList
+    plural: customers
+    singular: customer
   preserveUnknownFields: false
-  scope: Cluster
+  scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Project is the Schema for the projects API
+      description: Customer is the Schema for the customers API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -39,62 +39,29 @@ spec:
         metadata:
           type: object
         spec:
-          description: ProjectSpec defines the desired state of Project
+          description: CustomerSpec defines the desired state of Customer
           properties:
-            assigneeType:
-              description: Task assignee type
-              enum:
-              - PROJECT_LEAD
-              - UNASSIGNED
-              type: string
-            avatarId:
-              description: An integer value for the project's avatar.
-              type: integer
-            categoryId:
-              description: The ID of the project's category
-              type: integer
-            description:
-              description: Description for project
-              type: string
-            issueSecurityScheme:
-              description: The ID of the issue security scheme for the project, which enables you to control who can and cannot view issues
-              type: integer
-            key:
-              description: The project key is used as the prefix of your project's issue keys
-              type: string
-            leadAccountId:
-              description: ID of project lead
-              maxLength: 128
+            email:
+              description: Email of the customer
+              pattern: \S+@\S+\.\S+
               type: string
             name:
-              description: Name of the project
+              description: Name of the customer
               type: string
-            notificationScheme:
-              description: The ID of the notification scheme for the project
-              type: integer
-            openAccess:
-              description: The Open Access status, which dictates who can access the project. If set to true all customers can access the project. If false, only customers added to project can access the project.
-              type: boolean
-            permissionScheme:
-              description: The ID of the permission scheme for the project
-              type: integer
-            projectTemplateKey:
-              description: A prebuilt configuration for a project
-              type: string
-            projectTypeKey:
-              description: The project type, which dictates the application-specific feature set
-              enum:
-              - business
-              - service_desk
-              - software
-              type: string
-            url:
-              description: A link to information about this project, such as project documentation
-              type: string
+            projects:
+              description: List of ProjectKeys in which customer will be added
+              items:
+                type: string
+              type: array
           type: object
         status:
-          description: ProjectStatus defines the observed state of Project
+          description: CustomerStatus defines the observed state of Customer
           properties:
+            associatedProjects:
+              description: List of ProjectKeys in which customer has bee added
+              items:
+                type: string
+              type: array
             conditions:
               description: Status conditions
               items:
@@ -118,11 +85,11 @@ spec:
                 - type
                 type: object
               type: array
-            id:
-              description: Jira service desk project ID
+            customerId:
+              description: Jira Service Desk Customer Account Id
               type: string
           required:
-          - id
+          - customerId
           type: object
       type: object
   version: v1alpha1
