@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"os"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +19,6 @@ var _ = Describe("Customer Controller", func() {
 
 	AfterEach(func() {
 		cUtil.TryDeleteCustomer(mockData.SampleCustomer.Spec.Name, ns)
-		util.TryDeleteProject(mockData.CreateProjectInput.Spec.Name, ns)
 	})
 
 	Describe("Create new Jira Service Desk customer", func() {
@@ -27,57 +27,69 @@ var _ = Describe("Customer Controller", func() {
 				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
 				customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
 
-				Expect(customer.Status.CustomerId).To(Equal(""))
+				Expect(customer.Status.CustomerId).ToNot(Equal(""))
 			})
 		})
 	})
 
-	// Describe("Add Jira Service Desk customer to project", func() {
-	// 	Context("With Valid Project Id", func() {
-	// 		It("Should add the customer in the project", func() {
-	// 			//	_ = util.CreateProject(mockData.CreateProjectInput, ns)
-	// 			project := util.GetProject(mockData.CreateProjectInput.Spec.Name, ns)
+	Describe("Modifying customer associations", func() {
 
-	// 			Expect(project.Status.ID).ToNot(Equal(""))
+		BeforeEach(func() {
+			_ = util.CreateProject(mockData.CreateProjectInput, ns)
+		})
 
-	// 			//_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
-	// 			customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
+		AfterEach(func() {
+			util.TryDeleteProject(mockData.CreateProjectInput.Spec.Name, ns)
+		})
 
-	// 			Expect(customer.Status.CustomerId).ToNot(Equal(""))
+		Describe("Add Jira Service Desk customer to project", func() {
+			Context("With Valid Project Id", func() {
+				It("Should add the customer in the project", func() {
 
-	// 			customer.Spec.Projects = []string{"TEST"}
+					project := util.GetProject(mockData.CreateProjectInput.Spec.Name, ns)
+					Expect(project.Status.ID).ToNot(Equal(""))
 
-	// 			_ = cUtil.UpdateCustomer(customer, ns)
-	// 			updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)
+					_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
+					time.Sleep(5 * time.Second)
 
-	// 			Expect(customer.Spec.Projects).To(Equal(updatedCustomer.Status.AssociatedProjects))
-	// 		})
-	// 	})
-	// })
+					customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
 
-	// Describe("Remove Jira Service Desk customer from project", func() {
-	// 	Context("With Valid Project Id", func() {
-	// 		It("Should remove the customer from that project", func() {
+					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
-	// 			//	_ = util.CreateProject(mockData.CreateProjectInput, ns)
-	// 			project := util.GetProject(mockData.CreateProjectInput.Spec.Name, ns)
+					customer.Spec.Projects = mockData.AddedProjectsList
 
-	// 			Expect(project.Status.ID).ToNot(Equal(""))
+					_ = cUtil.UpdateCustomer(customer, ns)
+					updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)
 
-	// 			//				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
-	// 			customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
+					Expect(customer.Spec.Projects).To(Equal(updatedCustomer.Status.AssociatedProjects))
+				})
+			})
+		})
 
-	// 			Expect(customer.Status.CustomerId).ToNot(Equal(""))
+		Describe("Remove Jira Service Desk customer from project", func() {
+			Context("With Valid Project Id", func() {
+				It("Should remove the customer from that project", func() {
 
-	// 			customer.Spec.Projects = []string{}
+					project := util.GetProject(mockData.CreateProjectInput.Spec.Name, ns)
+					Expect(project.Status.ID).ToNot(Equal(""))
 
-	// 			_ = cUtil.UpdateCustomer(customer, ns)
-	// 			updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)
+					_ = cUtil.CreateCustomer(mockData.SampleUpdatedCustomer, ns)
+					time.Sleep(5 * time.Second)
 
-	// 			Expect(updatedCustomer.Status.AssociatedProjects).To(BeNil())
-	// 		})
-	// 	})
-	// })
+					customer := cUtil.GetCustomer(mockData.SampleUpdatedCustomer.Spec.Name, ns)
+
+					Expect(customer.Status.CustomerId).ToNot(Equal(""))
+
+					customer.Spec.Projects = mockData.RemovedProjectsList
+
+					_ = cUtil.UpdateCustomer(customer, ns)
+					updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)
+
+					Expect(updatedCustomer.Status.AssociatedProjects).To(BeNil())
+				})
+			})
+		})
+	})
 
 	Describe("Delete Jira Service Desk customer", func() {
 		Context("With valid Customer AccountId", func() {

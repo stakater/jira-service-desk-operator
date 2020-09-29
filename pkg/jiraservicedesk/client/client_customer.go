@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"strconv"
 
@@ -68,8 +67,6 @@ func (c *jiraServiceDeskClient) GetCustomerById(customerAccountId string) (Custo
 	}
 
 	customer = customerGetResponseToCustomerMapper(responseObject)
-	fmt.Println("Customer2:")
-	fmt.Println(customer)
 
 	return customer, err
 }

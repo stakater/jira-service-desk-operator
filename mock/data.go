@@ -27,6 +27,9 @@ var AddCustomerSuccessResponse = map[string]interface{}{
 	"accountIds": []string{CustomerAccountId},
 }
 
+var AddedProjectsList = []string{"TEST"}
+var RemovedProjectsList = []string{}
+
 var SampleCustomer = jiraservicedeskv1alpha1.Customer{
 	Spec: jiraservicedeskv1alpha1.CustomerSpec{
 		Name:  "customer",
