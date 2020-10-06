@@ -227,7 +227,6 @@ spec:
   provider:
     name: stakater
     url: https://stakater.com
-  replaces: jira-service-desk-operator.v0.0.15
   version: 0.0.16
   webhookdefinitions:
   - admissionReviewVersions: null
