@@ -106,7 +106,6 @@ type ProjectStatus struct {
 // +kubebuilder:subresource:status
 
 // Project is the Schema for the projects API
-// +kubebuilder:resource:path=projects,scope=Cluster
 type Project struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
