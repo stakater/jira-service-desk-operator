@@ -19,7 +19,6 @@ package v1alpha1
 import (
 	"fmt"
 
-	"github.com/operator-framework/operator-sdk/pkg/status"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -99,7 +98,7 @@ type ProjectStatus struct {
 	ID string `json:"id"`
 
 	// Status conditions
-	Conditions status.Conditions `json:"conditions,omitempty"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -127,11 +126,11 @@ func init() {
 	SchemeBuilder.Register(&Project{}, &ProjectList{})
 }
 
-func (project *Project) GetReconcileStatus() status.Conditions {
+func (project *Project) GetReconcileStatus() []metav1.Condition {
 	return project.Status.Conditions
 }
 
-func (project *Project) SetReconcileStatus(reconcileStatus status.Conditions) {
+func (project *Project) SetReconcileStatus(reconcileStatus []metav1.Condition) {
 	project.Status.Conditions = reconcileStatus
 }
 
