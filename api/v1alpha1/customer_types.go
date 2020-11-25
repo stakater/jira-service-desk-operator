@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/operator-framework/operator-sdk/pkg/status"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -57,7 +56,7 @@ type CustomerStatus struct {
 	AssociatedProjects []string `json:"associatedProjects,omitempty"`
 
 	// Status conditions
-	Conditions status.Conditions `json:"conditions,omitempty"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -85,11 +84,11 @@ func init() {
 	SchemeBuilder.Register(&Customer{}, &CustomerList{})
 }
 
-func (customer *Customer) GetReconcileStatus() status.Conditions {
+func (customer *Customer) GetReconcileStatus() []metav1.Condition {
 	return customer.Status.Conditions
 }
 
-func (customer *Customer) SetReconcileStatus(reconcileStatus status.Conditions) {
+func (customer *Customer) SetReconcileStatus(reconcileStatus []metav1.Condition) {
 	customer.Status.Conditions = reconcileStatus
 }
 

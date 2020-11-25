@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 
-	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
+	util "github.com/stakater/operator-utils/util"
 	secretsUtil "github.com/stakater/operator-utils/util/secrets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -43,9 +43,9 @@ func LoadControllerConfig(apiReader client.Reader) (ControllerConfig, error) {
 	// Retrieve operator namespace
 	operatorNamespace, _ := os.LookupEnv("OPERATOR_NAMESPACE")
 	if len(operatorNamespace) == 0 {
-		operatorNamespaceTemp, err := k8sutil.GetOperatorNamespace()
+		operatorNamespaceTemp, err := util.GetOperatorNamespace()
 		if err != nil {
-			if err == k8sutil.ErrNoNamespace {
+			if err.Error() == "namespace not found for current environment" {
 				log.Info("Skipping leader election; not running in a cluster.")
 			}
 			log.Error(err, "Unable to get operator namespace")
