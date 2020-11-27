@@ -37,6 +37,8 @@ type ProjectSpec struct {
 	Name string `json:"name,omitempty"`
 
 	// The project key is used as the prefix of your project's issue keys
+	// +kubebuilder:validation:MaxLength=10
+	// +kubebuilder:validation:Pattern=^[A-Z][a-zA-Z0-9]+$
 	// +required
 	Key string `json:"key,omitempty"`
 
