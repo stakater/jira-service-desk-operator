@@ -46,9 +46,9 @@ spec:
         - /manager
         env:
         - name: CONFIG_SECRET_NAME
-          value: {{ .Values.configSecretName | default jira-service-desk-config }}
+          value: "{{ default "jira-service-desk-config" .Values.configSecretName }}"
         - name: ENABLE_WEBHOOKS
-          value: {{ .Values.webhook.enabled | default true}}
+          value: "{{ default true .Values.webhook.enabled }}"
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: manager

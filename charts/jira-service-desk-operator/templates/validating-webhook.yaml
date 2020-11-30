@@ -11,39 +11,39 @@ webhooks:
   - clientConfig:
       caBundle: Cg==
       service:
-        name: {{ include "jira-service-desk-operator.fullname" . }}--webhook-service
+        name: {{ include "jira-service-desk-operator.fullname" . }}-webhook-service
         namespace: {{ .Release.Namespace }}
-      path: /validate-jiraservicedesk-stakater-com-v1alpha1-customer
-  failurePolicy: Fail
-  name: vcustomer.kb.io
-  rules:
-  - apiGroups:
-    - jiraservicedesk.stakater.com
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - customers
-- clientConfig:
-    caBundle: Cg==
-    service:
-        name: {{ include "jira-service-desk-operator.fullname" . }}--webhook-service
+        path: /validate-jiraservicedesk-stakater-com-v1alpha1-customer
+    failurePolicy: Fail
+    name: vcustomer.kb.io
+    rules:
+    - apiGroups:
+      - jiraservicedesk.stakater.com
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - customers
+  - clientConfig:
+      caBundle: Cg==
+      service:
+        name: {{ include "jira-service-desk-operator.fullname" . }}-webhook-service
         namespace: {{ .Release.Namespace }}
-      path: /validate-jiraservicedesk-stakater-com-v1alpha1-project
-  failurePolicy: Fail
-  name: vproject.kb.io
-  rules:
-  - apiGroups:
-    - jiraservicedesk.stakater.com
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - projects
+        path: /validate-jiraservicedesk-stakater-com-v1alpha1-project
+    failurePolicy: Fail
+    name: vproject.kb.io
+    rules:
+    - apiGroups:
+      - jiraservicedesk.stakater.com
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - projects
 {{- end -}}
 
 
