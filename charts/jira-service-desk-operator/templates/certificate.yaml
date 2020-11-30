@@ -1,0 +1,24 @@
+{{- if .Values.webhook.enabled -}}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: {{ include "jira-service-desk-operator.fullname" . }}-selfsigned-issuer
+  namespace: {{ .Release.Namespace }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: {{ include "jira-service-desk-operator.fullname" . }}-serving-cert
+  namespace: {{ .Release.Namespace }}
+spec:
+  dnsNames:
+  - "{{ include "jira-service-desk-operator.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc"
+  - "{{ include "jira-service-desk-operator.fullname" . }}-webhook-service.{{ .Release.Namespace }}.svc.cluster.local"
+  issuerRef:
+    kind: Issuer
+    name: {{ include "jira-service-desk-operator.fullname" . }}-selfsigned-issuer
+  secretName:  {{ include "jira-service-desk-operator.tlsSecretName" . }}
+{{- end -}}
