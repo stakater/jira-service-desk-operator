@@ -65,8 +65,8 @@ Create the name of the service account to use
 Create the name of the tls secret to use
 */}}
 {{- define "jira-service-desk-operator.tlsSecretName" -}}
-{{- if .Values.tlsSecretName }}
-{{- .Values.tlsSecretName }}
+{{- if .Values.webhook.certs.secret }}
+{{- .Values.webhook.certs.secret }}
 {{- else }}
 {{- printf "%s-webhook-server-cert" (include "jira-service-desk-operator.fullname" .) }}
 {{- end }}

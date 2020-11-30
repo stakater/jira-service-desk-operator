@@ -12,11 +12,11 @@ fullnameOverride: ""
 watchNamespaces: []
 configSecretName: "jira-service-desk-config"
 
-tlsSecretName: ""
-
 # Webhook Configuration
 webhook:
   enabled: true
+  certs:
+    secret: ""
 
 service:
   type: ClusterIP
