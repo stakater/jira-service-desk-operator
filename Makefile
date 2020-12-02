@@ -157,6 +157,14 @@ verify-golangci-lint: $(GOLANGCI_LINT)
 
 verify: verify-fmt verify-golangci-lint
 
-# Generate Helm Chart Resources
-generate-helm-chart-manifests: controller-gen
-	$(CONTROLLER_GEN) crd paths="./..." output:crd:artifacts:config=charts/jira-service-desk-operator/crds
+bump-chart-operator:
+	sed -i "s/^version:.*/version:  $(VERSION)/" charts/jira-service-desk-operator/Chart.yaml
+	sed -i "s/^appVersion:.*/appVersion:  $(VERSION)/" charts/jira-service-desk-operator/Chart.yaml
+	sed -i "s/tag:.*/tag:  v$(VERSION)/" charts/jira-service-desk-operator/values.yaml
+
+bump-chart-crds:
+	sed -i "s/^version:.*/version:  $(VERSION)/" charts/jira-service-desk-operator-crds/Chart.yaml
+	sed -i "s/^appVersion:.*/appVersion:  $(VERSION)/" charts/jira-service-desk-operator-crds/Chart.yaml
+
+# Bump Chart
+bump-chart: bump-chart-operator bump-chart-crds

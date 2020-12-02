@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "jira-service-desk-operator.name" -}}
+{{- define "jira-service-desk-operator-crds.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "jira-service-desk-operator.fullname" -}}
+{{- define "jira-service-desk-operator-crds.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "jira-service-desk-operator.chart" -}}
+{{- define "jira-service-desk-operator-crds.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "jira-service-desk-operator.labels" -}}
-helm.sh/chart: {{ include "jira-service-desk-operator.chart" . }}
-{{ include "jira-service-desk-operator.selectorLabels" . }}
+{{- define "jira-service-desk-operator-crds.labels" -}}
+helm.sh/chart: {{ include "jira-service-desk-operator-crds.chart" . }}
+{{ include "jira-service-desk-operator-crds.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "jira-service-desk-operator.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "jira-service-desk-operator.name" . }}
+{{- define "jira-service-desk-operator-crds.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "jira-service-desk-operator-crds.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "jira-service-desk-operator.serviceAccountName" -}}
+{{- define "jira-service-desk-operator-crds.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "jira-service-desk-operator.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "jira-service-desk-operator-crds.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

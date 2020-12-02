@@ -1,0 +1,9 @@
+# Full name for operator
+operatorFullName: managed-openshift-operator
+
+# Scope for CRDs, cane be Namespaced or Cluster
+scope: Namespaced
+
+# Webhook Configuration
+webhook:
+  enabled: true
