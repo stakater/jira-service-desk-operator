@@ -17,6 +17,5 @@ Helm doesn't support templatization and upgrade or deletion for CRDs. We mantain
 ```sh
 helm repo add stakater https://stakater.github.io/stakater-charts/
 helm repo update
-helm install stakater/jira-service-desk-operator-crds --namespace jira-service-desk-operator
 helm install stakater/jira-service-desk-operator --namespace jira-service-desk-operator
 ```
