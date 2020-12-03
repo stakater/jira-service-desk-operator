@@ -1,4 +1,5 @@
 # jira-service-desk-operator
+
 Kubernetes operator for Jira Service Desk
 
 ## About
@@ -12,14 +13,17 @@ Jira service desk(JSD) operator is used to automate the process of setting up JS
 It uses [Jira REST API](https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/) in it's underlying layer and can be extended to perform other tasks that are supported via the REST API.
 
 ### Project
+
 We support the following CRUD operation on project via our Jira Service Desk Operator:
+
 * Create - Creates a new projects with the provided fields
 * Update - Updates an existing project with the updated fields
 * Delete - Removes and deletes the project 
 
 Examples for Project Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/project).
 
-#### Limitations:
+#### Limitations
+
 * We only support creating three types of JSD projects via our operator i.e Business, ServiceDesk, Software. The details and differences between these project types can be viewed [here](https://confluence.atlassian.com/adminjiraserver/jira-applications-and-project-types-overview-938846805.html).
 * Following are the immutable fields that cannot be updated:
     * ProjectTemplateKey
@@ -34,7 +38,8 @@ Examples for Project Custom Resource can be found at [here](https://github.com/s
     You can read more about these fields on [Jira Service Desk api docs](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-projects/#api-rest-api-3-project-post).
 
 
-### Customer:
+### Customer
+
 We support the following CRUD operations on customer via our Jira Service Desk Operator
 * Create - Create a new customer and assign the projects mentioned in the CR
 * Update - Only updates(add/remove) the associated projects mentioned in the CR
@@ -42,7 +47,8 @@ We support the following CRUD operations on customer via our Jira Service Desk O
 
 Examples for Project Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/blob/handle-customers/examples/customer/customer.yaml).
 
-#### Limitations:
+#### Limitations
+
 * Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can’t be accessed later with the Jira Service Desk Operator.
 * Each custom resource is associated to a single customer. 
 * You can not update **customer name and email**.
@@ -92,18 +98,19 @@ $ oc apply -f bundle/manifests
 2. Run `make run ENABLE_WEBHOOKS=false WATCH_NAMESPACE=default OPERATOR_NAMESPACE=default` where `WATCH_NAMESPACE` denotes the namespaces that the operator is supposed to watch and `OPERATOR_NAMESPACE` is the namespace in which it's supposed to be deployed.
 
 3. Before committing your changes run the following to ensure that everything is verified and up-to-date:
+
    - `make verify`
    - `make bundle`
    - `make packagemanifests`
    
 ## Running Tests
 
-### Pre-requisites:
+### Pre-requisites
+
 1. Create a namespace with the name `test`
 2. Create `jira-service-desk-config` secret in test namespace
 
-### To run tests:
+### To run tests
+
 Use the following command to run tests:
 `make test OPERATOR_NAMESPACE=test USE_EXISTING_CLUSTER=true`
-
-
