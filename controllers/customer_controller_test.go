@@ -70,8 +70,6 @@ var _ = Describe("Customer Controller", func() {
 
 					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
-					//customer.Spec.Projects = mockData.AddedProjectsList
-
 					// Assigning Customer -> CustomerTestproject Key
 					customer.Spec.Projects = []string{strings.ToUpper(cusKey)}
 
@@ -87,6 +85,9 @@ var _ = Describe("Customer Controller", func() {
 	Describe("Delete Jira Service Desk customer", func() {
 		Context("With valid Customer AccountId", func() {
 			It("should delete the customer", func() {
+
+				mockData.SampleCustomer.Spec.Projects = []string{strings.ToUpper(cusKey)}
+
 				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
 
 				customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
