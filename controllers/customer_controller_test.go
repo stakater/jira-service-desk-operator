@@ -47,7 +47,7 @@ var _ = Describe("Customer Controller", func() {
 
 					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
-					customer.Spec.Projects = mockData.AddedProjectsList
+					customer.Spec.Projects = []string{strings.ToUpper(cusKey)}
 
 					_ = cUtil.UpdateCustomer(customer, ns)
 					updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)
@@ -63,6 +63,9 @@ var _ = Describe("Customer Controller", func() {
 					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
 
+					// Assigning Customer -> CustomerTestproject Key
+					mockData.SampleUpdatedCustomer.Spec.Projects = []string{strings.ToUpper(cusKey)}
+
 					_ = cUtil.CreateCustomer(mockData.SampleUpdatedCustomer, ns)
 					time.Sleep(5 * time.Second)
 
@@ -70,8 +73,7 @@ var _ = Describe("Customer Controller", func() {
 
 					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
-					// Assigning Customer -> CustomerTestproject Key
-					customer.Spec.Projects = []string{strings.ToUpper(cusKey)}
+					customer.Spec.Projects = mockData.RemovedProjectsList
 
 					_ = cUtil.UpdateCustomer(customer, ns)
 					updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)

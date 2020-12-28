@@ -123,6 +123,7 @@ var _ = Describe("Project Controller", func() {
 		Describe("Create new Jira servie desk project resource", func() {
 			Context("with invalid fields", func() {
 				It("should not create a new project", func() {
+					projectInvalidInput.Spec.Key = strings.ToUpper(controllerUtil.RandSeqString(10))
 					_ = util.CreateProject(projectInvalidInput, ns)
 					project := util.GetProject(projectInvalidInput.Spec.Name, ns)
 
