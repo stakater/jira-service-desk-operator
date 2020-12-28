@@ -70,6 +70,7 @@ var _ = Describe("Customer Controller", func() {
 					Expect(project.Status.ID).ToNot(Equal(""))
 
 					mockData.SampleUpdatedCustomer.Spec.Name = customerInput.Spec.Name
+					mockData.SampleUpdatedCustomer.Spec.Email = customerInput.Spec.Email
 					// Assigning Customer -> CustomerTestproject Key
 					mockData.SampleUpdatedCustomer.Spec.Projects = []string{strings.ToUpper(cusKey)}
 
@@ -95,15 +96,15 @@ var _ = Describe("Customer Controller", func() {
 		Context("With valid Customer AccountId", func() {
 			It("should delete the customer", func() {
 
-				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
+				_ = cUtil.CreateCustomer(customerInput, ns)
 
-				customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
+				customer := cUtil.GetCustomer(customerInput.Spec.Name, ns)
 				Expect(customer.Status.CustomerId).NotTo(BeEmpty())
 
 				cUtil.DeleteCustomer(customer.Name, ns)
 
 				customerObject := &v1alpha1.Customer{}
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: mockData.SampleCustomer.Spec.Name, Namespace: ns}, customerObject)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: customerInput.Spec.Name, Namespace: ns}, customerObject)
 
 				Expect(err).To(HaveOccurred())
 			})
