@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"os"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
+	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
 	mockData "github.com/stakater/jira-service-desk-operator/mock"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -18,6 +20,12 @@ var _ = Describe("Project Controller", func() {
 	Describe("Positive test cases", func() {
 
 		projectInput := mockData.CreateProjectInput
+
+		// Generation of 3 char long random string
+		key := controllerUtil.RandSeqString(3)
+
+		projectInput.Spec.Name += key
+		projectInput.Spec.Key = strings.ToUpper(key)
 
 		AfterEach(func() {
 			util.TryDeleteProject(projectInput.Spec.Name, ns)

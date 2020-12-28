@@ -2,6 +2,8 @@ package util
 
 import (
 	"context"
+	"math/rand"
+	"time"
 
 	"github.com/onsi/ginkgo"
 	ginko "github.com/onsi/ginkgo"
@@ -19,6 +21,17 @@ type TestUtil struct {
 	ctx       context.Context
 	k8sClient client.Client
 	r         reconcile.Reconciler
+}
+
+// RandSeq Generates a letter sequence with `n` characters
+func RandSeqString(n int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyz")
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 // New creates new TestUtil

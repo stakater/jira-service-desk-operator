@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -69,7 +70,10 @@ var _ = Describe("Customer Controller", func() {
 
 					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
-					customer.Spec.Projects = mockData.RemovedProjectsList
+					//customer.Spec.Projects = mockData.AddedProjectsList
+
+					// Assigning Customer -> CustomerTestproject Key
+					customer.Spec.Projects = []string{strings.ToUpper(cusKey)}
 
 					_ = cUtil.UpdateCustomer(customer, ns)
 					updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)

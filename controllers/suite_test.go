@@ -20,6 +20,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -57,6 +58,8 @@ var cr *CustomerReconciler
 var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
+
+var cusKey = ""
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -128,6 +131,12 @@ var _ = BeforeSuite(func(done Done) {
 
 	cUtil = controllerUtil.New(ctx, k8sClient, cr)
 	Expect(util).ToNot(BeNil())
+
+	// Generation of 3 char long random string
+	cusKey = controllerUtil.RandSeqString(3)
+
+	mockData.CustomerTestProjectInput.Spec.Name += cusKey
+	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(cusKey)
 
 	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
 
