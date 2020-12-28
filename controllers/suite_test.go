@@ -132,7 +132,7 @@ var _ = BeforeSuite(func(done Done) {
 	Expect(util).ToNot(BeNil())
 
 	// Generation of 3 char long random string
-	cusKey = controllerUtil.RandSeqString(3)
+	cusKey = cUtil.RandSeqString(3)
 
 	mockData.CustomerTestProjectInput.Spec.Name += cusKey
 	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(cusKey)

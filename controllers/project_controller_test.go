@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
-	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
 	mockData "github.com/stakater/jira-service-desk-operator/mock"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -22,7 +21,7 @@ var _ = Describe("Project Controller", func() {
 		projectInput := mockData.CreateProjectInput
 
 		// Generation of 3 char long random string
-		key := controllerUtil.RandSeqString(3)
+		key := cUtil.RandSeqString(3)
 
 		projectInput.Spec.Name += key
 		projectInput.Spec.Key = strings.ToUpper(key)
@@ -123,7 +122,9 @@ var _ = Describe("Project Controller", func() {
 		Describe("Create new Jira servie desk project resource", func() {
 			Context("with invalid fields", func() {
 				It("should not create a new project", func() {
-					projectInvalidInput.Spec.Key = strings.ToUpper(controllerUtil.RandSeqString(10))
+					key := cUtil.RandSeqString(10)
+					projectInvalidInput.Spec.Key = strings.ToUpper(key)
+					projectInvalidInput.Spec.Name += key[:3]
 					_ = util.CreateProject(projectInvalidInput, ns)
 					project := util.GetProject(projectInvalidInput.Spec.Name, ns)
 

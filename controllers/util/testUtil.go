@@ -23,17 +23,6 @@ type TestUtil struct {
 	r         reconcile.Reconciler
 }
 
-// RandSeq Generates a letter sequence with `n` characters
-func RandSeqString(n int) string {
-	letters := []rune("abcdefghijklmnopqrstuvwxyz")
-	rand.Seed(time.Now().UnixNano())
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
-}
-
 // New creates new TestUtil
 func New(ctx context.Context, k8sClient client.Client, r reconcile.Reconciler) *TestUtil {
 	return &TestUtil{
@@ -41,6 +30,25 @@ func New(ctx context.Context, k8sClient client.Client, r reconcile.Reconciler) *
 		k8sClient: k8sClient,
 		r:         r,
 	}
+}
+
+// RandCustomer Generates random customer names and emails
+func (t *TestUtil) RandCustomer(customer jiraservicedeskv1alpha1.Customer) jiraservicedeskv1alpha1.Customer {
+	str := t.RandSeqString(3)
+	customer.Spec.Name += str
+	customer.Spec.Email = "customer" + str + "@sample.com"
+	return customer
+}
+
+// RandSeqString Generates a letter sequence with `n` characters
+func (t *TestUtil) RandSeqString(n int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyz")
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 // CreateNamespace creates a namespace in the kubernetes server

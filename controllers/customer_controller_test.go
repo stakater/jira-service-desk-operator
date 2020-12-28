@@ -25,6 +25,9 @@ var _ = Describe("Customer Controller", func() {
 	Describe("Create new Jira Service Desk customer", func() {
 		Context("With valid fields", func() {
 			It("should create a new customer", func() {
+				// Randomize customer name and email
+				mockData.SampleCustomer = cUtil.RandCustomer(mockData.SampleCustomer)
+
 				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
 				customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
 
@@ -39,6 +42,9 @@ var _ = Describe("Customer Controller", func() {
 				It("Should add the customer in the project", func() {
 					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
+
+					// Randomize customer name and email
+					mockData.SampleCustomer = cUtil.RandCustomer(mockData.SampleCustomer)
 
 					_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
 					time.Sleep(5 * time.Second)
@@ -63,6 +69,8 @@ var _ = Describe("Customer Controller", func() {
 					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
 
+					// Randomize customer name and email
+					mockData.SampleCustomer = cUtil.RandCustomer(mockData.SampleUpdatedCustomer)
 					// Assigning Customer -> CustomerTestproject Key
 					mockData.SampleUpdatedCustomer.Spec.Projects = []string{strings.ToUpper(cusKey)}
 
@@ -87,8 +95,6 @@ var _ = Describe("Customer Controller", func() {
 	Describe("Delete Jira Service Desk customer", func() {
 		Context("With valid Customer AccountId", func() {
 			It("should delete the customer", func() {
-
-				mockData.SampleCustomer.Spec.Projects = []string{strings.ToUpper(cusKey)}
 
 				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
 
