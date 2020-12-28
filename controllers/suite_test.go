@@ -59,6 +59,7 @@ var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
 var cusKey = ""
+var customerProjectInput = mockData.CustomerTestProjectInput
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -134,16 +135,16 @@ var _ = BeforeSuite(func(done Done) {
 	// Generation of 3 char long random string
 	cusKey = cUtil.RandSeqString(3)
 
-	mockData.CustomerTestProjectInput.Spec.Name += cusKey
-	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(cusKey)
+	customerProjectInput.Spec.Name += cusKey
+	customerProjectInput.Spec.Key = strings.ToUpper(cusKey)
 
-	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
+	_ = util.CreateProject(customerProjectInput, ns)
 
 	close(done)
 }, 60)
 
 var _ = AfterSuite(func() {
-	util.TryDeleteProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
+	util.TryDeleteProject(customerProjectInput.Spec.Name, ns)
 
 	By("tearing down the test environment")
 	err := testEnv.Stop()
