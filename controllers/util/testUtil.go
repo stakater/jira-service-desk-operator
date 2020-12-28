@@ -32,7 +32,7 @@ func New(ctx context.Context, k8sClient client.Client, r reconcile.Reconciler) *
 	}
 }
 
-// RandCustomer Generates random customer names and emails
+// RandCustomer updates a customer with a random name and email
 func (t *TestUtil) RandCustomer(customer jiraservicedeskv1alpha1.Customer) jiraservicedeskv1alpha1.Customer {
 	str := t.RandSeqString(3)
 	customer.Spec.Name += str

@@ -18,18 +18,21 @@ var _ = Describe("Customer Controller", func() {
 
 	ns, _ = os.LookupEnv("OPERATOR_NAMESPACE")
 
+	customerInput := mockData.SampleCustomer
+	// Randomize customer name and email
+	customerInput = cUtil.RandCustomer(customerInput)
+
 	AfterEach(func() {
-		cUtil.TryDeleteCustomer(mockData.SampleCustomer.Spec.Name, ns)
+		cUtil.TryDeleteCustomer(customerInput.Spec.Name, ns)
 	})
 
 	Describe("Create new Jira Service Desk customer", func() {
 		Context("With valid fields", func() {
 			It("should create a new customer", func() {
 				// Randomize customer name and email
-				mockData.SampleCustomer = cUtil.RandCustomer(mockData.SampleCustomer)
 
-				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
-				customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
+				_ = cUtil.CreateCustomer(customerInput, ns)
+				customer := cUtil.GetCustomer(customerInput.Spec.Name, ns)
 
 				Expect(customer.Status.CustomerId).ToNot(Equal(""))
 			})
@@ -43,13 +46,10 @@ var _ = Describe("Customer Controller", func() {
 					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
 
-					// Randomize customer name and email
-					mockData.SampleCustomer = cUtil.RandCustomer(mockData.SampleCustomer)
-
-					_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
+					_ = cUtil.CreateCustomer(customerInput, ns)
 					time.Sleep(5 * time.Second)
 
-					customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
+					customer := cUtil.GetCustomer(customerInput.Spec.Name, ns)
 
 					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
@@ -69,8 +69,7 @@ var _ = Describe("Customer Controller", func() {
 					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
 
-					// Randomize customer name and email
-					mockData.SampleCustomer = cUtil.RandCustomer(mockData.SampleUpdatedCustomer)
+					mockData.SampleUpdatedCustomer.Spec.Name = customerInput.Spec.Name
 					// Assigning Customer -> CustomerTestproject Key
 					mockData.SampleUpdatedCustomer.Spec.Projects = []string{strings.ToUpper(cusKey)}
 
