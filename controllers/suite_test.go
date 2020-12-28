@@ -58,7 +58,6 @@ var cr *CustomerReconciler
 var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
-
 var cusKey = ""
 
 func TestAPIs(t *testing.T) {
