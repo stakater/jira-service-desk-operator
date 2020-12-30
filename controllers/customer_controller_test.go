@@ -20,7 +20,9 @@ var _ = Describe("Customer Controller", func() {
 
 	customerInput := mockData.SampleCustomer
 	// Randomize customer name and email
-	customerInput = cUtil.RandCustomer(customerInput)
+	str := cUtil.RandSeqString(3)
+	customerInput.Spec.Name += str
+	customerInput.Spec.Email = "customer" + str + "@sample.com"
 
 	AfterEach(func() {
 		cUtil.TryDeleteCustomer(customerInput.Spec.Name, ns)
@@ -51,7 +53,7 @@ var _ = Describe("Customer Controller", func() {
 
 					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
-					customer.Spec.Projects = []string{strings.ToUpper(cusKey)}
+					customer.Spec.Projects = []string{strings.ToUpper(customerKey)}
 
 					_ = cUtil.UpdateCustomer(customer, ns)
 					updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)
@@ -70,7 +72,7 @@ var _ = Describe("Customer Controller", func() {
 					mockData.SampleUpdatedCustomer.Spec.Name = customerInput.Spec.Name
 					mockData.SampleUpdatedCustomer.Spec.Email = customerInput.Spec.Email
 					// Assigning Customer -> CustomerTestproject Key
-					mockData.SampleUpdatedCustomer.Spec.Projects = []string{strings.ToUpper(cusKey)}
+					mockData.SampleUpdatedCustomer.Spec.Projects = []string{strings.ToUpper(customerKey)}
 
 					_ = cUtil.CreateCustomer(mockData.SampleUpdatedCustomer, ns)
 					time.Sleep(5 * time.Second)

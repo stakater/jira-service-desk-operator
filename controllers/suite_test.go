@@ -58,7 +58,7 @@ var cr *CustomerReconciler
 var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
-var cusKey = cUtil.RandSeqString(3)
+var customerKey = cUtil.RandSeqString(3)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -131,8 +131,8 @@ var _ = BeforeSuite(func(done Done) {
 	cUtil = controllerUtil.New(ctx, k8sClient, cr)
 	Expect(util).ToNot(BeNil())
 
-	mockData.CustomerTestProjectInput.Spec.Name += cusKey
-	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(cusKey)
+	mockData.CustomerTestProjectInput.Spec.Name += customerKey
+	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(customerKey)
 
 	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
 

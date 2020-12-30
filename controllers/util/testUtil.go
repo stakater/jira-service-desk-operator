@@ -32,14 +32,6 @@ func New(ctx context.Context, k8sClient client.Client, r reconcile.Reconciler) *
 	}
 }
 
-// RandCustomer updates a customer with a random name and email
-func (t *TestUtil) RandCustomer(customer jiraservicedeskv1alpha1.Customer) jiraservicedeskv1alpha1.Customer {
-	str := t.RandSeqString(3)
-	customer.Spec.Name += str
-	customer.Spec.Email = "customer" + str + "@sample.com"
-	return customer
-}
-
 // RandSeqString Generates a letter sequence with `n` characters
 func (t *TestUtil) RandSeqString(n int) string {
 	letters := []rune("abcdefghijklmnopqrstuvwxyz")
