@@ -29,8 +29,6 @@ var _ = Describe("Customer Controller", func() {
 	Describe("Create new Jira Service Desk customer", func() {
 		Context("With valid fields", func() {
 			It("should create a new customer", func() {
-				// Randomize customer name and email
-
 				_ = cUtil.CreateCustomer(customerInput, ns)
 				customer := cUtil.GetCustomer(customerInput.Spec.Name, ns)
 

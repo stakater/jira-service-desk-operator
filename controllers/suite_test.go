@@ -140,7 +140,6 @@ var _ = BeforeSuite(func(done Done) {
 }, 60)
 
 var _ = AfterSuite(func() {
-	//customerProjectInput.Spec.Name = "customertestproject" + cusKey
 	util.TryDeleteProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 
 	By("tearing down the test environment")
