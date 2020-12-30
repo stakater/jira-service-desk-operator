@@ -58,7 +58,7 @@ var cr *CustomerReconciler
 var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
-var cusKey = ""
+var cusKey = cUtil.RandSeqString(3)
 var customerProjectInput = mockData.CustomerTestProjectInput
 
 func TestAPIs(t *testing.T) {
@@ -132,9 +132,6 @@ var _ = BeforeSuite(func(done Done) {
 	cUtil = controllerUtil.New(ctx, k8sClient, cr)
 	Expect(util).ToNot(BeNil())
 
-	// Generation of 3 char long random string
-	cusKey = cUtil.RandSeqString(3)
-
 	customerProjectInput.Spec.Name += cusKey
 	customerProjectInput.Spec.Key = strings.ToUpper(cusKey)
 
@@ -144,6 +141,7 @@ var _ = BeforeSuite(func(done Done) {
 }, 60)
 
 var _ = AfterSuite(func() {
+	//customerProjectInput.Spec.Name = "customertestproject" + cusKey
 	util.TryDeleteProject(customerProjectInput.Spec.Name, ns)
 
 	By("tearing down the test environment")
