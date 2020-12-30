@@ -25,6 +25,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	mockData "github.com/stakater/jira-service-desk-operator/mock"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -35,7 +36,6 @@ import (
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
-	mockData "github.com/stakater/jira-service-desk-operator/mock"
 	c "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
 	"github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/config"
 	secretsUtil "github.com/stakater/operator-utils/util/secrets"
@@ -59,7 +59,6 @@ var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
 var cusKey = cUtil.RandSeqString(3)
-var customerProjectInput = mockData.CustomerTestProjectInput
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -132,17 +131,17 @@ var _ = BeforeSuite(func(done Done) {
 	cUtil = controllerUtil.New(ctx, k8sClient, cr)
 	Expect(util).ToNot(BeNil())
 
-	customerProjectInput.Spec.Name += cusKey
-	customerProjectInput.Spec.Key = strings.ToUpper(cusKey)
+	mockData.CustomerTestProjectInput.Spec.Name += cusKey
+	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(cusKey)
 
-	_ = util.CreateProject(customerProjectInput, ns)
+	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
 
 	close(done)
 }, 60)
 
 var _ = AfterSuite(func() {
 	//customerProjectInput.Spec.Name = "customertestproject" + cusKey
-	util.TryDeleteProject(customerProjectInput.Spec.Name, ns)
+	util.TryDeleteProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 
 	By("tearing down the test environment")
 	err := testEnv.Stop()
