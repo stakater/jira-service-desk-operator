@@ -2,6 +2,8 @@ package util
 
 import (
 	"context"
+	"math/rand"
+	"time"
 
 	"github.com/onsi/ginkgo"
 	ginko "github.com/onsi/ginkgo"
@@ -28,6 +30,17 @@ func New(ctx context.Context, k8sClient client.Client, r reconcile.Reconciler) *
 		k8sClient: k8sClient,
 		r:         r,
 	}
+}
+
+// RandSeqString Generates a letter sequence with `n` characters
+func (t *TestUtil) RandSeqString(n int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyz")
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 // CreateNamespace creates a namespace in the kubernetes server

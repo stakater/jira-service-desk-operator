@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"os"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,6 +19,12 @@ var _ = Describe("Project Controller", func() {
 	Describe("Positive test cases", func() {
 
 		projectInput := mockData.CreateProjectInput
+
+		// Generation of 3 char long random string
+		key := cUtil.RandSeqString(3)
+
+		projectInput.Spec.Name += key
+		projectInput.Spec.Key = strings.ToUpper(key)
 
 		AfterEach(func() {
 			util.TryDeleteProject(projectInput.Spec.Name, ns)
@@ -115,6 +122,9 @@ var _ = Describe("Project Controller", func() {
 		Describe("Create new Jira servie desk project resource", func() {
 			Context("with invalid fields", func() {
 				It("should not create a new project", func() {
+					key := cUtil.RandSeqString(9)
+					projectInvalidInput.Spec.Key = strings.ToUpper(key)
+					projectInvalidInput.Spec.Name += key[:3]
 					_ = util.CreateProject(projectInvalidInput, ns)
 					project := util.GetProject(projectInvalidInput.Spec.Name, ns)
 

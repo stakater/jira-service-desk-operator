@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -17,15 +18,21 @@ var _ = Describe("Customer Controller", func() {
 
 	ns, _ = os.LookupEnv("OPERATOR_NAMESPACE")
 
+	customerInput := mockData.SampleCustomer
+	// Randomize customer name and email
+	str := cUtil.RandSeqString(3)
+	customerInput.Spec.Name += str
+	customerInput.Spec.Email = "customer" + str + "@sample.com"
+
 	AfterEach(func() {
-		cUtil.TryDeleteCustomer(mockData.SampleCustomer.Spec.Name, ns)
+		cUtil.TryDeleteCustomer(customerInput.Spec.Name, ns)
 	})
 
 	Describe("Create new Jira Service Desk customer", func() {
 		Context("With valid fields", func() {
 			It("should create a new customer", func() {
-				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
-				customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
+				_ = cUtil.CreateCustomer(customerInput, ns)
+				customer := cUtil.GetCustomer(customerInput.Spec.Name, ns)
 
 				Expect(customer.Status.CustomerId).ToNot(Equal(""))
 			})
@@ -39,14 +46,14 @@ var _ = Describe("Customer Controller", func() {
 					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
 
-					_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
+					_ = cUtil.CreateCustomer(customerInput, ns)
 					time.Sleep(5 * time.Second)
 
-					customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
+					customer := cUtil.GetCustomer(customerInput.Spec.Name, ns)
 
 					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
-					customer.Spec.Projects = mockData.AddedProjectsList
+					customer.Spec.Projects = []string{strings.ToUpper(customerKey)}
 
 					_ = cUtil.UpdateCustomer(customer, ns)
 					updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)
@@ -61,6 +68,11 @@ var _ = Describe("Customer Controller", func() {
 				It("Should remove the customer from that project", func() {
 					project := util.GetProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
 					Expect(project.Status.ID).ToNot(Equal(""))
+
+					mockData.SampleUpdatedCustomer.Spec.Name = customerInput.Spec.Name
+					mockData.SampleUpdatedCustomer.Spec.Email = customerInput.Spec.Email
+					// Assigning Customer -> CustomerTestproject Key
+					mockData.SampleUpdatedCustomer.Spec.Projects = []string{strings.ToUpper(customerKey)}
 
 					_ = cUtil.CreateCustomer(mockData.SampleUpdatedCustomer, ns)
 					time.Sleep(5 * time.Second)
@@ -83,15 +95,16 @@ var _ = Describe("Customer Controller", func() {
 	Describe("Delete Jira Service Desk customer", func() {
 		Context("With valid Customer AccountId", func() {
 			It("should delete the customer", func() {
-				_ = cUtil.CreateCustomer(mockData.SampleCustomer, ns)
 
-				customer := cUtil.GetCustomer(mockData.SampleCustomer.Spec.Name, ns)
+				_ = cUtil.CreateCustomer(customerInput, ns)
+
+				customer := cUtil.GetCustomer(customerInput.Spec.Name, ns)
 				Expect(customer.Status.CustomerId).NotTo(BeEmpty())
 
 				cUtil.DeleteCustomer(customer.Name, ns)
 
 				customerObject := &v1alpha1.Customer{}
-				err := k8sClient.Get(ctx, types.NamespacedName{Name: mockData.SampleCustomer.Spec.Name, Namespace: ns}, customerObject)
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: customerInput.Spec.Name, Namespace: ns}, customerObject)
 
 				Expect(err).To(HaveOccurred())
 			})

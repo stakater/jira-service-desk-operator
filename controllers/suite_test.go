@@ -20,10 +20,12 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	mockData "github.com/stakater/jira-service-desk-operator/mock"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -34,7 +36,6 @@ import (
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
 	controllerUtil "github.com/stakater/jira-service-desk-operator/controllers/util"
-	mockData "github.com/stakater/jira-service-desk-operator/mock"
 	c "github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/client"
 	"github.com/stakater/jira-service-desk-operator/pkg/jiraservicedesk/config"
 	secretsUtil "github.com/stakater/operator-utils/util/secrets"
@@ -57,6 +58,7 @@ var cr *CustomerReconciler
 var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
+var customerKey = cUtil.RandSeqString(3)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -128,6 +130,9 @@ var _ = BeforeSuite(func(done Done) {
 
 	cUtil = controllerUtil.New(ctx, k8sClient, cr)
 	Expect(util).ToNot(BeNil())
+
+	mockData.CustomerTestProjectInput.Spec.Name += customerKey
+	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(customerKey)
 
 	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
 
