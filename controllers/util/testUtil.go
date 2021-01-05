@@ -2,11 +2,13 @@ package util
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"time"
 
 	"github.com/onsi/ginkgo"
 	ginko "github.com/onsi/ginkgo"
+	mockdata "github.com/stakater/jira-service-desk-operator/mock"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -59,6 +61,20 @@ func (t *TestUtil) CreateNamespaceObject(name string) *v1.Namespace {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 		},
+	}
+}
+
+// DeleteNamespace deletes a namespace
+func (t *TestUtil) DeleteNamespace(name string) {
+	namespaceObject := &v1.Namespace{}
+	err := t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name}, namespaceObject)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	err = t.k8sClient.Delete(t.ctx, namespaceObject)
+	if err != nil {
+		ginkgo.Fail(err.Error())
 	}
 }
 
@@ -240,4 +256,68 @@ func (t *TestUtil) TryDeleteCustomer(name string, namespace string) {
 	_ = t.k8sClient.Delete(t.ctx, customerObject)
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
 	_, _ = t.r.Reconcile(req)
+}
+
+// DeleteAllProjects delete all the projects in the namespace
+func (t *TestUtil) DeleteAllProjects(namespace string) {
+	// Specify namespace in list Options
+	listOptions := &client.ListOptions{Namespace: namespace}
+
+	// List projects in a specified namespace
+	projectList := &jiraservicedeskv1alpha1.ProjectList{}
+	err := t.k8sClient.List(context.TODO(), projectList, listOptions)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	for _, project := range projectList.Items {
+		project.Finalizers = []string{}
+
+		err := t.k8sClient.Update(t.ctx, &project)
+		if err != nil {
+			if err.Error() == fmt.Sprintf(mockdata.ProjectObjectModifiedError, project.Name) {
+				currentProject := t.GetProject(project.Name, namespace)
+				currentProject.Finalizers = []string{}
+				if err != nil {
+					ginkgo.Fail(err.Error())
+				}
+			} else {
+				ginkgo.Fail(err.Error())
+			}
+		}
+
+		t.TryDeleteProject(project.Name, namespace)
+	}
+}
+
+// DeleteAllCustomers delete all the customers in the namespace
+func (t *TestUtil) DeleteAllCustomers(namespace string) {
+	// Specify namespace in list Options
+	listOptions := &client.ListOptions{Namespace: namespace}
+
+	// List customers in a specified namespace
+	customerList := &jiraservicedeskv1alpha1.CustomerList{}
+	err := t.k8sClient.List(context.TODO(), customerList, listOptions)
+	if err != nil {
+		ginkgo.Fail(err.Error())
+	}
+
+	for _, customer := range customerList.Items {
+		customer.Finalizers = []string{}
+
+		err := t.k8sClient.Update(t.ctx, &customer)
+		if err != nil {
+			if err.Error() == fmt.Sprintf(mockdata.CustomerObjectModifiedError, customer.Name) {
+				currentCustomer := t.GetCustomer(customer.Name, namespace)
+				currentCustomer.Finalizers = []string{}
+				if err != nil {
+					ginkgo.Fail(err.Error())
+				}
+			} else {
+				ginkgo.Fail(err.Error())
+			}
+		}
+
+		t.TryDeleteCustomer(customer.Name, namespace)
+	}
 }

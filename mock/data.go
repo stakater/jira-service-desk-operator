@@ -23,6 +23,9 @@ var AddCustomerFailedErrorMsg = "Rest request to add Customer failed with status
 var RemoveCustomerFailedErrorMsg = "Rest request to remove Customer failed with status: 400"
 var DeleteCustomerFailedErrorMsg = "Rest request to delete Customer failed with status: 400"
 
+var ProjectObjectModifiedError = "Operation cannot be fulfilled on projects.jiraservicedesk.stakater.com \"%s\": the object has been modified; please apply your changes to the latest version and try again"
+var CustomerObjectModifiedError = "Operation cannot be fulfilled on customers.jiraservicedesk.stakater.com \"%s\": the object has been modified; please apply your changes to the latest version and try again"
+
 var AddCustomerSuccessResponse = map[string]interface{}{
 	"accountIds": []string{CustomerAccountId},
 }
