@@ -140,7 +140,9 @@ var _ = BeforeSuite(func(done Done) {
 }, 60)
 
 var _ = AfterSuite(func() {
-	util.TryDeleteProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
+	// Cleanup - Delete all remnent resources
+	util.DeleteAllProjects(ns)
+	util.DeleteAllCustomers(ns)
 
 	By("tearing down the test environment")
 	err := testEnv.Stop()
