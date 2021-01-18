@@ -125,6 +125,7 @@ var _ = Describe("Project Controller", func() {
 					key := cUtil.RandSeqString(9)
 					projectInvalidInput.Spec.Key = strings.ToUpper(key)
 					projectInvalidInput.Spec.Name += key[:3]
+
 					_ = util.CreateProject(projectInvalidInput, ns)
 					project := util.GetProject(projectInvalidInput.Spec.Name, ns)
 

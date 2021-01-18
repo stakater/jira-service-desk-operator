@@ -117,7 +117,7 @@ func (r *CustomerReconciler) handleUpdate(req ctrl.Request, existingCustomer jir
 	log.Info("Modifying project associations for JSD Customer: " + instance.Spec.Name)
 
 	existingCustomerInstance := r.JiraServiceDeskClient.GetCustomerCRFromCustomer(existingCustomer)
-	if ok, err := instance.IsValidUpdate(existingCustomerInstance); !ok {
+	if ok, err := instance.IsValidCustomerUpdate(existingCustomerInstance); !ok {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
@@ -217,7 +217,7 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
 	} else {
-		log.Info("Customer %s do not exists on JSD. So skipping deletion", instance.Spec.Name)
+		log.Info("Customer '" + instance.Spec.Name + "' do not exists on JSD. So skipping deletion")
 	}
 
 	// Delete Finalizer

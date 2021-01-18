@@ -169,7 +169,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
 	} else {
-		log.Info("Project %s do not exists on JSD. So skipping deletion", instance.Spec.Name)
+		log.Info("Project '" + instance.Spec.Name + "' do not exists on JSD. So skipping deletion")
 	}
 
 	// Delete finalizer
