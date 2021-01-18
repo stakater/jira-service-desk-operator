@@ -137,6 +137,7 @@ func (c *jiraServiceDeskClient) CreateLegacyCustomer(customerEmail string, proje
 	if response.StatusCode < 200 || response.StatusCode > 299 {
 		err = errors.New("Rest request to create a legacy customer failed with status: " + strconv.Itoa(response.StatusCode) +
 			" and response: " + string(responseData))
+		return "", err
 	}
 
 	var responseObject LegacyCustomerCreateResponse
