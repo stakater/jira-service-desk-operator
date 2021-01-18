@@ -209,10 +209,15 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 
 	log.Info("Deleting Jira Service Desk Customer: " + instance.Spec.Name)
 
-	// Delete Customer
-	err := r.JiraServiceDeskClient.DeleteCustomer(instance.Status.CustomerId)
-	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	// Check if the customer was created
+	if instance.Status.CustomerId != "" {
+		// Delete Customer
+		err := r.JiraServiceDeskClient.DeleteCustomer(instance.Status.CustomerId)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+	} else {
+		log.Info("Customer %s do not exists on JSD. So skipping deletion", instance.Spec.Name)
 	}
 
 	// Delete Finalizer
@@ -221,7 +226,7 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 	log.Info("Finalizer removed for customer: " + instance.Spec.Name)
 
 	// Update instance
-	err = r.Client.Update(context.TODO(), instance)
+	err := r.Client.Update(context.TODO(), instance)
 	if err != nil {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}

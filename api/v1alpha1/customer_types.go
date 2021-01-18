@@ -42,9 +42,9 @@ type CustomerSpec struct {
 	// +required
 	Email string `json:"email,omitempty"`
 
-	// A legacy or a normal customer
+	// A boolean flag for creating a legacy customer
 	// In case of a legacy Customer, a signup link is sent to the customer email which he can than use to signup
-	// In case of a normal Customer, no signup link is sent to the customer. The customer than has to signup himself using the portal
+	// In case of a normal Customer, no signup link is sent to the customer. The customer than has to signup manually using the portal
 	// If not given, default behaviour is false i.e. normal customer
 	// +optional
 	LegacyCustomer bool `json:"legacyCustomer,omitempty"`
@@ -121,6 +121,14 @@ func (customer *Customer) IsValidUpdate(existingCustomer Customer) (bool, error)
 	}
 	if customer.Spec.Name != existingCustomer.Spec.Name {
 		return false, fmt.Errorf("%s %s", "Customer name", invalidUpdateErrorMsg)
+	}
+
+	return true, nil
+}
+
+func (customer *Customer) IsValidCustomerUpdate(existingCustomer Customer) (bool, error) {
+	if !strings.EqualFold(customer.Spec.Email, existingCustomer.Spec.Email) {
+		return false, fmt.Errorf("%s %s", "Customer email", invalidUpdateErrorMsg)
 	}
 
 	return true, nil

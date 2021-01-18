@@ -162,10 +162,14 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 
 	log.Info("Deleting Jira Service Desk Project: " + instance.Spec.Name)
 
-	// Delete project from JSD
-	err := r.JiraServiceDeskClient.DeleteProject(instance.Status.ID)
-	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	// Check if the project was created
+	if instance.Status.ID != "" {
+		err := r.JiraServiceDeskClient.DeleteProject(instance.Status.ID)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+	} else {
+		log.Info("Project %s do not exists on JSD. So skipping deletion", instance.Spec.Name)
 	}
 
 	// Delete finalizer
@@ -174,7 +178,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 	log.Info("Finalizer removed for project: " + instance.Spec.Name)
 
 	// Update instance
-	err = r.Client.Update(context.TODO(), instance)
+	err := r.Client.Update(context.TODO(), instance)
 	if err != nil {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
