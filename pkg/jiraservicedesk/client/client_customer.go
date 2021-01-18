@@ -14,6 +14,7 @@ const (
 	CreateCustomerApiPath = "/rest/servicedeskapi/customer"
 	AddCustomerApiPath    = "/rest/servicedeskapi/servicedesk/"
 	EndpointUser          = "/rest/api/3/user?accountId="
+	LegacyCustomerApiPath = "/rest/servicedesk/1/pages/people/customers/pagination/"
 )
 
 type Customer struct {
@@ -39,6 +40,21 @@ type CustomerGetResponse struct {
 	EmailAddress string `json:"emailAddress,omitempty"`
 	DisplayName  string `json:"displayName,omitempty"`
 	AccountType  string `json:"accountType,omitempty"`
+}
+
+type LegacyCustomerRequestBody struct {
+	Emails []string `json:"emails,omitempty"`
+}
+
+type LegacyCustomerCreateResponse struct {
+	Success []LegacyCustomerSuccessResponse `json:"success,omitempty"`
+}
+
+type LegacyCustomerSuccessResponse struct {
+	Key          string `json:"key,omitempty"`
+	EmailAddress string `json:"emailAddress,omitempty"`
+	DisplayName  string `json:"displayName,omitempty"`
+	AccoundId    string `json:"accountId,omitempty"`
 }
 
 func (c *jiraServiceDeskClient) GetCustomerById(customerAccountId string) (Customer, error) {
@@ -98,6 +114,38 @@ func (c *jiraServiceDeskClient) CreateCustomer(customer Customer) (string, error
 	}
 
 	return responseObject.AccountId, err
+}
+
+// https://stakater-test.atlassian.net/rest/servicedesk/1/pages/people/customers/pagination/TES/invite
+func (c *jiraServiceDeskClient) CreateLegacyCustomer(customerEmail string, projectKey string) (string, error) {
+	legacyCustomerBody := LegacyCustomerRequestBody{
+		Emails: []string{customerEmail},
+	}
+
+	request, err := c.newRequest("POST", LegacyCustomerApiPath+projectKey, legacyCustomerBody, false)
+	if err != nil {
+		return "", err
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+	responseData, _ := ioutil.ReadAll(response.Body)
+
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		err = errors.New("Rest request to create a legacy customer failed with status: " + strconv.Itoa(response.StatusCode) +
+			" and response: " + string(responseData))
+	}
+
+	var responseObject LegacyCustomerCreateResponse
+	err = json.Unmarshal(responseData, &responseObject)
+	if err != nil {
+		return "", err
+	}
+
+	return responseObject.Success[0].AccoundId, nil
 }
 
 func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, projectKey string) error {

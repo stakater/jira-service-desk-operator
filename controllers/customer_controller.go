@@ -165,12 +165,23 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 
 	log.Info("Creating Jira Service Desk Customer: " + instance.Spec.Name)
 
-	customer := r.JiraServiceDeskClient.GetCustomerFromCustomerCRForCreateCustomer(instance)
-	customerId, err := r.JiraServiceDeskClient.CreateCustomer(customer)
-	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	// If legacy Customer flag is true than create a legacy customer, else create a normal customer
+	if instance.Spec.LegacyCustomer {
+		customerID, err := r.JiraServiceDeskClient.CreateLegacyCustomer(instance.Spec.Email, instance.Spec.Projects[0])
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+
+		instance.Status.CustomerId = customerID
+	} else {
+		customer := r.JiraServiceDeskClient.GetCustomerFromCustomerCRForCreateCustomer(instance)
+		customerID, err := r.JiraServiceDeskClient.CreateCustomer(customer)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+
+		instance.Status.CustomerId = customerID
 	}
-	instance.Status.CustomerId = customerId
 
 	log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
 
@@ -183,7 +194,7 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 		}
 		log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 	}
-	instance.Status.AssociatedProjects = instance.Spec.DeepCopy().Projects
+	instance.Status.AssociatedProjects = instance.Spec.Projects
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }

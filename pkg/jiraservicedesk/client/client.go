@@ -27,6 +27,7 @@ type Client interface {
 	UpdateProjectAccessPermissions(status bool, key string) error
 	GetCustomerById(customerAccountId string) (Customer, error)
 	CreateCustomer(customer Customer) (string, error)
+	CreateLegacyCustomer(email string, projectKey string) (string, error)
 	AddCustomerToProject(customerAccountId string, projectKey string) error
 	RemoveCustomerFromProject(customerAccountId string, projectKey string) error
 	DeleteCustomer(customerAccountId string) error

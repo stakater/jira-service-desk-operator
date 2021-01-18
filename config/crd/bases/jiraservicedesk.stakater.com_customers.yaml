@@ -40,6 +40,13 @@ spec:
               description: Email of the customer
               pattern: \S+@\S+\.\S+
               type: string
+            legacyCustomer:
+              description: A legacy or a normal customer In case of a legacy Customer,
+                a signup link is sent to the customer email which he can than use
+                to signup In case of a normal Customer, no signup link is sent to
+                the customer. The customer than has to signup himself using the portal
+                If not given, default behaviour is false i.e. normal customer
+              type: boolean
             name:
               description: Name of the customer
               type: string
@@ -47,6 +54,7 @@ spec:
               description: List of ProjectKeys in which customer will be added
               items:
                 type: string
+              minItems: 1
               type: array
           type: object
         status:

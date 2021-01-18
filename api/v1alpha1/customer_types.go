@@ -42,7 +42,15 @@ type CustomerSpec struct {
 	// +required
 	Email string `json:"email,omitempty"`
 
+	// A legacy or a normal customer
+	// In case of a legacy Customer, a signup link is sent to the customer email which he can than use to signup
+	// In case of a normal Customer, no signup link is sent to the customer. The customer than has to signup himself using the portal
+	// If not given, default behaviour is false i.e. normal customer
+	// +optional
+	LegacyCustomer bool `json:"legacyCustomer,omitempty"`
+
 	// List of ProjectKeys in which customer will be added
+	// +kubebuilder:validation:MinItems=1
 	// +optional
 	Projects []string `json:"projects,omitempty"`
 }
