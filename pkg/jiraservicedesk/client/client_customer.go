@@ -11,10 +11,11 @@ import (
 
 const (
 	// Endpoints
-	CreateCustomerApiPath = "/rest/servicedeskapi/customer"
-	AddCustomerApiPath    = "/rest/servicedeskapi/servicedesk/"
-	EndpointUser          = "/rest/api/3/user?accountId="
-	LegacyCustomerApiPath = "/rest/servicedesk/1/pages/people/customers/pagination/"
+	CreateCustomerApiPath        = "/rest/servicedeskapi/customer"
+	AddCustomerApiPath           = "/rest/servicedeskapi/servicedesk/"
+	EndpointUser                 = "/rest/api/3/user?accountId="
+	LegacyCustomerApiPath        = "/rest/servicedesk/1/pages/people/customers/pagination/"
+	LegacyCustomerCreateEndpoint = "/invite"
 )
 
 type Customer struct {
@@ -57,6 +58,7 @@ type LegacyCustomerSuccessResponse struct {
 	AccoundId    string `json:"accountId,omitempty"`
 }
 
+// GetCustomerById gets a customer by ID from JSD
 func (c *jiraServiceDeskClient) GetCustomerById(customerAccountId string) (Customer, error) {
 	var customer Customer
 
@@ -87,6 +89,7 @@ func (c *jiraServiceDeskClient) GetCustomerById(customerAccountId string) (Custo
 	return customer, err
 }
 
+// CreateCustomer create a new customer on JSD
 func (c *jiraServiceDeskClient) CreateCustomer(customer Customer) (string, error) {
 	request, err := c.newRequest("POST", CreateCustomerApiPath, customer, false)
 	if err != nil {
@@ -116,13 +119,13 @@ func (c *jiraServiceDeskClient) CreateCustomer(customer Customer) (string, error
 	return responseObject.AccountId, err
 }
 
-// https://stakater-test.atlassian.net/rest/servicedesk/1/pages/people/customers/pagination/TES/invite
+// CreateLegacyCustomer create a customer on JSD using the legacy api endpoint
 func (c *jiraServiceDeskClient) CreateLegacyCustomer(customerEmail string, projectKey string) (string, error) {
-	legacyCustomerBody := LegacyCustomerRequestBody{
+	legacyCustomerRequestBody := LegacyCustomerRequestBody{
 		Emails: []string{customerEmail},
 	}
 
-	request, err := c.newRequest("POST", LegacyCustomerApiPath+projectKey, legacyCustomerBody, false)
+	request, err := c.newRequest("POST", LegacyCustomerApiPath+projectKey+LegacyCustomerCreateEndpoint, legacyCustomerRequestBody, false)
 	if err != nil {
 		return "", err
 	}
@@ -135,7 +138,7 @@ func (c *jiraServiceDeskClient) CreateLegacyCustomer(customerEmail string, proje
 	responseData, _ := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode < 200 || response.StatusCode > 299 {
-		err = errors.New("Rest request to create a legacy customer failed with status: " + strconv.Itoa(response.StatusCode) +
+		err = errors.New("Rest request to create legacy customer failed with status: " + strconv.Itoa(response.StatusCode) +
 			" and response: " + string(responseData))
 		return "", err
 	}
@@ -149,6 +152,7 @@ func (c *jiraServiceDeskClient) CreateLegacyCustomer(customerEmail string, proje
 	return responseObject.Success[0].AccoundId, nil
 }
 
+// AddCustomerToProject adds a customer to a JSD project
 func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, projectKey string) error {
 	addCustomerBody := CustomerAddResponse{
 		AccountIds: []string{customerAccountId},
@@ -174,6 +178,7 @@ func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, p
 	return nil
 }
 
+// RemoveCustomerFromProject removes a customer from JSD project
 func (c *jiraServiceDeskClient) RemoveCustomerFromProject(customerAccountId string, projectKey string) error {
 	removeCustomerBody := CustomerAddResponse{
 		AccountIds: []string{customerAccountId},
@@ -199,6 +204,7 @@ func (c *jiraServiceDeskClient) RemoveCustomerFromProject(customerAccountId stri
 	return nil
 }
 
+// Delete customer deletes a customer from JSD
 func (c *jiraServiceDeskClient) DeleteCustomer(customerAccountId string) error {
 	request, err := c.newRequest("DELETE", EndpointUser+customerAccountId, nil, false)
 	if err != nil {
