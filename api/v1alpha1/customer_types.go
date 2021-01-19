@@ -129,7 +129,7 @@ func (customer *Customer) IsValidUpdate(existingCustomer Customer) (bool, error)
 func (customer *Customer) IsValidCustomerUpdate(existingCustomer Customer) (bool, error) {
 	if !strings.EqualFold(customer.Spec.Email, existingCustomer.Spec.Email) {
 		// Customer creation takes few seconds to complete. Checking if the customer is Get during the creation process.
-		if existingCustomer.Spec.Name == "User" && existingCustomer.Spec.Email == "" {
+		if existingCustomer.Spec.Name == "User " && existingCustomer.Spec.Email == "?" {
 			return true, nil
 		}
 		return false, fmt.Errorf("%s %s", "Customer email", invalidUpdateErrorMsg)
