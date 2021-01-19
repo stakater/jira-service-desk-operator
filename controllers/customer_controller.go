@@ -95,11 +95,27 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	if len(instance.Status.CustomerId) > 0 {
+		// Get the customer from Jira Service Desk
 		existingCustomer, err := r.JiraServiceDeskClient.GetCustomerById(instance.Status.CustomerId)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
-		return r.handleUpdate(req, existingCustomer, instance)
+
+		// Check if the customer needs an update
+		if r.JiraServiceDeskClient.IsCustomerUpdated(instance, existingCustomer) {
+
+			// Check if this is a valid customer update
+			existingCustomerInstance := r.JiraServiceDeskClient.GetCustomerCRFromCustomer(existingCustomer)
+			if ok, err := instance.IsValidCustomerUpdate(existingCustomerInstance); !ok {
+				return reconcilerUtil.ManageError(r.Client, instance, err, false)
+			}
+
+			// Handle customer update
+			return r.handleUpdate(req, instance)
+		} else {
+			log.Info("Skipping update. No changes found")
+			return reconcilerUtil.DoNotRequeue()
+		}
 	}
 
 	return r.handleCreate(req, instance)
@@ -111,15 +127,10 @@ func (r *CustomerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *CustomerReconciler) handleUpdate(req ctrl.Request, existingCustomer jiraservicedeskclient.Customer, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
+func (r *CustomerReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
 	log := r.Log.WithValues("customer", req.NamespacedName)
 
 	log.Info("Modifying project associations for JSD Customer: " + instance.Spec.Name)
-
-	existingCustomerInstance := r.JiraServiceDeskClient.GetCustomerCRFromCustomer(existingCustomer)
-	if ok, err := instance.IsValidCustomerUpdate(existingCustomerInstance); !ok {
-		return reconcilerUtil.ManageError(r.Client, instance, err, false)
-	}
 
 	for _, specProjectKey := range instance.Spec.Projects {
 		found := false
@@ -155,7 +166,7 @@ func (r *CustomerReconciler) handleUpdate(req ctrl.Request, existingCustomer jir
 		}
 	}
 
-	instance.Status.AssociatedProjects = instance.Spec.DeepCopy().Projects
+	instance.Status.AssociatedProjects = instance.Spec.Projects
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }

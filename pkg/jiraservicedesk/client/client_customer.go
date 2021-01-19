@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"reflect"
 	"strconv"
 
 	jiraservicedeskv1alpha1 "github.com/stakater/jira-service-desk-operator/api/v1alpha1"
@@ -176,6 +177,14 @@ func (c *jiraServiceDeskClient) AddCustomerToProject(customerAccountId string, p
 	}
 
 	return nil
+}
+
+func (c *jiraServiceDeskClient) IsCustomerUpdated(customer *jiraservicedeskv1alpha1.Customer, existingCustomer Customer) bool {
+	if reflect.DeepEqual(customer.Spec.Projects, customer.Status.AssociatedProjects) && customer.Spec.Email == existingCustomer.Email {
+		return false
+	} else {
+		return true
+	}
 }
 
 // RemoveCustomerFromProject removes a customer from JSD project

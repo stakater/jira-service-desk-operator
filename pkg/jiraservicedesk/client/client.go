@@ -28,6 +28,7 @@ type Client interface {
 	GetCustomerById(customerAccountId string) (Customer, error)
 	CreateCustomer(customer Customer) (string, error)
 	CreateLegacyCustomer(email string, projectKey string) (string, error)
+	IsCustomerUpdated(customer *jiraservicedeskv1alpha1.Customer, existingCustomer Customer) bool
 	AddCustomerToProject(customerAccountId string, projectKey string) error
 	RemoveCustomerFromProject(customerAccountId string, projectKey string) error
 	DeleteCustomer(customerAccountId string) error
