@@ -41,12 +41,12 @@ spec:
               pattern: \S+@\S+\.\S+
               type: string
             legacyCustomer:
-              description: A boolean flag for creating a legacy customer In case of
-                a legacy Customer, a signup link is sent to the customer email which
-                he can than use to signup In case of a normal Customer, no signup
-                link is sent to the customer. The customer than has to signup manually
-                using the portal If not given, default behaviour is false i.e. normal
-                customer
+              description: LegacyCustomer is a boolean flag that represents whether
+                a customer is created using legacy API or not In case of a legacy
+                Customer, a signup link is sent to the customer email which he can
+                than use to signup In case of a normal Customer, no signup link is
+                sent to the customer. The customer than has to signup manually using
+                the portal If not given, default behaviour is false i.e. normal customer
               type: boolean
             name:
               description: Name of the customer
