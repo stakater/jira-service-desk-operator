@@ -25,14 +25,11 @@ import (
 )
 
 const (
-	invalidUpdateErrorMsg string = "can not be modified."
+	invalidUpdateErrorMsg string = " is an immutable field and can not be modified."
 )
 
 // CustomerSpec defines the desired state of Customer
 type CustomerSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Name of the customer
 	// +required
 	Name string `json:"name,omitempty"`
@@ -42,7 +39,7 @@ type CustomerSpec struct {
 	// +required
 	Email string `json:"email,omitempty"`
 
-	// A boolean flag for creating a legacy customer
+	// LegacyCustomer is a boolean flag that represents whether a customer is created using legacy API or not
 	// In case of a legacy Customer, a signup link is sent to the customer email which he can than use to signup
 	// In case of a normal Customer, no signup link is sent to the customer. The customer than has to signup manually using the portal
 	// If not given, default behaviour is false i.e. normal customer
@@ -117,10 +114,14 @@ func (customer *Customer) IsValid() (bool, error) {
 func (customer *Customer) IsValidUpdate(existingCustomer Customer) (bool, error) {
 
 	if !strings.EqualFold(customer.Spec.Email, existingCustomer.Spec.Email) {
-		return false, fmt.Errorf("%s %s", "Customer email", invalidUpdateErrorMsg)
+		return false, fmt.Errorf("%s %s", "CustomerEmail", invalidUpdateErrorMsg)
 	}
 	if customer.Spec.Name != existingCustomer.Spec.Name {
-		return false, fmt.Errorf("%s %s", "Customer name", invalidUpdateErrorMsg)
+		return false, fmt.Errorf("%s %s", "CustomerName", invalidUpdateErrorMsg)
+	}
+
+	if customer.Spec.LegacyCustomer != existingCustomer.Spec.LegacyCustomer {
+		return false, fmt.Errorf("%s %s", "LegacyCustomer", invalidUpdateErrorMsg)
 	}
 
 	return true, nil
