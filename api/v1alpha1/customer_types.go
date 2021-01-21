@@ -128,7 +128,7 @@ func (customer *Customer) IsValidUpdate(existingCustomer Customer) (bool, error)
 
 func (customer *Customer) IsValidCustomerUpdate(existingCustomer Customer) (bool, error) {
 	if !strings.EqualFold(customer.Spec.Email, existingCustomer.Spec.Email) {
-		// Customer creation takes few seconds to complete. Checking if the customer is Get during the creation process.
+		// It takes a few seconds for customers to be persisted at JSD. Check if it's pending with known values are return.
 		if existingCustomer.Spec.Name == "User " && existingCustomer.Spec.Email == "?" {
 			return true, nil
 		}
