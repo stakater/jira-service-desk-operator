@@ -42,7 +42,15 @@ type CustomerSpec struct {
 	// +required
 	Email string `json:"email,omitempty"`
 
+	// A boolean flag for creating a legacy customer
+	// In case of a legacy Customer, a signup link is sent to the customer email which he can than use to signup
+	// In case of a normal Customer, no signup link is sent to the customer. The customer than has to signup manually using the portal
+	// If not given, default behaviour is false i.e. normal customer
+	// +optional
+	LegacyCustomer bool `json:"legacyCustomer,omitempty"`
+
 	// List of ProjectKeys in which customer will be added
+	// +kubebuilder:validation:MinItems=1
 	// +optional
 	Projects []string `json:"projects,omitempty"`
 }
@@ -113,6 +121,18 @@ func (customer *Customer) IsValidUpdate(existingCustomer Customer) (bool, error)
 	}
 	if customer.Spec.Name != existingCustomer.Spec.Name {
 		return false, fmt.Errorf("%s %s", "Customer name", invalidUpdateErrorMsg)
+	}
+
+	return true, nil
+}
+
+func (customer *Customer) IsValidCustomerUpdate(existingCustomer Customer) (bool, error) {
+	if !strings.EqualFold(customer.Spec.Email, existingCustomer.Spec.Email) {
+		// It takes a few seconds for customers to be persisted at JSD. Check if it's pending with known values are return.
+		if existingCustomer.Spec.Name == "User " && existingCustomer.Spec.Email == "?" {
+			return true, nil
+		}
+		return false, fmt.Errorf("%s %s", "Customer email", invalidUpdateErrorMsg)
 	}
 
 	return true, nil

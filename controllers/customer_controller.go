@@ -95,11 +95,27 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	if len(instance.Status.CustomerId) > 0 {
+		// Get the customer from Jira Service Desk
 		existingCustomer, err := r.JiraServiceDeskClient.GetCustomerById(instance.Status.CustomerId)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
-		return r.handleUpdate(req, existingCustomer, instance)
+
+		// Check if the customer needs an update
+		if r.JiraServiceDeskClient.IsCustomerUpdated(instance, existingCustomer) {
+
+			// Check if this is a valid customer update
+			existingCustomerInstance := r.JiraServiceDeskClient.GetCustomerCRFromCustomer(existingCustomer)
+			if ok, err := instance.IsValidCustomerUpdate(existingCustomerInstance); !ok {
+				return reconcilerUtil.ManageError(r.Client, instance, err, false)
+			}
+
+			// Handle customer update
+			return r.handleUpdate(req, instance)
+		} else {
+			log.Info("Skipping update. No changes found")
+			return reconcilerUtil.DoNotRequeue()
+		}
 	}
 
 	return r.handleCreate(req, instance)
@@ -111,15 +127,10 @@ func (r *CustomerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *CustomerReconciler) handleUpdate(req ctrl.Request, existingCustomer jiraservicedeskclient.Customer, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
+func (r *CustomerReconciler) handleUpdate(req ctrl.Request, instance *jiraservicedeskv1alpha1.Customer) (ctrl.Result, error) {
 	log := r.Log.WithValues("customer", req.NamespacedName)
 
 	log.Info("Modifying project associations for JSD Customer: " + instance.Spec.Name)
-
-	existingCustomerInstance := r.JiraServiceDeskClient.GetCustomerCRFromCustomer(existingCustomer)
-	if ok, err := instance.IsValidUpdate(existingCustomerInstance); !ok {
-		return reconcilerUtil.ManageError(r.Client, instance, err, false)
-	}
 
 	for _, specProjectKey := range instance.Spec.Projects {
 		found := false
@@ -155,7 +166,7 @@ func (r *CustomerReconciler) handleUpdate(req ctrl.Request, existingCustomer jir
 		}
 	}
 
-	instance.Status.AssociatedProjects = instance.Spec.DeepCopy().Projects
+	instance.Status.AssociatedProjects = instance.Spec.Projects
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
@@ -165,12 +176,23 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 
 	log.Info("Creating Jira Service Desk Customer: " + instance.Spec.Name)
 
-	customer := r.JiraServiceDeskClient.GetCustomerFromCustomerCRForCreateCustomer(instance)
-	customerId, err := r.JiraServiceDeskClient.CreateCustomer(customer)
-	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	// If legacy Customer flag is true than create a legacy customer, else create a normal customer
+	if instance.Spec.LegacyCustomer {
+		customerID, err := r.JiraServiceDeskClient.CreateLegacyCustomer(instance.Spec.Email, instance.Spec.Projects[0])
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+
+		instance.Status.CustomerId = customerID
+	} else {
+		customer := r.JiraServiceDeskClient.GetCustomerFromCustomerCRForCreateCustomer(instance)
+		customerID, err := r.JiraServiceDeskClient.CreateCustomer(customer)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+
+		instance.Status.CustomerId = customerID
 	}
-	instance.Status.CustomerId = customerId
 
 	log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
 
@@ -183,7 +205,7 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 		}
 		log.Info("Successfully added Jira Service Desk Customer into project: " + projectKey)
 	}
-	instance.Status.AssociatedProjects = instance.Spec.DeepCopy().Projects
+	instance.Status.AssociatedProjects = instance.Spec.Projects
 
 	return reconcilerUtil.ManageSuccess(r.Client, instance)
 }
@@ -198,10 +220,15 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 
 	log.Info("Deleting Jira Service Desk Customer: " + instance.Spec.Name)
 
-	// Delete Customer
-	err := r.JiraServiceDeskClient.DeleteCustomer(instance.Status.CustomerId)
-	if err != nil {
-		return reconcilerUtil.ManageError(r.Client, instance, err, false)
+	// Check if the customer was created
+	if instance.Status.CustomerId != "" {
+		// Delete Customer
+		err := r.JiraServiceDeskClient.DeleteCustomer(instance.Status.CustomerId)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+	} else {
+		log.Info("Customer '" + instance.Spec.Name + "' do not exists on JSD. So skipping deletion")
 	}
 
 	// Delete Finalizer
@@ -210,7 +237,7 @@ func (r *CustomerReconciler) handleDelete(req ctrl.Request, instance *jiraservic
 	log.Info("Finalizer removed for customer: " + instance.Spec.Name)
 
 	// Update instance
-	err = r.Client.Update(context.TODO(), instance)
+	err := r.Client.Update(context.TODO(), instance)
 	if err != nil {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
