@@ -62,7 +62,7 @@ spec:
             key:
               description: The project key is used as the prefix of your project's issue keys
               maxLength: 10
-              pattern: ^[A-Z][a-zA-Z0-9]+$
+              pattern: ^[A-Z][A-Z0-9]+$
               type: string
             leadAccountId:
               description: ID of project lead
