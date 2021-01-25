@@ -69,8 +69,8 @@ Examples for Legacy Customer Custom Resource can be found at [here](https://gith
 
 #### Limitations
 
-* **Customer name and email** are immutable and can't be updated later.
 * Customer name can't be set while creating a legacy customer. The customer name is set equivalent to customer email by default. Once the customer signs up using the signup link, the customer name is updated to the new provided value during the signup.
+* You can not update **customer name and email**.
 * Each customer resource is associated to a single customer.
 
 
