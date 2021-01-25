@@ -45,14 +45,14 @@ We support the following CRUD operations on customer via our Jira Service Desk O
 * Update - Only updates(add/remove) the associated projects mentioned in the CR
 * Delete - Remove all the project associations and deletes the customer
 
-Examples for Customer Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/blob/handle-customers/examples/customer/customer.yaml).
+Examples for Customer Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/customer).
 
 #### Limitations
 
 * Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can’t be accessed later with the Jira Service Desk Operator.
 * Each custom resource is associated to a single customer. 
 * You can not update **customer name and email**.
-* Once a customer is created, no signup link is sent to the customer email. The customer then has to signup on the help center manually with the provided email to access the projects associated with him on the customer portal.
+* Once a customer is created, no signup link is sent to the customer email. The customer then has to signup on the help center manually with his provided email to access the projects associated with him on the customer portal.
 
 
 ### Legacy Customer
@@ -65,10 +65,12 @@ We support the following CRUD operations on a legacy customer created via our Ji
 * Update - Only update (add/remove) the associated projects mentioned in the CR
 * Delete - Remove all the project associations and deletes the customer
 
+Examples for Legacy Customer Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/customer).
+
 #### Limitations
 
 * **Customer name and email** are immutable and can't be updated later.
-* Customer name can't be set while creating a legacy customer. The customer is set equivalent to customer email by default. Once the customer signs up using the signup link, the customer name is updated to the new provided value during the signup.
+* Customer name can't be set while creating a legacy customer. The customer name is set equivalent to customer email by default. Once the customer signs up using the signup link, the customer name is updated to the new provided value during the signup.
 * Each customer resource is associated to a single customer.
 
 
