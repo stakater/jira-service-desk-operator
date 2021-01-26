@@ -20,7 +20,7 @@ We support the following CRUD operation on project via our Jira Service Desk Ope
 * Update - Updates an existing project with the updated fields
 * Delete - Removes and deletes the project 
 
-Examples for Project Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/project).
+Examples for Project Custom Resource can be found [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/project).
 
 #### Limitations
 
@@ -45,7 +45,7 @@ We support the following CRUD operations on customer via our Jira Service Desk O
 * Update - Only updates(add/remove) the associated projects mentioned in the CR
 * Delete - Remove all the project associations and deletes the customer
 
-Examples for Customer Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/customer).
+Examples for Customer Custom Resource can be found [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/customer).
 
 #### Limitations
 
@@ -54,24 +54,7 @@ Examples for Customer Custom Resource can be found at [here](https://github.com/
 * You can not update **customer name and email**.
 * Once a customer is created, no signup link is sent to the customer email. The customer then has to signup on the help center manually with his provided email to access the projects associated with him on the customer portal.
 
-
-### Legacy Customer
-
-To resolve the sign link limitation during the customer creation, we have introduced a legacy customer. The legacy customer uses Jira Legacy API at its backend. When a legacy customer is created a signup link is automatically sent to the customer email. The customer can then use this signup link to signup on the customer portal and access the projects associated with him.
-To create a legacy customer, set the **LegacyCustomer** flag to true in the customer CR. If no value is provided for LegacyCustomer flag than a normal customer is created.
-
-We support the following CRUD operations on a legacy customer created via our Jira Service Desk Operator:
-* Create - Creates a new customer and assign the projects mentioned in the CR
-* Update - Only update (add/remove) the associated projects mentioned in the CR
-* Delete - Remove all the project associations and deletes the customer
-
-Examples for Legacy Customer Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/customer).
-
-#### Limitations
-
-* Customer name can't be set while creating a legacy customer. The customer name is set equivalent to customer email by default. Once the customer signs up using the signup link, the customer name is updated to the new provided value during the signup.
-* You can not update **customer name and email**.
-* Each customer resource is associated to a single customer.
+To resolve the sign up link limitation during customer creation, we have introduced the legacy customer flag in customer CR. When the flag is true, customer is created using the Jira legacy API and a signup link is sent to his email. However, customer name can't be set while creating a legacy customer. The customer name is set equivalent to customer email by default. Once the customer signs up using the signup link, the customer name is updated to the new provided value during the signup.
 
 
 ## Usage
