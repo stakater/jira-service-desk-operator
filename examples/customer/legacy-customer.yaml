@@ -5,7 +5,7 @@ metadata:
 spec:
   name: Legacy Customer
   email: legacycustomer@sample.com
-  legacyCustomer: false
+  legacyCustomer: true
   projects:
     - TEST1
     - TEST2
