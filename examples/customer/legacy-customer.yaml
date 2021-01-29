@@ -1,0 +1,11 @@
+apiVersion: jiraservicedesk.stakater.com/v1alpha1
+kind: Customer
+metadata:
+  name: legacy-customer
+spec:
+  name: Legacy Customer
+  email: legacycustomer@sample.com
+  legacyCustomer: true
+  projects:
+    - TEST1
+    - TEST2

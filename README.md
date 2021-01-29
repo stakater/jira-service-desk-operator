@@ -20,7 +20,7 @@ We support the following CRUD operation on project via our Jira Service Desk Ope
 * Update - Updates an existing project with the updated fields
 * Delete - Removes and deletes the project 
 
-Examples for Project Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/project).
+Examples for Project Custom Resource can be found [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/project).
 
 #### Limitations
 
@@ -45,13 +45,17 @@ We support the following CRUD operations on customer via our Jira Service Desk O
 * Update - Only updates(add/remove) the associated projects mentioned in the CR
 * Delete - Remove all the project associations and deletes the customer
 
-Examples for Project Custom Resource can be found at [here](https://github.com/stakater/jira-service-desk-operator/blob/handle-customers/examples/customer/customer.yaml).
+Examples for Customer Custom Resource can be found [here](https://github.com/stakater/jira-service-desk-operator/tree/master/examples/customer).
 
 #### Limitations
 
 * Jira Service Desk Operator can access only those customers which are created through it. Customers that are manually created and added in the projects can’t be accessed later with the Jira Service Desk Operator.
 * Each custom resource is associated to a single customer. 
 * You can not update **customer name and email**.
+* Once a customer is created, no signup link is sent to the customer email. The customer then has to signup on the help center manually with his provided email to access the projects associated with him on the customer portal.
+
+To resolve the sign up link limitation during customer creation, we have introduced the legacy customer flag in customer CR. When the flag is true, customer is created using the Jira legacy API and a signup link is sent to his email. However, customer name can't be set while creating a legacy customer. The customer name is set equivalent to customer email by default. Once the customer signs up using the signup link, the customer name is updated to the new provided value during the signup.
+
 
 ## Usage
 
