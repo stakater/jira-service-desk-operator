@@ -26,6 +26,7 @@ import (
 
 const (
 	invalidUpdateErrorMsg string = " is an immutable field and can not be modified."
+	duplicateKeysErr      string = "Duplicate Project Keys are not allowed"
 )
 
 // CustomerSpec defines the desired state of Customer
@@ -98,14 +99,9 @@ func (customer *Customer) SetReconcileStatus(reconcileStatus []metav1.Condition)
 }
 
 func (customer *Customer) IsValid() (bool, error) {
-	keys := make(map[string]bool)
 
-	for _, entry := range customer.Spec.Projects {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-		} else {
-			return false, errors.New("Duplicate Project Keys are not allowed")
-		}
+	if duplicateKeysExist(customer.Spec.Projects) {
+		return false, errors.New(duplicateKeysErr)
 	}
 
 	return true, nil
@@ -124,6 +120,10 @@ func (customer *Customer) IsValidUpdate(existingCustomer Customer) (bool, error)
 		return false, fmt.Errorf("%s %s", "LegacyCustomer", invalidUpdateErrorMsg)
 	}
 
+	if duplicateKeysExist(customer.Spec.Projects) {
+		return false, errors.New(duplicateKeysErr)
+	}
+
 	return true, nil
 }
 
@@ -137,4 +137,17 @@ func (customer *Customer) IsValidCustomerUpdate(existingCustomer Customer) (bool
 	}
 
 	return true, nil
+}
+
+func duplicateKeysExist(projectKeys []string) bool {
+	keys := make(map[string]bool)
+
+	for _, entry := range projectKeys {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+		} else {
+			return true
+		}
+	}
+	return false
 }
