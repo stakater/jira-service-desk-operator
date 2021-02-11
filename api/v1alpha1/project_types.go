@@ -66,6 +66,7 @@ type ProjectSpec struct {
 	LeadAccountId string `json:"leadAccountId,omitempty"`
 
 	// A link to information about this project, such as project documentation
+	// +kubebuilder:validation:Pattern="(http|ftp|https)://([a-zA-Z0-9~!@#$%^&*()_=+/?.:;',-]*)?"
 	// +optional
 	URL string `json:"url,omitempty"`
 
