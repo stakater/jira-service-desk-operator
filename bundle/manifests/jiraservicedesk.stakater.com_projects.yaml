@@ -92,6 +92,7 @@ spec:
               type: string
             url:
               description: A link to information about this project, such as project documentation
+              pattern: (http|ftp|https)://([a-zA-Z0-9~!@#$%^&*()_=+/?.:;',-]*)?
               type: string
           type: object
         status:
