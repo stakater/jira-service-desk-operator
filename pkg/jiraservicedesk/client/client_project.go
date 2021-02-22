@@ -15,6 +15,9 @@ const (
 	ServiceDeskV1ApiPath       = "/rest/servicedesk/1/servicedesk/"
 	RequestSecurityPath        = "/settings/requestsecurity"
 
+	// Project tags
+	EnableUndotag = "enableUndo"
+
 	// Project Template Types
 	ClassicProjectTemplateKey = "com.atlassian.servicedesk:itil-v2-service-desk-project"
 	NextGenProjectTemplateKey = "com.atlassian.servicedesk:next-gen-it-service-desk"
@@ -150,8 +153,8 @@ func (c *jiraServiceDeskClient) UpdateProject(updatedProject Project, id string)
 	return nil
 }
 
-func (c *jiraServiceDeskClient) DeleteProject(id string) error {
-	request, err := c.newRequest("DELETE", EndpointApiVersion3Project+"/"+id, nil, false)
+func (c *jiraServiceDeskClient) DeleteProject(id string, enableUndo bool) error {
+	request, err := c.newRequest("DELETE", EndpointApiVersion3Project+"/"+id+"?"+EnableUndotag+"="+strconv.FormatBool(enableUndo), nil, false)
 	if err != nil {
 		return err
 	}

@@ -164,7 +164,7 @@ func (r *ProjectReconciler) handleDelete(req ctrl.Request, instance *jiraservice
 
 	// Check if the project was created
 	if instance.Status.ID != "" {
-		err := r.JiraServiceDeskClient.DeleteProject(instance.Status.ID)
+		err := r.JiraServiceDeskClient.DeleteProject(instance.Status.ID, instance.Spec.EnableUndo)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}

@@ -93,6 +93,10 @@ type ProjectSpec struct {
 	// The Open Access status, which dictates who can access the project. If set to true all customers can access the project. If false, only customers added to project can access the project.
 	// +optional, if not provided default behaviour is False
 	OpenAccess bool `json:"openAccess,omitempty"`
+
+	// EnableUndo allows project placed in the Jira recycle bin where it will be available for restoration
+	// +optional
+	EnableUndo bool `json:"enableUndo,omitempty"`
 }
 
 // ProjectStatus defines the observed state of Project

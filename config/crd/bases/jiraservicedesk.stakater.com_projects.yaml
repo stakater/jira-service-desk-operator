@@ -51,6 +51,10 @@ spec:
             description:
               description: Description for project
               type: string
+            enableUndo:
+              description: EnableUndo allows project placed in the Jira recycle bin
+                where it will be available for restoration
+              type: boolean
             issueSecurityScheme:
               description: The ID of the issue security scheme for the project, which
                 enables you to control who can and cannot view issues

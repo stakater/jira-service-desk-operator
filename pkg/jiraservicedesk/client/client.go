@@ -20,7 +20,7 @@ type Client interface {
 	GetProjectFromProjectCR(project *jiraservicedeskv1alpha1.Project) Project
 	GetProjectCRFromProject(project Project) jiraservicedeskv1alpha1.Project
 	CreateProject(project Project) (string, error)
-	DeleteProject(id string) error
+	DeleteProject(id string, enableUndo bool) error
 	UpdateProject(updatedProject Project, id string) error
 	ProjectEqual(oldProject Project, newProject Project) bool
 	GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
