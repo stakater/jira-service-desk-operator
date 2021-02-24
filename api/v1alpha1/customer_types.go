@@ -33,12 +33,12 @@ const (
 type CustomerSpec struct {
 	// Name of the customer
 	// +required
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
 	// Email of the customer
 	// +kubebuilder:validation:Pattern=\S+@\S+\.\S+
 	// +required
-	Email string `json:"email,omitempty"`
+	Email string `json:"email"`
 
 	// LegacyCustomer is a boolean flag that represents whether a customer is created using legacy API or not
 	// In case of a legacy Customer, a signup link is sent to the customer email which he can than use to signup
