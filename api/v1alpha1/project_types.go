@@ -34,36 +34,36 @@ type ProjectSpec struct {
 
 	// Name of the project
 	// +required
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
 	// The project key is used as the prefix of your project's issue keys
 	// +kubebuilder:validation:MaxLength=10
 	// +kubebuilder:validation:Pattern=^[A-Z][A-Z0-9]+$
 	// +required
-	Key string `json:"key,omitempty"`
+	Key string `json:"key"`
 
 	// The project type, which dictates the application-specific feature set
 	// +kubebuilder:validation:Enum=business;service_desk;software
 	// +required
-	ProjectTypeKey string `json:"projectTypeKey,omitempty"`
+	ProjectTypeKey string `json:"projectTypeKey"`
 
 	// A prebuilt configuration for a project
 	// +required
-	ProjectTemplateKey string `json:"projectTemplateKey,omitempty"`
+	ProjectTemplateKey string `json:"projectTemplateKey"`
 
 	// Description for project
 	// +required
-	Description string `json:"description,omitempty"`
+	Description string `json:"description"`
 
 	// Task assignee type
 	// +kubebuilder:validation:Enum=PROJECT_LEAD;UNASSIGNED
 	// +required
-	AssigneeType string `json:"assigneeType,omitempty"`
+	AssigneeType string `json:"assigneeType"`
 
 	// ID of project lead
 	// +kubebuilder:validation:MaxLength=128
 	// +required
-	LeadAccountId string `json:"leadAccountId,omitempty"`
+	LeadAccountId string `json:"leadAccountId"`
 
 	// A link to information about this project, such as project documentation
 	// +kubebuilder:validation:Pattern="(http|ftp|https)://([a-zA-Z0-9~!@#$%^&*()_=+/?.:;',-]*)?"

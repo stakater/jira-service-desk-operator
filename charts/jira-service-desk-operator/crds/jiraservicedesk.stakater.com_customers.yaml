@@ -57,6 +57,9 @@ spec:
                 type: string
               minItems: 1
               type: array
+          required:
+          - email
+          - name
           type: object
         status:
           description: CustomerStatus defines the observed state of Customer
