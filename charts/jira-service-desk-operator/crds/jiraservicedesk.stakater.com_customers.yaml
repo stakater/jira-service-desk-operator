@@ -60,6 +60,7 @@ spec:
           required:
           - email
           - name
+          - projects
           type: object
         status:
           description: CustomerStatus defines the observed state of Customer

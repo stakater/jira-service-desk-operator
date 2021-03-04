@@ -49,8 +49,8 @@ type CustomerSpec struct {
 
 	// List of ProjectKeys in which customer will be added
 	// +kubebuilder:validation:MinItems=1
-	// +optional
-	Projects []string `json:"projects,omitempty"`
+	// +required
+	Projects []string `json:"projects"`
 }
 
 // CustomerStatus defines the observed state of Customer
