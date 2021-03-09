@@ -140,6 +140,8 @@ var _ = BeforeSuite(func(done Done) {
 	mockData.SampleProjectInput.Spec.Name += projectKey
 	mockData.SampleProjectInput.Spec.Key = strings.ToUpper(projectKey)
 
+	_ = util.CreateProject(mockData.SampleProjectInput, ns)
+
 	close(done)
 }, 60)
 
