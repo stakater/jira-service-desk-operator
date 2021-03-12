@@ -31,12 +31,14 @@ var AddCustomerSuccessResponse = map[string]interface{}{
 }
 
 var AddedProjectsList = []string{"CTP"}
-var RemovedProjectsList = []string{}
 
 var SampleCustomer = jiraservicedeskv1alpha1.Customer{
 	Spec: jiraservicedeskv1alpha1.CustomerSpec{
 		Name:  "customer",
 		Email: "customer@sample.com",
+		Projects: []string{
+			"SAMPLE",
+		}
 	},
 }
 
@@ -108,6 +110,19 @@ var CreateProjectInvalidInput = jiraservicedeskv1alpha1.Project{
 		PermissionScheme:    10011,
 		NotificationScheme:  10021,
 		CategoryId:          10120,
+	},
+}
+
+var SampleProjectInput = jiraservicedeskv1alpha1.Project{
+	Spec: jiraservicedeskv1alpha1.ProjectSpec{
+		Name:               "SampleProject",
+		Key:                "SAMPLE",
+		ProjectTypeKey:     "service_desk",
+		ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
+		Description:        "Sample project for jira-service-desk-operator",
+		AssigneeType:       "PROJECT_LEAD",
+		LeadAccountId:      "5f62e5902b42470070d1fb83",
+		URL:                "https://test.com",
 	},
 }
 
