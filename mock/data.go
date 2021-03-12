@@ -38,7 +38,7 @@ var SampleCustomer = jiraservicedeskv1alpha1.Customer{
 		Email: "customer@sample.com",
 		Projects: []string{
 			"SAMPLE",
-		}
+		},
 	},
 }
 
@@ -115,7 +115,7 @@ var CreateProjectInvalidInput = jiraservicedeskv1alpha1.Project{
 
 var SampleProjectInput = jiraservicedeskv1alpha1.Project{
 	Spec: jiraservicedeskv1alpha1.ProjectSpec{
-		Name:               "SampleProject",
+		Name:               "sampleproject",
 		Key:                "SAMPLE",
 		ProjectTypeKey:     "service_desk",
 		ProjectTemplateKey: "com.atlassian.servicedesk:itil-v2-service-desk-project",
