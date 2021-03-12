@@ -135,11 +135,11 @@ var _ = BeforeSuite(func(done Done) {
 	mockData.CustomerTestProjectInput.Spec.Name += customerKey
 	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(customerKey)
 
-	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
-
 	mockData.SampleProjectInput.Spec.Name += projectKey
 	mockData.SampleProjectInput.Spec.Key = strings.ToUpper(projectKey)
 
+	// Creating projects for customer tests
+	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
 	_ = util.CreateProject(mockData.SampleProjectInput, ns)
 
 	close(done)
