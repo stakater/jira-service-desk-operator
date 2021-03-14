@@ -23,6 +23,7 @@ var _ = Describe("Customer Controller", func() {
 	str := cUtil.RandSeqString(3)
 	customerInput.Spec.Name += str
 	customerInput.Spec.Email = "customer" + str + "@sample.com"
+	customerInput.Spec.Projects = []string{strings.ToUpper(projectKey)}
 
 	AfterEach(func() {
 		cUtil.TryDeleteCustomer(customerInput.Spec.Name, ns)
