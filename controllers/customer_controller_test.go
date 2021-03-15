@@ -81,12 +81,12 @@ var _ = Describe("Customer Controller", func() {
 
 					Expect(customer.Status.CustomerId).ToNot(Equal(""))
 
-					customer.Spec.Projects = mockData.RemovedProjectsList
+					customer.Spec.Projects = []string{strings.ToUpper(projectKey)}
 
 					_ = cUtil.UpdateCustomer(customer, ns)
 					updatedCustomer := cUtil.GetCustomer(customer.Spec.Name, ns)
 
-					Expect(updatedCustomer.Status.AssociatedProjects).To(BeNil())
+					Expect(customer.Spec.Projects).To(Equal(updatedCustomer.Status.AssociatedProjects))
 				})
 			})
 		})

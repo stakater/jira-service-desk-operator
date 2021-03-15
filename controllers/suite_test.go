@@ -59,6 +59,7 @@ var cUtil *controllerUtil.TestUtil
 
 var log = logf.Log.WithName("config")
 var customerKey = cUtil.RandSeqString(3)
+var projectKey = cUtil.RandSeqString(3)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -134,14 +135,20 @@ var _ = BeforeSuite(func(done Done) {
 	mockData.CustomerTestProjectInput.Spec.Name += customerKey
 	mockData.CustomerTestProjectInput.Spec.Key = strings.ToUpper(customerKey)
 
+	mockData.SampleProjectInput.Spec.Name += projectKey
+	mockData.SampleProjectInput.Spec.Key = strings.ToUpper(projectKey)
+
+	// Creating projects for customer tests
 	_ = util.CreateProject(mockData.CustomerTestProjectInput, ns)
+	_ = util.CreateProject(mockData.SampleProjectInput, ns)
 
 	close(done)
 }, 60)
 
 var _ = AfterSuite(func() {
-	// Delete the project created for customer tests
+	// Delete the projects created for customer tests
 	util.DeleteProject(mockData.CustomerTestProjectInput.Spec.Name, ns)
+	util.DeleteProject(mockData.SampleProjectInput.Spec.Name, ns)
 
 	// Cleanup - Delete all remnent resources
 	util.DeleteAllProjects(ns)
