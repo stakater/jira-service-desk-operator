@@ -26,6 +26,7 @@ type Client interface {
 	GetProjectForUpdateRequest(existingProject Project, newProject *jiraservicedeskv1alpha1.Project) Project
 	UpdateProjectAccessPermissions(status bool, key string) error
 	GetCustomerById(customerAccountId string) (Customer, error)
+	GetCustomerIdByEmail(emailAddress string) (string, error)
 	CreateCustomer(customer Customer) (string, error)
 	CreateLegacyCustomer(email string, projectKey string) (string, error)
 	IsCustomerUpdated(customer *jiraservicedeskv1alpha1.Customer, existingCustomer Customer) bool

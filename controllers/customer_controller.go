@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"strings"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -32,7 +33,8 @@ import (
 )
 
 const (
-	CustomerFinalizer string = "jiraservicedesk.stakater.com/customer"
+	CustomerFinalizer        string = "jiraservicedesk.stakater.com/customer"
+	CustomerAlreadyExistsErr string = "An account already exists for this email"
 )
 
 // CustomerReconciler reconciles a Customer object
@@ -175,24 +177,30 @@ func (r *CustomerReconciler) handleCreate(req ctrl.Request, instance *jiraservic
 	log := r.Log.WithValues("customer", req.NamespacedName)
 
 	log.Info("Creating Jira Service Desk Customer: " + instance.Spec.Name)
+	var customerID string
+	var err error
 
 	// If legacy Customer flag is true than create a legacy customer, else create a normal customer
 	if instance.Spec.LegacyCustomer {
-		customerID, err := r.JiraServiceDeskClient.CreateLegacyCustomer(instance.Spec.Email, instance.Spec.Projects[0])
-		if err != nil {
-			return reconcilerUtil.ManageError(r.Client, instance, err, false)
-		}
-
-		instance.Status.CustomerId = customerID
+		customerID, err = r.JiraServiceDeskClient.CreateLegacyCustomer(instance.Spec.Email, instance.Spec.Projects[0])
 	} else {
 		customer := r.JiraServiceDeskClient.GetCustomerFromCustomerCRForCreateCustomer(instance)
-		customerID, err := r.JiraServiceDeskClient.CreateCustomer(customer)
+		customerID, err = r.JiraServiceDeskClient.CreateCustomer(customer)
+	}
+
+	// If customer already exists, reconstruct status of the custom resource
+	if err != nil && strings.Contains(err.Error(), CustomerAlreadyExistsErr) {
+		existingCustomerID, err := r.JiraServiceDeskClient.GetCustomerIdByEmail(instance.Spec.Email)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
+		customerID = existingCustomerID
 
-		instance.Status.CustomerId = customerID
+	} else if err != nil {
+		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
+
+	instance.Status.CustomerId = customerID
 
 	log.Info("Successfully created Jira Service Desk Customer: " + instance.Spec.Name)
 
