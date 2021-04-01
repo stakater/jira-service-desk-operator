@@ -20,7 +20,7 @@ func TestJiraService_GetProject_shouldGetProject_whenValidProjectIdIsGiven(t *te
 		JSON(mockData.GetProjectByIdResponseJSON)
 
 	jiraClient := NewClient("", mockData.BaseURL, "")
-	project, err := jiraClient.GetProjectById("/" + mockData.ProjectID)
+	project, err := jiraClient.GetProjectByIdentifier("/" + mockData.ProjectID)
 
 	st.Expect(t, project.Description, mockData.GetProjectByIdExpectedResponse.Description)
 	st.Expect(t, project.Name, mockData.GetProjectByIdExpectedResponse.Name)
@@ -41,7 +41,7 @@ func TestJiraService_GetProject_shouldNotGetProject_whenInValidProjectIdIsGiven(
 		Reply(404)
 
 	jiraClient := NewClient("", mockData.BaseURL, "")
-	_, err := jiraClient.GetProjectById("/" + mockData.ProjectID)
+	_, err := jiraClient.GetProjectByIdentifier("/" + mockData.ProjectID)
 
 	st.Expect(t, err, errors.New(mockData.GetProjectFailedErrorMsg))
 	st.Expect(t, gock.IsDone(), true)

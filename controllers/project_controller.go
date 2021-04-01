@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"strings"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -99,7 +100,7 @@ func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Check if the Project already exists
 	if len(instance.Status.ID) > 0 {
-		existingProject, err := r.JiraServiceDeskClient.GetProjectById(instance.Status.ID)
+		existingProject, err := r.JiraServiceDeskClient.GetProjectByIdentifier(instance.Status.ID)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
 		}
@@ -133,7 +134,17 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 
 	project := r.JiraServiceDeskClient.GetProjectFromProjectCR(instance)
 	projectId, err := r.JiraServiceDeskClient.CreateProject(project)
-	if err != nil {
+
+	// If project already exists then reconstruct status
+	if err != nil && strings.Contains(err.Error(), "A project with that name already exists.") {
+		existingProject, err := r.JiraServiceDeskClient.GetProjectByIdentifier(instance.Spec.Key)
+		if err != nil {
+			return reconcilerUtil.ManageError(r.Client, instance, err, false)
+		}
+		log.Info("Successfully reconstructed status for Jira Service Desk Project " + instance.Spec.Name)
+
+		projectId = existingProject.Id
+	} else if err != nil {
 		return reconcilerUtil.ManageError(r.Client, instance, err, false)
 	}
 
