@@ -17,6 +17,7 @@ const (
 	EndpointUser                 = "/rest/api/3/user?accountId="
 	LegacyCustomerApiPath        = "/rest/servicedesk/1/pages/people/customers/pagination/"
 	LegacyCustomerCreateEndpoint = "/invite"
+	SearchUserEndpoint           = "/rest/api/3/user/search?query="
 )
 
 type Customer struct {
@@ -43,6 +44,8 @@ type CustomerGetResponse struct {
 	DisplayName  string `json:"displayName,omitempty"`
 	AccountType  string `json:"accountType,omitempty"`
 }
+
+type CustomerGetByEmailResponse []CustomerGetResponse
 
 type LegacyCustomerRequestBody struct {
 	Emails []string `json:"emails,omitempty"`
@@ -88,6 +91,37 @@ func (c *jiraServiceDeskClient) GetCustomerById(customerAccountId string) (Custo
 	customer = customerGetResponseToCustomerMapper(responseObject)
 
 	return customer, err
+}
+
+// GetCustomerById gets a customer by ID from JSD
+func (c *jiraServiceDeskClient) GetCustomerIdByEmail(emailAddress string) (string, error) {
+	request, err := c.newRequest("GET", SearchUserEndpoint+emailAddress, nil, false)
+	if err != nil {
+		return "", err
+	}
+
+	response, err := c.do(request)
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode < 200 || response.StatusCode > 299 {
+		err := errors.New("Rest request to get customer failed with status: " + strconv.Itoa(response.StatusCode))
+		return "", err
+	}
+
+	var responseObject CustomerGetByEmailResponse
+	err = json.NewDecoder(response.Body).Decode(&responseObject)
+	if err != nil {
+		return "", err
+	}
+
+	if len(responseObject) > 0 {
+		return responseObject[0].AccountId, err
+	}
+
+	return "", err
 }
 
 // CreateCustomer create a new customer on JSD
