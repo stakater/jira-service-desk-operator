@@ -36,6 +36,7 @@ const (
 	// TODO: Check if this is required in our case
 	// 	defaultRequeueTime        = 60 * time.Second
 	ProjectFinalizer string = "jiraservicedesk.stakater.com/project"
+	ProjectAlreadyExistsErr string = "A project with that name already exists."
 )
 
 // ProjectReconciler reconciles a Project object
@@ -136,7 +137,7 @@ func (r *ProjectReconciler) handleCreate(req ctrl.Request, instance *jiraservice
 	projectId, err := r.JiraServiceDeskClient.CreateProject(project)
 
 	// If project already exists then reconstruct status
-	if err != nil && strings.Contains(err.Error(), "A project with that name already exists.") {
+	if err != nil && strings.Contains(err.Error(), ProjectAlreadyExistsErr) {
 		existingProject, err := r.JiraServiceDeskClient.GetProjectByIdentifier(instance.Spec.Key)
 		if err != nil {
 			return reconcilerUtil.ManageError(r.Client, instance, err, false)
