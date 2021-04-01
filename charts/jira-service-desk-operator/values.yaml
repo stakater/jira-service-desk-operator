@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: stakater/jira-service-desk-operator
-  tag:  v0.0.39
+  tag:  v0.0.40
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 
