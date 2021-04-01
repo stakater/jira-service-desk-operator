@@ -68,7 +68,7 @@ type CustomerAccessRequestBody struct {
 	serviceDeskPublicSignup bool
 }
 
-func (c *jiraServiceDeskClient) GetProjectById(id string) (Project, error) {
+func (c *jiraServiceDeskClient) GetProjectByIdentifier(id string) (Project, error) {
 	var project Project
 
 	request, err := c.newRequest("GET", EndpointApiVersion3Project+"/"+id, nil, false)

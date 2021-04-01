@@ -94,6 +94,7 @@ func (r *CustomerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 	}
 
+	// If CustomerId exists in status, then it's an update request
 	if len(instance.Status.CustomerId) > 0 {
 		// Get the customer from Jira Service Desk
 		existingCustomer, err := r.JiraServiceDeskClient.GetCustomerById(instance.Status.CustomerId)
