@@ -71,8 +71,9 @@ func TestAPIs(t *testing.T) {
 
 var _ = BeforeSuite(func(done Done) {
 
-	logf.SetLogger(zap.LoggerTo(GinkgoWriter, true))
-
+	logger := zap.New(zap.UseDevMode(true), zap.WriteTo(GinkgoWriter))
+	logf.SetLogger(logger)
+	
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths: []string{filepath.Join("..", "config", "crd", "bases")},
