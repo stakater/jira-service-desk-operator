@@ -25,7 +25,7 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.2.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
-  name: jira-service-desk-operator.v0.0.42
+  name: jira-service-desk-operator.v0.0.43
   namespace: jira-service-desk-operator-system
 spec:
   apiservicedefinitions: {}
@@ -129,7 +129,7 @@ spec:
                 - --upstream=http://127.0.0.1:8080/
                 - --logtostderr=true
                 - --v=10
-                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.5.0
+                image: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.7.0
                 name: kube-rbac-proxy
                 ports:
                 - containerPort: 8443
@@ -147,7 +147,7 @@ spec:
                       fieldPath: metadata.annotations['olm.targetNamespaces']
                 - name: CONFIG_SECRET_NAME
                   value: jira-service-desk-config
-                image: stakater/jira-service-desk-operator:v0.0.42
+                image: stakater/jira-service-desk-operator:v0.0.43
                 name: manager
                 ports:
                 - containerPort: 9443
@@ -227,8 +227,8 @@ spec:
   provider:
     name: stakater
     url: https://stakater.com
-  replaces: jira-service-desk-operator.v0.0.41
-  version: 0.0.42
+  replaces: jira-service-desk-operator.v0.0.42
+  version: 0.0.43
   webhookdefinitions:
   - admissionReviewVersions:
     - v1beta1
