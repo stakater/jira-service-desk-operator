@@ -1,0 +1,248 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "jiraservicedesk.stakater.com/v1alpha1",
+          "kind": "Customer",
+          "metadata": {
+            "name": "customer"
+          },
+          "spec": {
+            "email": "samplecustomer@sample.com",
+            "name": "sample",
+            "projects": [
+              "TEST1",
+              "TEST2"
+            ]
+          }
+        },
+        {
+          "apiVersion": "jiraservicedesk.stakater.com/v1alpha1",
+          "kind": "Project",
+          "metadata": {
+            "name": "stakater"
+          },
+          "spec": {
+            "assigneeType": "PROJECT_LEAD",
+            "description": "Sample project for jira-service-desk-operator",
+            "key": "STK",
+            "leadAccountId": "5ebfbc3ead226b0ba46c3590",
+            "name": "stakater",
+            "projectTemplateKey": "com.atlassian.servicedesk:itil-v2-service-desk-project",
+            "projectTypeKey": "service_desk",
+            "url": "https://stakater.com"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    operators.operatorframework.io/builder: operator-sdk-v1.7.1+git
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: jira-service-desk-operator.v0.0.44
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Customer is the Schema for the customers API
+      displayName: Customer
+      kind: Customer
+      name: customers.jiraservicedesk.stakater.com
+      version: v1alpha1
+    - description: Project is the Schema for the projects API
+      displayName: Project
+      kind: Project
+      name: projects.jiraservicedesk.stakater.com
+      version: v1alpha1
+  description: Kubernetes operator for Jira Service Desk
+  displayName: jira-service-desk-operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - jiraservicedesk.stakater.com
+          resources:
+          - customers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - jiraservicedesk.stakater.com
+          resources:
+          - customers/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - jiraservicedesk.stakater.com
+          resources:
+          - projects
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - jiraservicedesk.stakater.com
+          resources:
+          - projects/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: jira-service-desk-operator-controller-manager
+      deployments:
+      - name: jira-service-desk-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=10
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                resources: {}
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                command:
+                - /manager
+                image: stakater/jira-service-desk-operator:v0.0.44
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 100m
+                    memory: 30Mi
+                  requests:
+                    cpu: 100m
+                    memory: 20Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: jira-service-desk-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: jira-service-desk-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - jira
+  - service desk
+  - operator
+  - openshift
+  - kubernetes
+  links:
+  - name: Jira Service Desk Operator
+    url: https://jira-service-desk-operator.domain
+  maintainers:
+  - email: hello@stakater.com
+    name: stakater
+  - email: ahmedwaleedmalik@gmail.com
+    name: ahmedwaleedmalik
+  maturity: alpha
+  provider:
+    name: stakater
+    url: https://stakater.com
+  version: 0.0.44

@@ -13,4 +13,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: stakater/jira-service-desk-operator
-  newTag: v0.0.43
+  newTag: v0.0.44
