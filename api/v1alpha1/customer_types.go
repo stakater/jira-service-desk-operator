@@ -1,5 +1,5 @@
 /*
-
+Copyright 2021.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
 const (
 	invalidUpdateErrorMsg string = " is an immutable field and can not be modified."
 	duplicateKeysErr      string = "Duplicate Project Keys are not allowed"
@@ -65,8 +64,8 @@ type CustomerStatus struct {
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
 
 // Customer is the Schema for the customers API
 type Customer struct {
@@ -77,7 +76,7 @@ type Customer struct {
 	Status CustomerStatus `json:"status,omitempty"`
 }
 
-// +kubebuilder:object:root=true
+//+kubebuilder:object:root=true
 
 // CustomerList contains a list of Customer
 type CustomerList struct {
