@@ -1,0 +1,100 @@
+
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  creationTimestamp: null
+  name: mutating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-jiraservicedesk-stakater-com-v1alpha1-customer
+  failurePolicy: Fail
+  name: mcustomer.kb.io
+  rules:
+  - apiGroups:
+    - jiraservicedesk.stakater.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - customers
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-jiraservicedesk-stakater-com-v1alpha1-project
+  failurePolicy: Fail
+  name: mproject.kb.io
+  rules:
+  - apiGroups:
+    - jiraservicedesk.stakater.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - projects
+  sideEffects: None
+
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  creationTimestamp: null
+  name: validating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-jiraservicedesk-stakater-com-v1alpha1-customer
+  failurePolicy: Fail
+  name: vcustomer.kb.io
+  rules:
+  - apiGroups:
+    - jiraservicedesk.stakater.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - customers
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-jiraservicedesk-stakater-com-v1alpha1-project
+  failurePolicy: Fail
+  name: vproject.kb.io
+  rules:
+  - apiGroups:
+    - jiraservicedesk.stakater.com
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - projects
+  sideEffects: None
