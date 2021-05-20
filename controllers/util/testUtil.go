@@ -129,7 +129,7 @@ func (t *TestUtil) CreateProject(project jiraservicedeskv1alpha1.Project, namesp
 
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: project.Spec.Name, Namespace: namespace}}
 
-	_, err = t.r.Reconcile(req)
+	_, err = t.r.Reconcile(context.Background(), req)
 	if err != nil {
 		ginkgo.Fail(err.Error())
 	}
@@ -148,7 +148,7 @@ func (t *TestUtil) CreateCustomer(customer jiraservicedeskv1alpha1.Customer, nam
 
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: customer.Spec.Name, Namespace: namespace}}
 
-	_, err = t.r.Reconcile(req)
+	_, err = t.r.Reconcile(context.Background(), req)
 	if err != nil {
 		ginkgo.Fail(err.Error())
 	}
@@ -166,7 +166,7 @@ func (t *TestUtil) UpdateCustomer(customerObject *jiraservicedeskv1alpha1.Custom
 
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: customerObject.Spec.Name, Namespace: namespace}}
 
-	_, err = t.r.Reconcile(req)
+	_, err = t.r.Reconcile(context.Background(), req)
 	if err != nil {
 		ginkgo.Fail(err.Error())
 	}
@@ -213,7 +213,7 @@ func (t *TestUtil) DeleteProject(name string, namespace string) {
 	}
 
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
-	_, err = t.r.Reconcile(req)
+	_, err = t.r.Reconcile(context.Background(), req)
 	if err != nil {
 		ginko.Fail(err.Error())
 	}
@@ -234,7 +234,7 @@ func (t *TestUtil) DeleteCustomer(name string, namespace string) {
 	}
 
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
-	_, err = t.r.Reconcile(req)
+	_, err = t.r.Reconcile(context.Background(), req)
 	if err != nil {
 		ginkgo.Fail(err.Error())
 	}
@@ -246,7 +246,7 @@ func (t *TestUtil) TryDeleteProject(name string, namespace string) {
 	_ = t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, projectObject)
 	_ = t.k8sClient.Delete(t.ctx, projectObject)
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
-	_, _ = t.r.Reconcile(req)
+	_, _ = t.r.Reconcile(context.Background(), req)
 }
 
 // TryDeleteCustomer - Tries to delete Customer if it exists, does not fail on any error
@@ -255,7 +255,7 @@ func (t *TestUtil) TryDeleteCustomer(name string, namespace string) {
 	_ = t.k8sClient.Get(t.ctx, types.NamespacedName{Name: name, Namespace: namespace}, customerObject)
 	_ = t.k8sClient.Delete(t.ctx, customerObject)
 	req := reconcile.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: namespace}}
-	_, _ = t.r.Reconcile(req)
+	_, _ = t.r.Reconcile(context.Background(), req)
 }
 
 // DeleteAllProjects delete all the projects in the namespace
