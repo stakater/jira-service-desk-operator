@@ -7,13 +7,6 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-  - list
-- apiGroups:
   - jiraservicedesk.stakater.com
   resources:
   - customers
@@ -25,6 +18,12 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - jiraservicedesk.stakater.com
+  resources:
+  - customers/finalizers
+  verbs:
+  - update
 - apiGroups:
   - jiraservicedesk.stakater.com
   resources:
@@ -45,6 +44,12 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - jiraservicedesk.stakater.com
+  resources:
+  - projects/finalizers
+  verbs:
+  - update
 - apiGroups:
   - jiraservicedesk.stakater.com
   resources:
