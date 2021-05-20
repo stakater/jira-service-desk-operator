@@ -1,0 +1,59 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+  name: jira-service-desk-operator.v0.0.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Customer is the Schema for the customers API
+      displayName: Customer
+      kind: Customer
+      name: customers.jiraservicedesk.stakater.com
+      version: v1alpha1
+    - description: Project is the Schema for the projects API
+      displayName: Project
+      kind: Project
+      name: projects.jiraservicedesk.stakater.com
+      version: v1alpha1
+  description: Kubernetes operator for Jira Service Desk
+  displayName: jira-service-desk-operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - jira
+  - service desk
+  - operator
+  - openshift
+  - kubernetes
+  links:
+  - name: Jira Service Desk Operator
+    url: https://jira-service-desk-operator.domain
+  maintainers:
+  - email: hello@stakater.com
+    name: stakater
+  - email: ahmedwaleedmalik@gmail.com
+    name: ahmedwaleedmalik
+  maturity: alpha
+  provider:
+    name: stakater
+    url: https://stakater.com
+  version: 0.0.0
