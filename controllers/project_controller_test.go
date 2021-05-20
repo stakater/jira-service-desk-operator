@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -75,7 +76,7 @@ var _ = Describe("Project Controller", func() {
 					}
 
 					req := reconcile.Request{NamespacedName: types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}}
-					_, err = r.Reconcile(req)
+					_, err = r.Reconcile(context.Background(), req)
 					if err != nil {
 						Fail(err.Error())
 					}
@@ -102,7 +103,7 @@ var _ = Describe("Project Controller", func() {
 					}
 
 					req := reconcile.Request{NamespacedName: types.NamespacedName{Name: projectInput.Spec.Name, Namespace: ns}}
-					_, err = r.Reconcile(req)
+					_, err = r.Reconcile(context.Background(), req)
 					if err != nil {
 						Fail(err.Error())
 					}

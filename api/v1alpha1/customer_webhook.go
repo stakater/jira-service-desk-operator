@@ -1,5 +1,5 @@
 /*
-
+Copyright 2021.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,7 +34,9 @@ func (r *Customer) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// +kubebuilder:webhook:path=/mutate-jiraservicedesk-stakater-com-v1alpha1-customer,mutating=true,failurePolicy=fail,groups=jiraservicedesk.stakater.com,resources=customers,verbs=create;update,versions=v1alpha1,name=mcustomer.kb.io
+// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+
+//+kubebuilder:webhook:path=/mutate-jiraservicedesk-stakater-com-v1alpha1-customer,mutating=true,failurePolicy=fail,sideEffects=None,groups=jiraservicedesk.stakater.com,resources=customers,verbs=create;update,versions=v1alpha1,name=mcustomer.kb.io,admissionReviewVersions={v1,v1beta1}
 
 var _ webhook.Defaulter = &Customer{}
 
@@ -46,7 +48,7 @@ func (r *Customer) Default() {
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
-// +kubebuilder:webhook:verbs=create;update,path=/validate-jiraservicedesk-stakater-com-v1alpha1-customer,mutating=false,failurePolicy=fail,groups=jiraservicedesk.stakater.com,resources=customers,versions=v1alpha1,name=vcustomer.kb.io
+//+kubebuilder:webhook:path=/validate-jiraservicedesk-stakater-com-v1alpha1-customer,mutating=false,failurePolicy=fail,sideEffects=None,groups=jiraservicedesk.stakater.com,resources=customers,verbs=create;update,versions=v1alpha1,name=vcustomer.kb.io,admissionReviewVersions={v1,v1beta1}
 
 var _ webhook.Validator = &Customer{}
 

@@ -51,7 +51,7 @@ type ProjectReconciler struct {
 // +kubebuilder:rbac:groups=jiraservicedesk.stakater.com,resources=projects/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list
 
-func (r *ProjectReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *ProjectReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	log := r.Log.WithValues("project", req.NamespacedName)
 

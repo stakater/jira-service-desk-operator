@@ -1,3 +1,5 @@
-## This file is auto-generated, do not modify ##
+## Append samples you want in your CSV to this file as resources ##
 resources:
+- jiraservicedesk_v1alpha1_customer.yaml
 - jiraservicedesk_v1alpha1_project.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
