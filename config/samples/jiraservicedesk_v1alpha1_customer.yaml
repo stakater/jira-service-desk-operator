@@ -1,7 +1,10 @@
 apiVersion: jiraservicedesk.stakater.com/v1alpha1
 kind: Customer
 metadata:
-  name: customer-sample
+  name: customer
 spec:
-  # Add fields here
-  foo: bar
+  name: sample
+  email: samplecustomer@sample.com
+  projects:
+    - TEST1
+    - TEST2
