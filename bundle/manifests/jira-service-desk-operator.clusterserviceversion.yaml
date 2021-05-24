@@ -40,7 +40,7 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.7.1+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
-  name: jira-service-desk-operator.v0.0.46
+  name: jira-service-desk-operator.v0.0.47
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -156,7 +156,7 @@ spec:
                 - --leader-elect
                 command:
                 - /manager
-                image: stakater/jira-service-desk-operator:v0.0.46
+                image: stakater/jira-service-desk-operator:v0.0.47
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -164,6 +164,10 @@ spec:
                   initialDelaySeconds: 15
                   periodSeconds: 20
                 name: manager
+                ports:
+                - containerPort: 9443
+                  name: webhook-server
+                  protocol: TCP
                 readinessProbe:
                   httpGet:
                     path: /readyz
@@ -179,10 +183,19 @@ spec:
                     memory: 20Mi
                 securityContext:
                   allowPrivilegeEscalation: false
+                volumeMounts:
+                - mountPath: /tmp/k8s-webhook-server/serving-certs
+                  name: cert
+                  readOnly: true
               securityContext:
                 runAsNonRoot: true
               serviceAccountName: jira-service-desk-operator-controller-manager
               terminationGracePeriodSeconds: 10
+              volumes:
+              - name: cert
+                secret:
+                  defaultMode: 420
+                  secretName: webhook-server-cert
       permissions:
       - rules:
         - apiGroups:
@@ -245,4 +258,89 @@ spec:
   provider:
     name: stakater
     url: https://stakater.com
-  version: 0.0.46
+  version: 0.0.47
+  webhookdefinitions:
+  - admissionReviewVersions:
+    - v1
+    - v1beta1
+    containerPort: 443
+    deploymentName: jira-service-desk-operator-controller-manager
+    failurePolicy: Fail
+    generateName: vcustomer.kb.io
+    rules:
+    - apiGroups:
+      - jiraservicedesk.stakater.com
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - customers
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-jiraservicedesk-stakater-com-v1alpha1-customer
+  - admissionReviewVersions:
+    - v1
+    - v1beta1
+    containerPort: 443
+    deploymentName: jira-service-desk-operator-controller-manager
+    failurePolicy: Fail
+    generateName: vproject.kb.io
+    rules:
+    - apiGroups:
+      - jiraservicedesk.stakater.com
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - projects
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-jiraservicedesk-stakater-com-v1alpha1-project
+  - admissionReviewVersions:
+    - v1
+    - v1beta1
+    containerPort: 443
+    deploymentName: jira-service-desk-operator-controller-manager
+    failurePolicy: Fail
+    generateName: mcustomer.kb.io
+    rules:
+    - apiGroups:
+      - jiraservicedesk.stakater.com
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - customers
+    sideEffects: None
+    targetPort: 9443
+    type: MutatingAdmissionWebhook
+    webhookPath: /mutate-jiraservicedesk-stakater-com-v1alpha1-customer
+  - admissionReviewVersions:
+    - v1
+    - v1beta1
+    containerPort: 443
+    deploymentName: jira-service-desk-operator-controller-manager
+    failurePolicy: Fail
+    generateName: mproject.kb.io
+    rules:
+    - apiGroups:
+      - jiraservicedesk.stakater.com
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - projects
+    sideEffects: None
+    targetPort: 9443
+    type: MutatingAdmissionWebhook
+    webhookPath: /mutate-jiraservicedesk-stakater-com-v1alpha1-project
