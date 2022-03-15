@@ -1,6 +1,6 @@
 {{- if .Values.webhook.enabled }}
 
-{{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1alpha2") -}}
+{{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") -}}
     {{- fail "cert-manager is not installed" }}
 {{ end }}
 ---
