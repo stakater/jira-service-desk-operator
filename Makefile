@@ -219,3 +219,4 @@ bump-chart:
 
 generate-crds: controller-gen
 	$(CONTROLLER_GEN) crd paths="./..." output:crd:artifacts:config=charts/jira-service-desk-operator/crds
+
