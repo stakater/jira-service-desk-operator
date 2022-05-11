@@ -105,7 +105,7 @@ var _ = BeforeSuite(func(done Done) {
 
 	apiBaseUrl, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskAPIBaseURLSecretKey)
 	Expect(err).ToNot(HaveOccurred())
-	Expect(apiBaseUrl).ToNot(BeNil())
+	Expect(apiBaseUrl).To(BeNil())
 
 	email, err := secretsUtil.LoadSecretDataUsingClient(k8sClient, config.JiraServiceDeskSecretName, ns, config.JiraServiceDeskEmailSecretKey)
 	Expect(err).ToNot(HaveOccurred())
