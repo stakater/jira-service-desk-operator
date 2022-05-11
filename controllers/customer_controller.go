@@ -64,7 +64,7 @@ func (r *CustomerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			// Return and don't requeue
 			return reconcilerUtil.DoNotRequeue()
 		}
-		// Error reading the object - donot requeue the request
+		// Error reading the object - don't requeue the request
 		return reconcilerUtil.RequeueWithError(err)
 	}
 
