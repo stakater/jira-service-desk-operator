@@ -15,7 +15,7 @@ spec:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+        kubectl.kubernetes.io/default-container: manager
       {{- end }}
       labels:
         {{- include "jira-service-desk-operator.selectorLabels" . | nindent 8 }}
