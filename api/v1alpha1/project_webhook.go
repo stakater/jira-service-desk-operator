@@ -36,7 +36,7 @@ func (r *Project) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 
-//+kubebuilder:webhook:path=/mutate-jiraservicedesk-stakater-com-v1alpha1-project,mutating=true,failurePolicy=fail,sideEffects=None,groups=jiraservicedesk.stakater.com,resources=projects,verbs=create;update,versions=v1alpha1,name=mproject.kb.io,admissionReviewVersions={v1,v1beta1}
+//+kubebuilder:webhook:path=/mutate-jiraservicedesk-stakater-com-v1alpha1-project,mutating=true,failurePolicy=fail,sideEffects=None,groups=jiraservicedesk.stakater.com,resources=projects,verbs=create;update,versions=v1alpha1,name=mproject.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &Project{}
 
@@ -48,7 +48,7 @@ func (r *Project) Default() {
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
-//+kubebuilder:webhook:path=/validate-jiraservicedesk-stakater-com-v1alpha1-project,mutating=false,failurePolicy=fail,sideEffects=None,groups=jiraservicedesk.stakater.com,resources=projects,verbs=create;update,versions=v1alpha1,name=vproject.kb.io,admissionReviewVersions={v1,v1beta1}
+//+kubebuilder:webhook:path=/validate-jiraservicedesk-stakater-com-v1alpha1-project,mutating=false,failurePolicy=fail,sideEffects=None,groups=jiraservicedesk.stakater.com,resources=projects,verbs=create;update,versions=v1alpha1,name=vproject.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Validator = &Project{}
 

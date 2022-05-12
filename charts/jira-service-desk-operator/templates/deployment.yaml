@@ -15,7 +15,7 @@ spec:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+        kubectl.kubernetes.io/default-container: manager
       {{- end }}
       labels:
         {{- include "jira-service-desk-operator.selectorLabels" . | nindent 8 }}
@@ -32,13 +32,13 @@ spec:
         - --secure-listen-address=0.0.0.0:8443
         - --upstream=http://127.0.0.1:8080/
         - --logtostderr=true
-        - --v=10
+        - --v=0
         # Issue: https://github.com/operator-framework/operator-sdk/issues/4813
         image: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.7.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: kube-rbac-proxy
         ports:
-        - containerPort: 8443
+        - protocol: TCP
           name: https
       - args:
         - --health-probe-bind-address=:8081
