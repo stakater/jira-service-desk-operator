@@ -57,7 +57,7 @@ jobs:
       run: |
         kubectl cluster-info
         kubectl create namespace test
-        echo "${{ JIRA_SERVICE_DESK_CONFIG }}"> kube.yaml
+        echo "${{ secrets.JIRA_SERVICE_DESK_CONFIG }}"> kube.yaml
         kubectl apply -f kube.yaml
         rm -f kube.yaml
         
