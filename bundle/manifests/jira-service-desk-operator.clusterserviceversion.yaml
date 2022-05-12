@@ -38,7 +38,7 @@ metadata:
         }
       ]
     capabilities: Basic Install
-    operators.operatorframework.io/builder: operator-sdk-v1.11.0+git
+    operators.operatorframework.io/builder: operator-sdk-v1.14.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
   name: jira-service-desk-operator.v0.0.47
   namespace: placeholder
@@ -262,7 +262,6 @@ spec:
   webhookdefinitions:
   - admissionReviewVersions:
     - v1
-    - v1beta1
     containerPort: 443
     deploymentName: jira-service-desk-operator-controller-manager
     failurePolicy: Fail
@@ -283,7 +282,6 @@ spec:
     webhookPath: /validate-jiraservicedesk-stakater-com-v1alpha1-customer
   - admissionReviewVersions:
     - v1
-    - v1beta1
     containerPort: 443
     deploymentName: jira-service-desk-operator-controller-manager
     failurePolicy: Fail
@@ -304,7 +302,6 @@ spec:
     webhookPath: /validate-jiraservicedesk-stakater-com-v1alpha1-project
   - admissionReviewVersions:
     - v1
-    - v1beta1
     containerPort: 443
     deploymentName: jira-service-desk-operator-controller-manager
     failurePolicy: Fail
@@ -325,7 +322,6 @@ spec:
     webhookPath: /mutate-jiraservicedesk-stakater-com-v1alpha1-customer
   - admissionReviewVersions:
     - v1
-    - v1beta1
     containerPort: 443
     deploymentName: jira-service-desk-operator-controller-manager
     failurePolicy: Fail
