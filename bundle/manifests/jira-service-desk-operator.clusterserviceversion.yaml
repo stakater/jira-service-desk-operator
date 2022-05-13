@@ -188,7 +188,7 @@ spec:
                 image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
                 name: kube-rbac-proxy
                 ports:
-                - containerPort: 0
+                - containerPort: 8443
                   name: https
                   protocol: TCP
                 resources:
@@ -273,6 +273,7 @@ spec:
   webhookdefinitions:
   - admissionReviewVersions:
     - v1
+    containerPort: 443
     deploymentName: jira-service-desk-operator-controller-manager
     failurePolicy: Fail
     generateName: mcustomer.kb.io
@@ -287,10 +288,12 @@ spec:
       resources:
       - customers
     sideEffects: None
+    targetPort: 9443
     type: MutatingAdmissionWebhook
     webhookPath: /mutate-jiraservicedesk-stakater-com-v1alpha1-customer
   - admissionReviewVersions:
     - v1
+    containerPort: 443
     deploymentName: jira-service-desk-operator-controller-manager
     failurePolicy: Fail
     generateName: mproject.kb.io
@@ -305,10 +308,12 @@ spec:
       resources:
       - projects
     sideEffects: None
+    targetPort: 9443
     type: MutatingAdmissionWebhook
     webhookPath: /mutate-jiraservicedesk-stakater-com-v1alpha1-project
   - admissionReviewVersions:
     - v1
+    containerPort: 443
     deploymentName: jira-service-desk-operator-controller-manager
     failurePolicy: Fail
     generateName: vcustomer.kb.io
@@ -323,10 +328,12 @@ spec:
       resources:
       - customers
     sideEffects: None
+    targetPort: 9443
     type: ValidatingAdmissionWebhook
     webhookPath: /validate-jiraservicedesk-stakater-com-v1alpha1-customer
   - admissionReviewVersions:
     - v1
+    containerPort: 443
     deploymentName: jira-service-desk-operator-controller-manager
     failurePolicy: Fail
     generateName: vproject.kb.io
@@ -341,5 +348,6 @@ spec:
       resources:
       - projects
     sideEffects: None
+    targetPort: 9443
     type: ValidatingAdmissionWebhook
     webhookPath: /validate-jiraservicedesk-stakater-com-v1alpha1-project
