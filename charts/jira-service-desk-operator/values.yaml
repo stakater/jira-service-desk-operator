@@ -18,6 +18,7 @@ webhook:
 
 service:
   type: ClusterIP
+  port: 443
   protocol: TCP
 
 # Monitoring Configuration

@@ -24,7 +24,8 @@ spec:
         - "--logtostderr=true"
         - "--v=0"
         ports:
-        - protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
           name: https
       - name: manager
         args:
