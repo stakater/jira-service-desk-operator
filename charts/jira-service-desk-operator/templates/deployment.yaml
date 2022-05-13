@@ -75,7 +75,6 @@ spec:
         ports:
         - containerPort: 9443
           name: webhook-server
-          port: 443
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         volumeMounts:

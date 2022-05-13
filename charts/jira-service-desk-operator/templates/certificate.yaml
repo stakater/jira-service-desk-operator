@@ -1,7 +1,7 @@
 {{- if .Values.webhook.enabled }}
 
 {{- if not (.Capabilities.APIVersions.Has "cert-manager.io/v1") -}}
-    {{- fail "cert-manager is not installed" }}
+    {{- fail "cert-manager/v1 CRDs not installed" }}
 {{ end }}
 ---
 apiVersion: cert-manager.io/v1
