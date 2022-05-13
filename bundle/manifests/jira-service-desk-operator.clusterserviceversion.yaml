@@ -40,7 +40,7 @@ metadata:
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.19.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
-  name: jira-service-desk-operator.v0.0.48
+  name: jira-service-desk-operator.v0.0.49
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -149,7 +149,7 @@ spec:
                 - --leader-elect
                 command:
                 - /manager
-                image: stakater/jira-service-desk-operator:v0.0.48
+                image: stakater/jira-service-desk-operator:v0.0.49
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -269,7 +269,7 @@ spec:
   provider:
     name: stakater
     url: https://stakater.com
-  version: 0.0.48
+  version: 0.0.49
   webhookdefinitions:
   - admissionReviewVersions:
     - v1
